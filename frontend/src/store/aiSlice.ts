@@ -24,24 +24,8 @@ interface AIState {
   lastDocumentFilename: string;
 }
 
-const initialWelcomeMessage: ChatMessage = {
-  id: 'welcome-1',
-  sender: 'assistant',
-  text: `**AIVOA Quality Copilot**
-Assistant for Pharmaceutical Complaint Intake & Risk Triage.
-
-**Available Capabilities:**
-• **Natural-Language Logging:** Enter raw complaint emails, customer reports, or quality observations.
-• **Document Ingestion:** Drag and drop **PDF, DOCX, TXT, or EML** files.
-• **Controlled Record Edits:** Request field changes such as *"Update affected quantity to 40 kg"* or *"Set batch number to PA240813"*.
-• **Automated QMS Triage:** Deterministic severity scoring, evidence extraction, and audit trails.
-
-*Select a quick action or upload a file below to begin.*`,
-  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-};
-
 const initialState: AIState = {
-  messages: [initialWelcomeMessage],
+  messages: [],
   loading: false,
   processingState: 'IDLE',
   statusText: 'Idle',
@@ -116,7 +100,7 @@ export const aiSlice = createSlice({
       state.isAnalyticsOpen = action.payload;
     },
     resetAI: (state) => {
-      state.messages = [initialWelcomeMessage];
+      state.messages = [];
       state.loading = false;
       state.processingState = 'IDLE';
       state.statusText = 'Idle';

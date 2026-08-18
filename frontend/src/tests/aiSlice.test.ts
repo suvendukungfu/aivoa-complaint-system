@@ -7,9 +7,9 @@ import aiReducer, {
 } from '../store/aiSlice';
 
 describe('Redux aiSlice', () => {
-  it('should initialize with welcome message and idle status', () => {
+  it('should initialize with empty messages and idle status', () => {
     const state = aiReducer(undefined, { type: 'unknown' });
-    expect(state.messages.length).toBeGreaterThan(0);
+    expect(state.messages.length).toBe(0);
     expect(state.loading).toBe(false);
     expect(state.statusText).toBe('Idle');
     expect(state.riskAssessment).toBeNull();
@@ -71,6 +71,7 @@ describe('Redux aiSlice', () => {
     expect(resetState.loading).toBe(false);
     expect(resetState.statusText).toBe('Idle');
     expect(resetState.riskAssessment).toBeNull();
+    expect(resetState.messages.length).toBe(0);
     expect(resetState.isObservabilityOpen).toBe(false);
   });
 });

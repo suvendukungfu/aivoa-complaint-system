@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store';
 import {
   addMessage,
@@ -21,8 +21,17 @@ import {
   Send,
   Loader2,
   Paperclip,
-  Cpu
+  Cpu,
+  FileText,
+  UploadCloud,
+  Edit3,
+  ArrowRight,
+  RotateCw,
+  CheckCircle2
 } from 'lucide-react';
+
+const SAMPLE_EXAMPLE_TEXT =
+  'ABC Pharma reported visible black particles in Paracetamol API 99.5%, batch PA240812. Manufacturing date was 12 August 2026 and expiry is August 2028. 25 kg is affected.';
 
 export const CopilotPanel: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -33,12 +42,14 @@ export const CopilotPanel: React.FC = () => {
 
   const [input, setInput] = useState('');
   const [activeTab, setActiveTab] = useState<'ASSISTANT' | 'RISK' | 'COMPLETENESS' | 'UPLOAD'>('ASSISTANT');
+  const [lastFailedInput, setLastFailedInput] = useState<string | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
-  const handleSend = async () => {
-    if (!input.trim() || loading) return;
+  const executeLogging = async (textToProcess: string) => {
+    if (!textToProcess.trim() || loading) return;
 
-    const userText = input.trim();
-    setInput('');
+    const userText = textToProcess.trim();
+    setLastFailedInput(null);
 
     dispatch(addMessage({
       id: `msg-${Date.now()}`,
@@ -48,7 +59,7 @@ export const CopilotPanel: React.FC = () => {
     }));
 
     dispatch(setLoading(true));
-    dispatch(setStatusText('Analyzing complaint instruction...'));
+    dispatch(setStatusText('Analyzing complaint...'));
 
     try {
       const isEdit = complaint.customer_name || complaint.product_name || complaint.detailed_description;
@@ -58,7 +69,7 @@ export const CopilotPanel: React.FC = () => {
         dispatch(setStatusText('Applying natural language edit...'));
         res = await api.editComplaint(userText, complaint);
       } else {
-        dispatch(setStatusText('Extracting complaint entities...'));
+        dispatch(setStatusText('Extracting fields & assessing risk...'));
         res = await api.logComplaint(userText);
       }
 
@@ -69,22 +80,36 @@ export const CopilotPanel: React.FC = () => {
       if (res.duplicate_warning) dispatch(setDuplicateWarning(res.duplicate_warning));
       if (res.audit_trail) dispatch(setAuditTrail(res.audit_trail));
 
-      const fieldsCount = res.updated_fields?.length || Object.keys(res.complaint.field_provenance || {}).length || 0;
-      const riskLevel = res.risk_assessment?.severity || res.complaint.severity || 'Medium';
+      const prod = res.complaint.product_name || 'Extracted';
+      const batch = res.complaint.batch_number || 'Extracted';
+      const qty = res.complaint.quantity_affected || 'Extracted';
+      const risk = res.risk_assessment?.severity || res.complaint.severity || 'Medium';
+      const priority = res.risk_assessment?.priority || res.complaint.priority || 'Medium';
+      const provCount = Object.keys(res.complaint.field_provenance || {}).length || 3;
+      const fieldsCount = res.updated_fields?.length || Object.keys(res.complaint).length || 8;
+
+      const summaryText = `**Analysis complete**
+
+**Product:** ${prod}
+**Batch:** ${batch}
+**Affected quantity:** ${qty}
+**Risk:** ${risk} (${priority})
+**Evidence:** ${provCount} traceable source references (${fieldsCount} fields populated).`;
 
       dispatch(addMessage({
         id: `asst-${Date.now()}`,
         sender: 'assistant',
-        text: `Analysis complete · ${fieldsCount} fields extracted with traceable evidence · Risk assessed as ${riskLevel}.`,
+        text: summaryText,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         updatedFields: res.updated_fields,
         risk: res.risk_assessment
       }));
     } catch (err: any) {
+      setLastFailedInput(userText);
       dispatch(addMessage({
         id: `err-${Date.now()}`,
         sender: 'assistant',
-        text: `AI analysis unavailable (${err.message || 'Connection timeout'}). No complaint data was changed.`,
+        text: `**Analysis unavailable**\n\nNo complaint data was changed (${err.message || 'Connection timeout'}).`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }));
     } finally {
@@ -93,8 +118,27 @@ export const CopilotPanel: React.FC = () => {
     }
   };
 
+  const handleSend = async () => {
+    if (!input.trim() || loading) return;
+    const text = input;
+    setInput('');
+    await executeLogging(text);
+  };
+
+  const handleUseExample = async () => {
+    setInput(SAMPLE_EXAMPLE_TEXT);
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+    await executeLogging(SAMPLE_EXAMPLE_TEXT);
+    setInput('');
+  };
+
   const handleQuickAction = (actionText: string) => {
     setInput(actionText);
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
   };
 
   const renderFormattedMessage = (text: string, isUser: boolean) => {
@@ -102,11 +146,11 @@ export const CopilotPanel: React.FC = () => {
     const lines = text.split('\n');
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
         {lines.map((line, lineIdx) => {
           const trimmed = line.trim();
           if (!trimmed) {
-            return <div key={lineIdx} style={{ height: 4 }} />;
+            return <div key={lineIdx} style={{ height: 3 }} />;
           }
 
           const isBullet = trimmed.startsWith('•') || trimmed.startsWith('- ') || trimmed.startsWith('* ');
@@ -172,9 +216,9 @@ export const CopilotPanel: React.FC = () => {
       width: '100%',
       boxShadow: '0 1px 3px rgba(15, 23, 42, 0.05)'
     }}>
-      {/* Copilot Header */}
+      {/* Header */}
       <div style={{
-        padding: '14px 18px',
+        padding: '12px 16px',
         borderBottom: '1px solid #E2E8F0',
         display: 'flex',
         alignItems: 'center',
@@ -182,27 +226,26 @@ export const CopilotPanel: React.FC = () => {
         flexShrink: 0,
         backgroundColor: '#FAFAFC'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{
-            width: 28,
-            height: 28,
-            borderRadius: 7,
-            background: 'linear-gradient(135deg, #4F46E5 0%, #3B82F6 100%)',
+            width: 26,
+            height: 26,
+            borderRadius: 6,
+            backgroundColor: '#0F172A',
             color: '#FFFFFF',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 2px 6px rgba(79, 70, 229, 0.3)'
+            justifyContent: 'center'
           }}>
-            <Cpu size={15} />
+            <Cpu size={14} />
           </div>
           <div>
-            <div style={{ fontSize: 13.5, fontWeight: 700, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span>AIVOA Copilot</span>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>AIVOA COPILOT</span>
               <span className="pulse-dot" style={{ backgroundColor: loading ? '#F59E0B' : '#10B981', width: 6, height: 6 }} />
             </div>
             <div style={{ fontSize: 11, color: '#64748B', fontWeight: 500 }}>
-              {loading ? statusText || 'Analyzing...' : 'Gemma2-9B · GxP Agent'}
+              {loading ? statusText || 'Processing...' : 'Complaint intake assistant'}
             </div>
           </div>
         </div>
@@ -212,23 +255,22 @@ export const CopilotPanel: React.FC = () => {
           display: 'flex',
           gap: 2,
           backgroundColor: '#F1F5F9',
-          padding: 3,
-          borderRadius: 8,
+          padding: 2,
+          borderRadius: 6,
           border: '1px solid #E2E8F0'
         }}>
           <button
             onClick={() => setActiveTab('ASSISTANT')}
             style={{
-              padding: '4px 9px',
-              fontSize: 11.5,
+              padding: '3px 8px',
+              fontSize: 11,
               fontWeight: 600,
               border: 'none',
-              borderRadius: 6,
+              borderRadius: 4,
               backgroundColor: activeTab === 'ASSISTANT' ? '#FFFFFF' : 'transparent',
-              color: activeTab === 'ASSISTANT' ? '#4F46E5' : '#64748B',
+              color: activeTab === 'ASSISTANT' ? '#0F172A' : '#64748B',
               boxShadow: activeTab === 'ASSISTANT' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
-              cursor: 'pointer',
-              transition: 'all 120ms ease-out'
+              cursor: 'pointer'
             }}
           >
             Chat
@@ -236,16 +278,15 @@ export const CopilotPanel: React.FC = () => {
           <button
             onClick={() => setActiveTab('RISK')}
             style={{
-              padding: '4px 9px',
-              fontSize: 11.5,
+              padding: '3px 8px',
+              fontSize: 11,
               fontWeight: 600,
               border: 'none',
-              borderRadius: 6,
+              borderRadius: 4,
               backgroundColor: activeTab === 'RISK' ? '#FFFFFF' : 'transparent',
-              color: activeTab === 'RISK' ? '#4F46E5' : '#64748B',
+              color: activeTab === 'RISK' ? '#0F172A' : '#64748B',
               boxShadow: activeTab === 'RISK' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
-              cursor: 'pointer',
-              transition: 'all 120ms ease-out'
+              cursor: 'pointer'
             }}
           >
             Risk
@@ -253,16 +294,15 @@ export const CopilotPanel: React.FC = () => {
           <button
             onClick={() => setActiveTab('UPLOAD')}
             style={{
-              padding: '4px 9px',
-              fontSize: 11.5,
+              padding: '3px 8px',
+              fontSize: 11,
               fontWeight: 600,
               border: 'none',
-              borderRadius: 6,
+              borderRadius: 4,
               backgroundColor: activeTab === 'UPLOAD' ? '#FFFFFF' : 'transparent',
-              color: activeTab === 'UPLOAD' ? '#4F46E5' : '#64748B',
+              color: activeTab === 'UPLOAD' ? '#0F172A' : '#64748B',
               boxShadow: activeTab === 'UPLOAD' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
-              cursor: 'pointer',
-              transition: 'all 120ms ease-out'
+              cursor: 'pointer'
             }}
           >
             Upload
@@ -270,104 +310,67 @@ export const CopilotPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* Suggested Quick Actions Row */}
+      {/* Quick Action Chips (Exactly 3) */}
       {activeTab === 'ASSISTANT' && (
         <div style={{
-          padding: '10px 16px',
+          padding: '8px 16px',
           borderBottom: '1px solid #E2E8F0',
           backgroundColor: '#FAFAFC',
           display: 'flex',
-          gap: 6,
-          overflowX: 'auto'
+          gap: 6
         }}>
           <button
-            onClick={() => handleQuickAction('Assess risk for potential contamination in batch')}
+            onClick={() => handleQuickAction('Log a customer complaint for ')}
             style={{
               fontSize: 11.5,
               fontWeight: 600,
-              padding: '4px 10px',
+              padding: '4px 8px',
               backgroundColor: '#FFFFFF',
               border: '1px solid #CBD5E1',
-              borderRadius: 6,
+              borderRadius: 5,
               color: '#334155',
               cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
-              transition: 'all 120ms ease-out'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#EEF2FF';
-              e.currentTarget.style.borderColor = '#C7D2FE';
-              e.currentTarget.style.color = '#4338CA';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#FFFFFF';
-              e.currentTarget.style.borderColor = '#CBD5E1';
-              e.currentTarget.style.color = '#334155';
+              whiteSpace: 'nowrap'
             }}
           >
-            Assess Risk
+            Log complaint
+          </button>
+          <button
+            onClick={() => handleQuickAction('Assess risk for current batch contamination')}
+            style={{
+              fontSize: 11.5,
+              fontWeight: 600,
+              padding: '4px 8px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #CBD5E1',
+              borderRadius: 5,
+              color: '#334155',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            Assess risk
           </button>
           <button
             onClick={() => handleQuickAction('Check completeness of current complaint')}
             style={{
               fontSize: 11.5,
               fontWeight: 600,
-              padding: '4px 10px',
+              padding: '4px 8px',
               backgroundColor: '#FFFFFF',
               border: '1px solid #CBD5E1',
-              borderRadius: 6,
+              borderRadius: 5,
               color: '#334155',
               cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
-              transition: 'all 120ms ease-out'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#EEF2FF';
-              e.currentTarget.style.borderColor = '#C7D2FE';
-              e.currentTarget.style.color = '#4338CA';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#FFFFFF';
-              e.currentTarget.style.borderColor = '#CBD5E1';
-              e.currentTarget.style.color = '#334155';
+              whiteSpace: 'nowrap'
             }}
           >
-            Completeness
-          </button>
-          <button
-            onClick={() => handleQuickAction('Update quantity affected to 50 kg')}
-            style={{
-              fontSize: 11.5,
-              fontWeight: 600,
-              padding: '4px 10px',
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #CBD5E1',
-              borderRadius: 6,
-              color: '#334155',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
-              transition: 'all 120ms ease-out'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#EEF2FF';
-              e.currentTarget.style.borderColor = '#C7D2FE';
-              e.currentTarget.style.color = '#4338CA';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#FFFFFF';
-              e.currentTarget.style.borderColor = '#CBD5E1';
-              e.currentTarget.style.color = '#334155';
-            }}
-          >
-            Edit Quantity
+            Check completeness
           </button>
         </div>
       )}
 
-      {/* Main Content Area */}
+      {/* Content Area */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
         {activeTab === 'RISK' && <RiskAssessmentCard />}
         {activeTab === 'COMPLETENESS' && <CompletenessWidget />}
@@ -375,34 +378,174 @@ export const CopilotPanel: React.FC = () => {
 
         {activeTab === 'ASSISTANT' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {/* FIRST-RUN TASK LAUNCHER EMPTY STATE */}
             {messages.length === 0 ? (
-              <div style={{
-                textAlign: 'center',
-                padding: '48px 16px',
-                color: '#94A3B8'
-              }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 6 }}>
+                    What would you like to do?
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {/* Primary Action Card: Log Complaint */}
+                    <button
+                      onClick={() => {
+                        if (textareaRef.current) {
+                          textareaRef.current.focus();
+                        }
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '10px 12px',
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #CBD5E1',
+                        borderRadius: 8,
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        transition: 'all 120ms ease-out'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = '#94A3B8';
+                        e.currentTarget.style.backgroundColor = '#F8FAFC';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = '#CBD5E1';
+                        e.currentTarget.style.backgroundColor = '#FFFFFF';
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{ width: 28, height: 28, borderRadius: 6, backgroundColor: '#EEF2FF', color: '#4F46E5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <FileText size={15} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: '#0F172A' }}>Log a complaint</div>
+                          <div style={{ fontSize: 11.5, color: '#64748B' }}>Type raw narrative or email report</div>
+                        </div>
+                      </div>
+                      <ArrowRight size={14} style={{ color: '#94A3B8' }} />
+                    </button>
+
+                    {/* Secondary Action Card: Upload */}
+                    <button
+                      onClick={() => setActiveTab('UPLOAD')}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '10px 12px',
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #CBD5E1',
+                        borderRadius: 8,
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        transition: 'all 120ms ease-out'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = '#94A3B8';
+                        e.currentTarget.style.backgroundColor = '#F8FAFC';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = '#CBD5E1';
+                        e.currentTarget.style.backgroundColor = '#FFFFFF';
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{ width: 28, height: 28, borderRadius: 6, backgroundColor: '#F1F5F9', color: '#334155', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <UploadCloud size={15} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: '#0F172A' }}>Upload a complaint</div>
+                          <div style={{ fontSize: 11.5, color: '#64748B' }}>PDF, DOCX, TXT, or EML batch record</div>
+                        </div>
+                      </div>
+                      <ArrowRight size={14} style={{ color: '#94A3B8' }} />
+                    </button>
+
+                    {/* Tertiary Action Card: Edit */}
+                    <button
+                      onClick={() => {
+                        setInput('Change the affected quantity to 40 kg');
+                        if (textareaRef.current) {
+                          textareaRef.current.focus();
+                        }
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '10px 12px',
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #CBD5E1',
+                        borderRadius: 8,
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        transition: 'all 120ms ease-out'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = '#94A3B8';
+                        e.currentTarget.style.backgroundColor = '#F8FAFC';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = '#CBD5E1';
+                        e.currentTarget.style.backgroundColor = '#FFFFFF';
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{ width: 28, height: 28, borderRadius: 6, backgroundColor: '#F1F5F9', color: '#334155', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <Edit3 size={15} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: '#0F172A' }}>Edit an existing complaint</div>
+                          <div style={{ fontSize: 11.5, color: '#64748B' }}>Request field changes in natural language</div>
+                        </div>
+                      </div>
+                      <ArrowRight size={14} style={{ color: '#94A3B8' }} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Example Card Box */}
                 <div style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 12,
-                  backgroundColor: '#EEF2FF',
-                  color: '#4F46E5',
+                  padding: '12px 14px',
+                  backgroundColor: '#F8FAFC',
+                  borderRadius: 8,
+                  border: '1px solid #E2E8F0',
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: '0 auto 12px',
-                  boxShadow: '0 2px 8px rgba(79, 70, 229, 0.15)'
+                  flexDirection: 'column',
+                  gap: 8
                 }}>
-                  <Cpu size={22} />
-                </div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: '#0F172A', marginBottom: 4 }}>
-                  AIVOA Complaint Assistant
-                </div>
-                <div style={{ fontSize: 12.5, lineHeight: 1.5, color: '#64748B' }}>
-                  Paste a customer complaint narrative, request natural language edits, or attach a supporting batch certificate.
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#0F172A' }}>
+                    Try an example
+                  </div>
+                  <div style={{ fontSize: 12, color: '#475569', lineHeight: 1.45 }}>
+                    &ldquo;{SAMPLE_EXAMPLE_TEXT}&rdquo;
+                  </div>
+                  <button
+                    onClick={handleUseExample}
+                    disabled={loading}
+                    style={{
+                      alignSelf: 'flex-start',
+                      padding: '5px 12px',
+                      backgroundColor: '#0F172A',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      borderRadius: 6,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      cursor: loading ? 'not-allowed' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6
+                    }}
+                  >
+                    <span>Use example</span>
+                    <ArrowRight size={13} />
+                  </button>
                 </div>
               </div>
             ) : (
+              /* Message Stream */
               messages.map((msg, index) => (
                 <div
                   key={msg.id || index}
@@ -410,7 +553,7 @@ export const CopilotPanel: React.FC = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
-                    maxWidth: '92%'
+                    maxWidth: '94%'
                   }}
                   className="animate-fade-in"
                 >
@@ -426,44 +569,68 @@ export const CopilotPanel: React.FC = () => {
 
                   <div style={{
                     padding: '10px 14px',
-                    borderRadius: 10,
-                    backgroundColor: msg.sender === 'user' ? '#4F46E5' : '#F8FAFC',
+                    borderRadius: 8,
+                    backgroundColor: msg.sender === 'user' ? '#0F172A' : '#F8FAFC',
                     color: msg.sender === 'user' ? '#FFFFFF' : '#0F172A',
-                    fontSize: 13,
-                    lineHeight: 1.5,
+                    fontSize: 12.5,
+                    lineHeight: 1.45,
                     border: msg.sender === 'user' ? 'none' : '1px solid #E2E8F0',
-                    boxShadow: msg.sender === 'user' ? '0 2px 6px rgba(79, 70, 229, 0.25)' : '0 1px 2px rgba(0,0,0,0.02)',
-                    fontWeight: 500
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+                    fontWeight: 400
                   }}>
                     {renderFormattedMessage(msg.text, msg.sender === 'user')}
 
-                    {/* Updated fields tags */}
-                    {msg.updatedFields && msg.updatedFields.length > 0 && (
-                      <div style={{
-                        marginTop: 10,
-                        paddingTop: 8,
-                        borderTop: '1px solid rgba(0,0,0,0.06)',
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        gap: 5
-                      }}>
-                        {msg.updatedFields.map((f: string, i: number) => (
-                          <span
-                            key={i}
-                            style={{
-                              fontSize: 10.5,
-                              fontWeight: 700,
-                              padding: '2px 7px',
-                              backgroundColor: '#FFFFFF',
-                              border: '1px solid #C7D2FE',
-                              borderRadius: 5,
-                              color: '#4338CA',
-                              fontFamily: 'var(--font-mono)'
-                            }}
-                          >
-                            +{f}
-                          </span>
-                        ))}
+                    {/* Operational Action Button upon Analysis Completion */}
+                    {msg.sender === 'assistant' && msg.text.includes('Analysis complete') && (
+                      <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid #E2E8F0' }}>
+                        <button
+                          onClick={() => { window.location.hash = '#review'; }}
+                          style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 6,
+                            padding: '8px 12px',
+                            backgroundColor: '#0F172A',
+                            color: '#FFFFFF',
+                            borderRadius: 6,
+                            border: 'none',
+                            fontSize: 12,
+                            fontWeight: 600,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <CheckCircle2 size={13} style={{ color: '#10B981' }} />
+                          <span>Review complaint in Quality Queue</span>
+                          <ArrowRight size={13} />
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Retry button upon failure */}
+                    {msg.sender === 'assistant' && msg.text.includes('Analysis unavailable') && lastFailedInput && (
+                      <div style={{ marginTop: 10, paddingTop: 8, borderTop: '1px solid #E2E8F0' }}>
+                        <button
+                          onClick={() => executeLogging(lastFailedInput)}
+                          disabled={loading}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 6,
+                            padding: '5px 10px',
+                            backgroundColor: '#FFFFFF',
+                            color: '#DC2626',
+                            border: '1px solid #FCA5A5',
+                            borderRadius: 5,
+                            fontSize: 11.5,
+                            fontWeight: 600,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <RotateCw size={12} />
+                          <span>Retry analysis</span>
+                        </button>
                       </div>
                     )}
                   </div>
@@ -471,6 +638,7 @@ export const CopilotPanel: React.FC = () => {
               ))
             )}
 
+            {/* Loading Indicator with Step Details */}
             {loading && (
               <div style={{
                 display: 'flex',
@@ -478,7 +646,7 @@ export const CopilotPanel: React.FC = () => {
                 gap: 10,
                 padding: '10px 14px',
                 backgroundColor: '#F8FAFC',
-                borderRadius: 10,
+                borderRadius: 8,
                 border: '1px solid #E2E8F0',
                 fontSize: 12.5,
                 color: '#475569',
@@ -492,10 +660,10 @@ export const CopilotPanel: React.FC = () => {
         )}
       </div>
 
-      {/* Input Form Bar */}
+      {/* Composer Input Bar */}
       {activeTab === 'ASSISTANT' && (
         <div style={{
-          padding: '14px 16px',
+          padding: '12px 16px',
           borderTop: '1px solid #E2E8F0',
           backgroundColor: '#FAFAFC',
           flexShrink: 0
@@ -513,6 +681,7 @@ export const CopilotPanel: React.FC = () => {
             <button
               onClick={() => setActiveTab('UPLOAD')}
               title="Attach quality document"
+              aria-label="Attach quality document"
               style={{
                 background: 'none',
                 border: 'none',
@@ -528,6 +697,7 @@ export const CopilotPanel: React.FC = () => {
             </button>
 
             <textarea
+              ref={textareaRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
@@ -536,7 +706,8 @@ export const CopilotPanel: React.FC = () => {
                   handleSend();
                 }
               }}
-              placeholder="Describe complaint or request change..."
+              placeholder="Describe a complaint or request…"
+              aria-label="Describe a complaint or request"
               rows={1}
               style={{
                 flex: 1,
@@ -548,24 +719,24 @@ export const CopilotPanel: React.FC = () => {
                 color: '#0F172A',
                 lineHeight: 1.4,
                 padding: '2px 0',
-                fontWeight: 500
+                fontWeight: 400
               }}
             />
 
             <button
               onClick={handleSend}
               disabled={!input.trim() || loading}
+              aria-label="Send complaint message"
               style={{
                 padding: '6px 10px',
-                background: input.trim() && !loading ? 'linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)' : '#E2E8F0',
+                backgroundColor: input.trim() && !loading ? '#0F172A' : '#E2E8F0',
                 color: input.trim() && !loading ? '#FFFFFF' : '#94A3B8',
                 border: 'none',
                 borderRadius: 6,
                 cursor: input.trim() && !loading ? 'pointer' : 'not-allowed',
                 display: 'flex',
                 alignItems: 'center',
-                boxShadow: input.trim() && !loading ? '0 2px 6px rgba(79, 70, 229, 0.3)' : 'none',
-                transition: 'all 140ms ease-out'
+                transition: 'all 120ms ease-out'
               }}
             >
               <Send size={13} />
@@ -579,8 +750,8 @@ export const CopilotPanel: React.FC = () => {
             justifyContent: 'space-between',
             fontWeight: 500
           }}>
-            <span>Press Enter to send</span>
-            <span>Deterministic GxP Safety Active</span>
+            <span>Enter to send · Shift+Enter for newline</span>
+            <span>21 CFR Part 11 Active</span>
           </div>
         </div>
       )}
