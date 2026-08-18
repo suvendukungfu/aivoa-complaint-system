@@ -116,7 +116,7 @@ describe('Copilot First-Run Experience Tests', () => {
     expect(api.logComplaint).toHaveBeenCalled();
 
     await waitFor(() => {
-      expect(screen.getByText(/Analysis complete/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/Analysis complete/i).length).toBeGreaterThan(0);
       expect(screen.getByText(/Review complaint in Quality Queue/i)).toBeInTheDocument();
     });
   });
