@@ -218,30 +218,32 @@ export const CopilotPanel: React.FC = () => {
       display: 'flex',
       flexDirection: 'column',
       height: '100%',
-      backgroundColor: '#FFFFFF',
-      borderLeft: '1px solid #E2E8F0',
+      backgroundColor: 'rgba(255, 255, 255, 0.035)',
+      backdropFilter: 'blur(24px)',
+      WebkitBackdropFilter: 'blur(24px)',
+      borderLeft: '1px solid rgba(255, 255, 255, 0.08)',
       minWidth: '320px',
       maxWidth: '420px',
       width: '100%',
-      boxShadow: '0 1px 3px rgba(15, 23, 42, 0.05)'
+      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)'
     }}>
       {/* Header */}
       <div style={{
         padding: '12px 16px',
-        borderBottom: '1px solid #E2E8F0',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexShrink: 0,
-        backgroundColor: '#FAFAFC'
+        backgroundColor: 'rgba(255, 255, 255, 0.02)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{
             width: 26,
             height: 26,
             borderRadius: 6,
-            backgroundColor: '#0F172A',
-            color: '#FFFFFF',
+            backgroundColor: '#FFFFFF',
+            color: '#080909',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
@@ -249,11 +251,11 @@ export const CopilotPanel: React.FC = () => {
             <Cpu size={14} />
           </div>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: 6 }}>
               <span>AIVOA COPILOT</span>
               <span className="pulse-dot" style={{ backgroundColor: loading ? '#F59E0B' : '#10B981', width: 6, height: 6 }} />
             </div>
-            <div style={{ fontSize: 11, color: '#64748B', fontWeight: 500 }}>
+            <div style={{ fontSize: 11, color: 'rgba(255, 255, 255, 0.50)', fontWeight: 500 }}>
               {loading ? statusText || 'Processing...' : (complaint.complaint_number ? `${complaint.complaint_number} · Analysis complete` : 'Complaint intake assistant')}
             </div>
           </div>
@@ -263,10 +265,10 @@ export const CopilotPanel: React.FC = () => {
         <div style={{
           display: 'flex',
           gap: 2,
-          backgroundColor: '#F1F5F9',
+          backgroundColor: 'rgba(255, 255, 255, 0.04)',
           padding: 2,
           borderRadius: 6,
-          border: '1px solid #E2E8F0'
+          border: '1px solid rgba(255, 255, 255, 0.08)'
         }}>
           <button
             onClick={() => setActiveTab('ASSISTANT')}
@@ -276,9 +278,8 @@ export const CopilotPanel: React.FC = () => {
               fontWeight: 600,
               border: 'none',
               borderRadius: 4,
-              backgroundColor: activeTab === 'ASSISTANT' ? '#FFFFFF' : 'transparent',
-              color: activeTab === 'ASSISTANT' ? '#0F172A' : '#64748B',
-              boxShadow: activeTab === 'ASSISTANT' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+              backgroundColor: activeTab === 'ASSISTANT' ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
+              color: activeTab === 'ASSISTANT' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.50)',
               cursor: 'pointer'
             }}
           >
@@ -292,9 +293,8 @@ export const CopilotPanel: React.FC = () => {
               fontWeight: 600,
               border: 'none',
               borderRadius: 4,
-              backgroundColor: activeTab === 'RISK' ? '#FFFFFF' : 'transparent',
-              color: activeTab === 'RISK' ? '#0F172A' : '#64748B',
-              boxShadow: activeTab === 'RISK' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+              backgroundColor: activeTab === 'RISK' ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
+              color: activeTab === 'RISK' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.50)',
               cursor: 'pointer'
             }}
           >
@@ -308,9 +308,8 @@ export const CopilotPanel: React.FC = () => {
               fontWeight: 600,
               border: 'none',
               borderRadius: 4,
-              backgroundColor: activeTab === 'UPLOAD' ? '#FFFFFF' : 'transparent',
-              color: activeTab === 'UPLOAD' ? '#0F172A' : '#64748B',
-              boxShadow: activeTab === 'UPLOAD' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+              backgroundColor: activeTab === 'UPLOAD' ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
+              color: activeTab === 'UPLOAD' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.50)',
               cursor: 'pointer'
             }}
           >

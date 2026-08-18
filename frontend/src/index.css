@@ -1,76 +1,76 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  --font-sans: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* Modern Premium Palette */
-  --bg-app: #F8FAFC;
-  --bg-sidebar: #0F172A;
-  --bg-sidebar-surface: #1E293B;
-  --bg-surface: #FFFFFF;
-  --bg-surface-glass: rgba(255, 255, 255, 0.85);
-  --bg-subtle: #F1F5F9;
-  --bg-hover: #E2E8F0;
-  --bg-active: #CBD5E1;
+  /* Dark Atmospheric Foundation */
+  --bg-app: #080909;
+  --bg-surface: #0C0D0E;
+  --bg-elevated: #111214;
+  --bg-sidebar: rgba(255, 255, 255, 0.025);
+  --bg-surface-glass: rgba(255, 255, 255, 0.035);
+  --bg-subtle: rgba(255, 255, 255, 0.025);
+  --bg-hover: rgba(255, 255, 255, 0.05);
+  --bg-active: rgba(255, 255, 255, 0.08);
 
-  --border: #E2E8F0;
-  --border-light: #F1F5F9;
-  --border-strong: #CBD5E1;
-  --border-focus: #6366F1;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-light: rgba(255, 255, 255, 0.05);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --border-focus: rgba(255, 255, 255, 0.35);
 
-  --text-primary: #0F172A;
-  --text-secondary: #475569;
-  --text-muted: #94A3B8;
-  --text-light: #CBD5E1;
-  --text-inverse: #FFFFFF;
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.78);
+  --text-tertiary: rgba(255, 255, 255, 0.55);
+  --text-muted: rgba(255, 255, 255, 0.38);
+  --text-inverse: #080909;
 
-  --primary: #4F46E5;
-  --primary-hover: #4338CA;
-  --primary-light: #6366F1;
-  --primary-subtle: #EEF2FF;
-  --primary-border: #C7D2FE;
-  --primary-text: #3730A3;
+  --primary: #FFFFFF;
+  --primary-hover: rgba(255, 255, 255, 0.90);
+  --primary-light: rgba(255, 255, 255, 0.15);
+  --primary-subtle: rgba(255, 255, 255, 0.04);
+  --primary-border: rgba(255, 255, 255, 0.18);
+  --primary-text: #FFFFFF;
 
   --success: #10B981;
   --success-hover: #059669;
-  --success-subtle: #ECFDF5;
-  --success-border: #A7F3D0;
-  --success-text: #065F46;
+  --success-subtle: rgba(16, 185, 129, 0.12);
+  --success-border: rgba(16, 185, 129, 0.30);
+  --success-text: #34D399;
 
   --warning: #F59E0B;
   --warning-hover: #D97706;
-  --warning-subtle: #FFFBEB;
-  --warning-border: #FDE68A;
-  --warning-text: #92400E;
+  --warning-subtle: rgba(245, 158, 11, 0.15);
+  --warning-border: rgba(245, 158, 11, 0.35);
+  --warning-text: #FBBF24;
 
   --danger: #EF4444;
   --danger-hover: #DC2626;
-  --danger-subtle: #FEF2F2;
-  --danger-border: #FECACA;
-  --danger-text: #991B1B;
+  --danger-subtle: rgba(239, 68, 68, 0.15);
+  --danger-border: rgba(239, 68, 68, 0.35);
+  --danger-text: #F87171;
 
-  --info: #0EA5E9;
-  --info-subtle: #F0F9FF;
-  --info-border: #BAE6FD;
-  --info-text: #0369A1;
+  --info: #38BDF8;
+  --info-subtle: rgba(56, 189, 248, 0.12);
+  --info-border: rgba(56, 189, 248, 0.30);
+  --info-text: #7DD3FC;
 
-  --shadow-subtle: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
-  --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
-  --shadow-elevated: 0 4px 14px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04);
-  --shadow-popover: 0 12px 28px -4px rgba(15, 23, 42, 0.12), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
-  --shadow-modal: 0 24px 48px -12px rgba(15, 23, 42, 0.25), 0 12px 24px -8px rgba(15, 23, 42, 0.08);
+  --shadow-subtle: 0 1px 2px 0 rgba(0, 0, 0, 0.20);
+  --shadow-card: 0 4px 16px -2px rgba(0, 0, 0, 0.30), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  --shadow-elevated: 0 12px 32px -4px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+  --shadow-popover: 0 16px 36px -4px rgba(0, 0, 0, 0.60), inset 0 1px 1px rgba(255, 255, 255, 0.14);
+  --shadow-modal: 0 24px 64px -12px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.20);
 
   --radius-xs: 4px;
   --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
   --radius-full: 9999px;
 
-  --transition-fast: 140ms cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-normal: 220ms cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-slow: 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 120ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 280ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {

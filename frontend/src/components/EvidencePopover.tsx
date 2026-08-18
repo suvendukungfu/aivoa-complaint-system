@@ -25,8 +25,8 @@ export const EvidencePopover: React.FC<EvidencePopoverProps> = ({
   const isUser = provenance.classification === 'USER_SPECIFIED' || provenance.source_type === 'user_edit';
   const isInferred = provenance.classification === 'INFERRED' || provenance.source_type === 'ai_inference';
 
-  const badgeColor = isUser ? '#059669' : isExplicit ? '#1D4ED8' : '#D97706';
-  const badgeBg = isUser ? '#ECFDF5' : isExplicit ? '#EFF6FF' : '#FFFBEB';
+  const badgeColor = isUser ? '#34D399' : isExplicit ? '#FFFFFF' : '#FBBF24';
+  const badgeBg = isUser ? 'rgba(16, 185, 129, 0.12)' : isExplicit ? 'rgba(255, 255, 255, 0.08)' : 'rgba(245, 158, 11, 0.12)';
   const badgeLabel = isUser ? 'User' : isExplicit ? 'AI' : 'Inferred';
 
   return (
@@ -54,10 +54,10 @@ export const EvidencePopover: React.FC<EvidencePopoverProps> = ({
             background: badgeBg,
             border: `1px solid ${badgeColor}33`,
             color: badgeColor,
-            borderRadius: 3,
-            padding: '1px 5px',
+            borderRadius: 4,
+            padding: '1px 6px',
             fontSize: 10,
-            fontWeight: 500,
+            fontWeight: 600,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -82,13 +82,15 @@ export const EvidencePopover: React.FC<EvidencePopoverProps> = ({
             left: 0,
             right: 0,
             zIndex: 50,
-            backgroundColor: '#FFFFFF',
-            borderRadius: 4,
-            border: '1px solid #E5E7EB',
-            boxShadow: '0 4px 12px -2px rgba(16, 24, 40, 0.12)',
+            backgroundColor: 'rgba(12, 13, 14, 0.96)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            borderRadius: 8,
+            border: '1px solid rgba(255, 255, 255, 0.14)',
+            boxShadow: '0 16px 36px rgba(0, 0, 0, 0.65)',
             padding: '10px 12px',
             fontSize: 11,
-            color: '#111827',
+            color: '#FFFFFF',
             animation: 'fadeIn 0.15s ease-out'
           }}
         >
@@ -99,117 +101,78 @@ export const EvidencePopover: React.FC<EvidencePopoverProps> = ({
                 style={{
                   background: badgeBg,
                   color: badgeColor,
-                  padding: '1px 5px',
                   borderRadius: 3,
-                  fontWeight: 500,
+                  padding: '1px 5px',
+                  fontWeight: 600,
                   fontSize: 10
                 }}
               >
-                {isUser ? 'User Specified' : isExplicit ? 'AI Extracted' : 'AI Inferred'}
+                {badgeLabel} {isExplicit ? 'Extracted' : isInferred ? 'Inference' : 'Edit'}
               </span>
-              <span style={{ fontWeight: 600, color: '#111827' }}>{label}</span>
+              <span style={{ fontWeight: 600, color: 'rgba(255, 255, 255, 0.90)' }}>{label}</span>
             </div>
-
-            <span style={{ fontSize: 10, color: '#6B7280' }}>
-              Confidence: <strong style={{ color: '#111827' }}>{Math.round(provenance.confidence * 100)}%</strong>
-            </span>
-          </div>
-
-          {/* Source Citation */}
-          <div style={{ marginBottom: 6, color: '#4B5563', fontSize: 11 }}>
-            <span style={{ color: '#6B7280' }}>Source: </span>
-            <strong style={{ color: '#111827' }}>
-              {provenance.source_document_id
-                ? provenance.source_document_id
-                : provenance.source_type === 'customer_prompt'
-                ? 'Customer Communication'
-                : provenance.source_type === 'user_edit'
-                ? 'Quality Operator'
-                : 'AI Reasoning Engine'}
-            </strong>
-
-            {provenance.page_number !== undefined && provenance.page_number !== null && (
-              <span
-                style={{
-                  marginLeft: 6,
-                  background: '#F3F4F6',
-                  padding: '1px 4px',
-                  borderRadius: 3,
-                  fontSize: 10,
-                  color: '#4B5563'
-                }}
-              >
-                Page {provenance.page_number}
+            {provenance.confidence !== undefined && (
+              <span style={{ color: 'rgba(255, 255, 255, 0.50)', fontSize: 10, fontFamily: 'var(--font-mono)' }}>
+                {Math.round(provenance.confidence * 100)}% conf
               </span>
             )}
           </div>
 
-          {/* Verbatim Evidence Snippet */}
+          {/* Evidence Snippet */}
           {provenance.text_span ? (
-            <div
-              style={{
-                backgroundColor: '#F9FAFB',
-                borderLeft: `2px solid ${badgeColor}`,
-                padding: '6px 8px',
-                borderRadius: '0 3px 3px 0',
-                marginBottom: 8,
-                fontFamily: 'monospace',
-                fontSize: 11,
-                color: '#111827',
-                lineHeight: 1.35
-              }}
-            >
-              <div style={{ fontSize: 9, color: '#6B7280', textTransform: 'uppercase', marginBottom: 2, fontWeight: 600 }}>
-                Verbatim Evidence:
+            <div style={{ marginBottom: 6 }}>
+              <div style={{ color: 'rgba(255, 255, 255, 0.45)', fontSize: 9.5, textTransform: 'uppercase', marginBottom: 2, letterSpacing: '0.04em' }}>
+                Verbatim Evidence
               </div>
-              "{provenance.text_span}"
+              <div
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                  borderLeft: '2px solid #FFFFFF',
+                  padding: '4px 6px',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 10.5,
+                  color: '#FFFFFF',
+                  lineHeight: 1.35,
+                  borderRadius: '0 4px 4px 0'
+                }}
+              >
+                &ldquo;{provenance.text_span}&rdquo;
+              </div>
             </div>
-          ) : (
-            <div
-              style={{
-                backgroundColor: '#F9FAFB',
-                borderLeft: '2px solid #D97706',
-                padding: '4px 8px',
-                borderRadius: '0 3px 3px 0',
-                marginBottom: 8,
-                fontSize: 10,
-                color: '#4B5563'
-              }}
-            >
-              {isUser
-                ? 'Specified directly by quality operator.'
-                : 'Inferred by AI from complaint context (no verbatim text span).'}
+          ) : isInferred ? (
+            <div style={{ marginBottom: 6, color: 'rgba(255, 255, 255, 0.50)', fontSize: 10.5, fontStyle: 'italic' }}>
+              Field inferred from context / standard QMS rules (no direct textual span).
             </div>
-          )}
+          ) : null}
 
-          {/* AI Run ID & Open Evidence Action */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 4, borderTop: '1px solid #F3F4F6' }}>
-            <span style={{ fontSize: 10, color: '#9CA3AF' }}>
-              {provenance.ai_run_id ? `Run: ${provenance.ai_run_id}` : 'Manual Input'}
-            </span>
+          {/* Source Document & Page */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 10, color: 'rgba(255, 255, 255, 0.50)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+              <FileText size={10} />
+              <span>{provenance.source_document_id || 'Complaint Document'}</span>
+              {provenance.page_number !== null && provenance.page_number !== undefined && (
+                <span>· Page {provenance.page_number}</span>
+              )}
+            </div>
 
-            {provenance.text_span && onOpenEvidence && (
+            {onOpenEvidence && (
               <button
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onOpenEvidence(provenance);
-                }}
+                onClick={() => onOpenEvidence(provenance)}
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#1D4ED8',
-                  fontWeight: 500,
-                  fontSize: 10,
+                  color: '#FFFFFF',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 3,
-                  padding: '1px 4px'
+                  gap: 2,
+                  fontSize: 10,
+                  fontWeight: 600,
+                  padding: 0
                 }}
               >
-                <FileText size={11} />
-                <span>Open Evidence</span>
+                <span>View Source</span>
                 <ExternalLink size={9} />
               </button>
             )}

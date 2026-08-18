@@ -8,7 +8,6 @@ import {
   Search,
   Database,
   ChevronDown,
-  Command,
   Plus,
   Menu,
   FileCheck2
@@ -92,307 +91,327 @@ export const TopBar: React.FC<TopBarProps> = ({
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }));
       dispatch(setToast({ type: 'success', message: `${scenario.label.split(':')[0]} loaded.` }));
-    } catch (err: any) {
+    } catch {
       dispatch(addMessage({
         id: `err-${Date.now()}`,
         sender: 'assistant',
         text: 'AI analysis unavailable. No complaint data was changed.',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }));
-      dispatch(setToast({ type: 'error', message: err.message || 'Failed to analyze scenario.' }));
+      dispatch(setToast({ type: 'error', message: 'AI service unavailable.' }));
     } finally {
       dispatch(setLoading(false));
       dispatch(setStatusText(''));
     }
   };
 
-  const workspaceLabels: Record<WorkspaceView, string> = {
-    LANDING: 'AIVOA Home',
-    OVERVIEW: 'Overview Dashboard',
-    INTAKE: 'Complaint Intake & Copilot',
-    REVIEW: 'Quality Review Queue',
-    DOCUMENTS: 'Document Evidence Viewer',
-    ANALYTICS: 'Operational Analytics',
-    TIMELINE: '21 CFR Part 11 Audit Trail',
-    SYSTEM_HEALTH: 'System Health & Telemetry'
+  const getBreadcrumb = () => {
+    switch (activeWorkspace) {
+      case 'OVERVIEW':
+        return 'Overview / Operations';
+      case 'INTAKE':
+        return `Complaints / ${complaintData.complaint_number || 'New Draft'}`;
+      case 'REVIEW':
+        return 'Review Queue / Quality Decisions';
+      case 'DOCUMENTS':
+        return 'Documents / Evidence Library';
+      case 'ANALYTICS':
+        return 'Analytics / QMS Metrics';
+      case 'TIMELINE':
+        return 'Audit Trail / 21 CFR Part 11';
+      case 'SYSTEM_HEALTH':
+        return 'System Health / Observability';
+      default:
+        return 'Workspace';
+    }
   };
 
   return (
-    <header style={{
-      height: '56px',
-      backgroundColor: 'rgba(255, 255, 255, 0.92)',
-      backdropFilter: 'blur(16px)',
-      WebkitBackdropFilter: 'blur(16px)',
-      borderBottom: '1px solid #E2E8F0',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '0 20px',
-      flexShrink: 0,
-      zIndex: 10,
-      gap: 16
-    }}>
-      {/* Left: Breadcrumbs & Current Record */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+    <header
+      style={{
+        height: '58px',
+        backgroundColor: 'rgba(8, 9, 9, 0.75)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 24px',
+        position: 'sticky',
+        top: 0,
+        zIndex: 40
+      }}
+    >
+      {/* Left: Breadcrumb & Mobile Menu Trigger */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         {onToggleMobileMenu && (
           <button
             onClick={onToggleMobileMenu}
+            className="mobile-hamburger"
             style={{
-              background: 'none',
-              border: 'none',
-              color: '#475569',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
+              display: 'none',
+              background: 'rgba(255, 255, 255, 0.04)',
+              border: '1px solid rgba(255, 255, 255, 0.10)',
+              borderRadius: 6,
               padding: 6,
-              borderRadius: 6
+              color: '#FFFFFF',
+              cursor: 'pointer'
             }}
-            aria-label="Toggle navigation menu"
+            aria-label="Open mobile menu"
           >
-            <Menu size={18} />
+            <Menu size={16} />
           </button>
         )}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, whiteSpace: 'nowrap' }}>
-          <span style={{ fontSize: 12.5, fontWeight: 500, color: '#64748B' }}>Workspace</span>
-          <span style={{ fontSize: 12, color: '#CBD5E1' }}>/</span>
-          <span style={{ fontSize: 13.5, fontWeight: 700, color: '#0F172A', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-            {workspaceLabels[activeWorkspace]}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span
+            style={{
+              fontSize: '13px',
+              fontWeight: 600,
+              color: 'rgba(255, 255, 255, 0.90)',
+              letterSpacing: '-0.01em'
+            }}
+          >
+            {getBreadcrumb()}
           </span>
-          {activeWorkspace === 'INTAKE' && complaintData.complaint_number && (
-            <span style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: 11.5,
-              fontWeight: 700,
-              color: '#4F46E5',
-              backgroundColor: '#EEF2FF',
-              padding: '2px 8px',
-              borderRadius: 6,
-              border: '1px solid #C7D2FE',
-              marginLeft: 4
-            }}>
-              {complaintData.complaint_number}
-            </span>
-          )}
         </div>
       </div>
 
-      {/* Center: Command Palette Trigger Search */}
-      <button
-        onClick={onOpenCommandBar}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          backgroundColor: '#F1F5F9',
-          border: '1px solid #E2E8F0',
-          borderRadius: 8,
-          padding: '6px 14px',
-          color: '#64748B',
-          fontSize: 12.5,
-          cursor: 'pointer',
-          maxWidth: '320px',
-          flex: '1 1 auto',
-          justifyContent: 'space-between',
-          transition: 'all 160ms ease-out',
-          boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.02)'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = '#CBD5E1';
-          e.currentTarget.style.backgroundColor = '#FFFFFF';
-          e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.04)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = '#E2E8F0';
-          e.currentTarget.style.backgroundColor = '#F1F5F9';
-          e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(0, 0, 0, 0.02)';
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
-          <Search size={14} style={{ flexShrink: 0, color: '#94A3B8' }} />
-          <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', fontWeight: 500 }}>
-            Search complaints, batches, documents...
-          </span>
-        </div>
-        <span style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 2,
-          fontSize: 10.5,
-          fontFamily: 'var(--font-mono)',
-          fontWeight: 600,
-          backgroundColor: '#FFFFFF',
-          color: '#475569',
-          border: '1px solid #CBD5E1',
-          borderRadius: 5,
-          padding: '2px 6px',
-          flexShrink: 0,
-          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)'
-        }}>
-          <Command size={10} />K
-        </span>
-      </button>
+      {/* Center: Command Bar Trigger */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <button
+          onClick={onOpenCommandBar}
+          style={{
+            height: '34px',
+            width: '280px',
+            backgroundColor: 'rgba(255, 255, 255, 0.035)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '9999px',
+            padding: '0 12px',
+            color: 'rgba(255, 255, 255, 0.45)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            fontSize: '12px',
+            cursor: 'pointer',
+            transition: 'all 140ms ease-out'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.06)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.18)';
+            e.currentTarget.style.color = 'rgba(255, 255, 255, 0.75)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.035)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+            e.currentTarget.style.color = 'rgba(255, 255, 255, 0.45)';
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Search size={13} />
+            <span>Search complaints, batch, text...</span>
+          </div>
+          <div
+            style={{
+              fontSize: '10.5px',
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
+              padding: '1px 5px',
+              borderRadius: 4,
+              color: 'rgba(255, 255, 255, 0.60)'
+            }}
+          >
+            ⌘K
+          </div>
+        </button>
+      </div>
 
-      {/* Right: Actions Group */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-        {/* Scenario Loader Dropdown */}
+      {/* Right: Actions & User Info */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        {/* Sample Scenario Dropdown */}
         <div style={{ position: 'relative' }}>
           <button
             onClick={() => setShowScenarioMenu(!showScenarioMenu)}
             style={{
+              height: '32px',
+              padding: '0 10px',
+              backgroundColor: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid rgba(255, 255, 255, 0.09)',
+              borderRadius: '9999px',
+              color: 'rgba(255, 255, 255, 0.75)',
+              fontSize: '11.5px',
+              fontWeight: 500,
               display: 'flex',
               alignItems: 'center',
               gap: 6,
-              padding: '6px 12px',
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #CBD5E1',
-              borderRadius: 7,
-              fontSize: 12.5,
-              fontWeight: 600,
-              color: '#334155',
               cursor: 'pointer',
-              boxShadow: 'var(--shadow-subtle)',
               transition: 'all 140ms ease-out'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#F8FAFC';
-              e.currentTarget.style.borderColor = '#94A3B8';
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.07)';
+              e.currentTarget.style.color = '#FFFFFF';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#FFFFFF';
-              e.currentTarget.style.borderColor = '#CBD5E1';
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
+              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.75)';
             }}
           >
-            <FileCheck2 size={13} style={{ color: '#6366F1' }} />
-            <span>GxP Scenarios</span>
-            <ChevronDown size={13} style={{ color: '#94A3B8' }} />
+            <FileCheck2 size={13} />
+            <span>Sample Scenarios</span>
+            <ChevronDown size={12} />
           </button>
 
           {showScenarioMenu && (
-            <div style={{
-              position: 'absolute',
-              top: '100%',
-              right: 0,
-              marginTop: 6,
-              width: '300px',
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #E2E8F0',
-              borderRadius: 10,
-              boxShadow: 'var(--shadow-popover)',
-              padding: 6,
-              zIndex: 50,
-              animation: 'slideUp 160ms cubic-bezier(0.16, 1, 0.3, 1) forwards'
-            }}>
-              <div style={{
-                fontSize: 10.5,
-                fontWeight: 700,
-                color: '#64748B',
-                padding: '6px 10px',
-                letterSpacing: '0.05em',
-                textTransform: 'uppercase'
-              }}>
-                Pre-seeded GxP Test Scenarios
+            <div
+              style={{
+                position: 'absolute',
+                top: 'calc(100% + 6px)',
+                right: 0,
+                width: '320px',
+                backgroundColor: 'rgba(12, 13, 14, 0.96)',
+                backdropFilter: 'blur(24px)',
+                WebkitBackdropFilter: 'blur(24px)',
+                border: '1px solid rgba(255, 255, 255, 0.14)',
+                borderRadius: '12px',
+                padding: '6px',
+                boxShadow: '0 16px 36px rgba(0, 0, 0, 0.6)',
+                zIndex: 60
+              }}
+            >
+              <div
+                style={{
+                  fontSize: '10px',
+                  fontWeight: 600,
+                  color: 'rgba(255, 255, 255, 0.40)',
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  padding: '6px 8px 4px'
+                }}
+              >
+                PRECONFIGURED GXP COMPLAINTS
               </div>
-              {SAMPLE_DATASETS.map((scenario, idx) => (
+              {SAMPLE_DATASETS.map((scenario) => (
                 <button
-                  key={idx}
+                  key={scenario.label}
                   onClick={() => handleLoadScenario(scenario)}
                   style={{
-                    display: 'block',
                     width: '100%',
-                    textAlign: 'left',
                     padding: '8px 10px',
-                    border: 'none',
+                    textAlign: 'left',
                     background: 'none',
-                    borderRadius: 6,
-                    fontSize: 12,
-                    fontWeight: 500,
-                    color: '#1E293B',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#FFFFFF',
+                    fontSize: '12px',
                     cursor: 'pointer',
-                    transition: 'all 120ms ease-out',
-                    lineHeight: 1.4
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2,
+                    transition: 'background-color 120ms ease'
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#EEF2FF';
-                    e.currentTarget.style.color = '#4338CA';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = '#1E293B';
-                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.06)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                 >
-                  {scenario.label}
+                  <span style={{ fontWeight: 600 }}>{scenario.label.split(':')[0]}</span>
+                  <span style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.55)', lineHeight: 1.3 }}>
+                    {scenario.label.split(':')[1]}
+                  </span>
                 </button>
               ))}
             </div>
           )}
         </div>
 
-        {/* Database Ledger */}
+        {/* Database History Modal Trigger */}
         <button
           onClick={handleOpenDatabaseModal}
           style={{
+            height: '32px',
+            padding: '0 10px',
+            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+            border: '1px solid rgba(255, 255, 255, 0.09)',
+            borderRadius: '9999px',
+            color: 'rgba(255, 255, 255, 0.75)',
+            fontSize: '11.5px',
+            fontWeight: 500,
             display: 'flex',
             alignItems: 'center',
             gap: 6,
-            padding: '6px 12px',
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #CBD5E1',
-            borderRadius: 7,
-            fontSize: 12.5,
-            fontWeight: 600,
-            color: '#334155',
             cursor: 'pointer',
-            boxShadow: 'var(--shadow-subtle)',
             transition: 'all 140ms ease-out'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#F8FAFC';
-            e.currentTarget.style.borderColor = '#94A3B8';
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.07)';
+            e.currentTarget.style.color = '#FFFFFF';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#FFFFFF';
-            e.currentTarget.style.borderColor = '#CBD5E1';
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
+            e.currentTarget.style.color = 'rgba(255, 255, 255, 0.75)';
           }}
-          title="Browse persisted database complaints"
         >
-          <Database size={13} style={{ color: '#0EA5E9' }} />
-          <span>Ledger</span>
+          <Database size={13} />
+          <span>Records</span>
         </button>
 
-        {/* Primary New Intake Button */}
+        {/* New Complaint Button */}
         <button
           onClick={onNewComplaint}
           style={{
+            height: '32px',
+            padding: '0 12px',
+            backgroundColor: '#FFFFFF',
+            color: '#080909',
+            border: 'none',
+            borderRadius: '9999px',
+            fontSize: '12px',
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            cursor: 'pointer',
+            transition: 'all 140ms ease-out'
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.90)')}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#FFFFFF')}
+        >
+          <Plus size={13} />
+          <span>New</span>
+        </button>
+
+        {/* User Pill */}
+        <div
+          style={{
+            height: '32px',
+            padding: '0 8px 0 4px',
+            backgroundColor: 'rgba(255, 255, 255, 0.04)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '9999px',
             display: 'flex',
             alignItems: 'center',
             gap: 6,
-            padding: '6px 14px',
-            background: 'linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)',
-            color: '#FFFFFF',
-            border: 'none',
-            borderRadius: 7,
-            fontSize: 12.5,
-            fontWeight: 600,
-            cursor: 'pointer',
-            boxShadow: '0 2px 6px rgba(79, 70, 229, 0.3)',
-            transition: 'all 140ms ease-out'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-1px)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(79, 70, 229, 0.4)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 2px 6px rgba(79, 70, 229, 0.3)';
+            fontSize: '11px',
+            color: 'rgba(255, 255, 255, 0.75)'
           }}
         >
-          <Plus size={14} />
-          <span>New Intake</span>
-        </button>
+          <div
+            style={{
+              width: 22,
+              height: 22,
+              borderRadius: '50%',
+              backgroundColor: '#FFFFFF',
+              color: '#080909',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 700,
+              fontSize: '10px'
+            }}
+          >
+            QP
+          </div>
+          <span style={{ fontWeight: 600 }}>Dr. Vance</span>
+        </div>
       </div>
     </header>
   );
 };
-
-export default TopBar;

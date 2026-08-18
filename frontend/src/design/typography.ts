@@ -1,69 +1,50 @@
+// AIVOA Design System — Typography
 export const typography = {
-  display: {
-    fontSize: '30px',
-    fontWeight: 600,
-    lineHeight: 1.2,
-    letterSpacing: '-0.025em',
-    color: 'var(--text-primary)'
+  fontFamily: {
+    sans: "var(--font-sans, 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif)",
+    mono: "var(--font-mono, 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace)"
   },
-  pageTitle: {
-    fontSize: '22px',
-    fontWeight: 600,
-    lineHeight: 1.25,
-    letterSpacing: '-0.02em',
-    color: 'var(--text-primary)'
-  },
-  sectionTitle: {
-    fontSize: '15px',
-    fontWeight: 600,
-    lineHeight: 1.35,
-    letterSpacing: '-0.01em',
-    color: 'var(--text-primary)'
-  },
-  sectionHeaderLabel: {
-    fontSize: '11px',
-    fontWeight: 600,
-    lineHeight: 1.2,
-    letterSpacing: '0.06em',
-    textTransform: 'uppercase' as const,
-    color: 'var(--text-muted)'
-  },
-  cardTitle: {
-    fontSize: '14px',
-    fontWeight: 600,
-    lineHeight: 1.4,
-    color: 'var(--text-primary)'
-  },
-  body: {
-    fontSize: '13px',
-    fontWeight: 400,
-    lineHeight: 1.5,
-    color: 'var(--text-primary)'
-  },
-  bodyMedium: {
-    fontSize: '13px',
-    fontWeight: 500,
-    lineHeight: 1.5,
-    color: 'var(--text-primary)'
-  },
-  secondary: {
-    fontSize: '12px',
-    fontWeight: 400,
-    lineHeight: 1.45,
-    color: 'var(--text-secondary)'
-  },
-  metadata: {
-    fontSize: '11px',
-    fontWeight: 500,
-    lineHeight: 1.4,
-    color: 'var(--text-muted)'
-  },
-  code: {
-    fontFamily: 'var(--font-mono)',
-    fontSize: '12px',
-    fontVariantNumeric: 'tabular-nums' as const
-  },
-  tabularNumeral: {
-    fontVariantNumeric: 'tabular-nums' as const
+
+  scale: {
+    pageTitle: {
+      fontSize: '28px',
+      lineHeight: '1.15',
+      fontWeight: '600',
+      letterSpacing: '-0.03em'
+    },
+    sectionTitle: {
+      fontSize: '18px',
+      lineHeight: '1.25',
+      fontWeight: '600',
+      letterSpacing: '-0.02em'
+    },
+    cardTitle: {
+      fontSize: '14.5px',
+      lineHeight: '1.35',
+      fontWeight: '600',
+      letterSpacing: '-0.01em'
+    },
+    body: {
+      fontSize: '13.5px',
+      lineHeight: '1.5',
+      fontWeight: '400'
+    },
+    bodySmall: {
+      fontSize: '12.5px',
+      lineHeight: '1.45',
+      fontWeight: '400'
+    },
+    metadata: {
+      fontSize: '11px',
+      lineHeight: '1.4',
+      fontWeight: '500',
+      letterSpacing: '0.06em',
+      textTransform: 'uppercase' as const
+    },
+    code: {
+      fontSize: '12px',
+      lineHeight: '1.4',
+      fontFamily: 'var(--font-mono)'
+    }
   }
-} as const;
+};

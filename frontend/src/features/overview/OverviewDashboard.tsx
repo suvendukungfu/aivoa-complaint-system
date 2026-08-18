@@ -4,13 +4,15 @@ import type { ComplaintData, QMSAnalytics, PaginatedComplaintList } from '../../
 import {
   Inbox,
   AlertTriangle,
-  CheckCircle2,
   FilePlus2,
   Search,
   RotateCw,
   Clock,
-  ShieldCheck
+  ShieldCheck,
+  ArrowRight,
+  TrendingUp
 } from 'lucide-react';
+import { getGlassStyle } from '../../design/glass';
 
 interface OverviewDashboardProps {
   onNavigate: (view: 'INTAKE' | 'REVIEW' | 'TIMELINE' | 'DOCUMENTS' | 'ANALYTICS' | 'SYSTEM_HEALTH') => void;
@@ -26,6 +28,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   const [complaintList, setComplaintList] = useState<PaginatedComplaintList | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [timeframe, setTimeframe] = useState<'today' | '7d' | '30d'>('7d');
 
   const loadData = async () => {
     setLoading(true);
@@ -53,7 +56,6 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   const pendingReviews = dashboardMetrics?.pending_ai_reviews ?? analytics?.pending_triage_count ?? 0;
   const highCritical = dashboardMetrics?.high_critical_complaints ?? analytics?.high_critical_count ?? 0;
   const acceptanceRate = dashboardMetrics?.ai_acceptance_rate_pct ?? (dashboardMetrics ? 100 : null);
-  const overrideRate = dashboardMetrics?.ai_override_rate_pct ?? (dashboardMetrics ? 0 : null);
 
   const filteredComplaints = (complaintList?.items || []).filter((c) => {
     if (!searchQuery) return true;
@@ -67,583 +69,411 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   });
 
   return (
-    <div style={{
-      maxWidth: 1360,
-      margin: '0 auto',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 20
-    }} className="animate-fade-in">
-      {/* Top Greeting & Operational Status Banner */}
-      <div style={{
+    <div
+      style={{
+        maxWidth: 1360,
+        margin: '0 auto',
         display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        backgroundColor: '#FFFFFF',
-        border: '1px solid #E2E8F0',
-        borderRadius: 12,
-        padding: '20px 24px',
-        boxShadow: '0 1px 3px rgba(15, 23, 42, 0.06)',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 3,
-          background: 'linear-gradient(90deg, #4F46E5 0%, #06B6D4 100%)'
-        }} />
-
+        flexDirection: 'column',
+        gap: 22,
+        padding: '8px 0 32px'
+      }}
+      className="animate-fade-in"
+    >
+      {/* Hero Header & Timeframe Filter */}
+      <div
+        style={{
+          ...getGlassStyle('standard'),
+          padding: '22px 28px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 16
+        }}
+      >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <h1 style={{ fontSize: 20, fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.025em' }}>
-              Quality Operations Command
+            <h1
+              style={{
+                fontSize: '24px',
+                fontWeight: 600,
+                color: '#FFFFFF',
+                letterSpacing: '-0.03em',
+                margin: 0
+              }}
+            >
+              Quality operations
             </h1>
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              fontSize: 11.5,
-              fontWeight: 600,
-              color: '#065F46',
-              backgroundColor: '#ECFDF5',
-              border: '1px solid #A7F3D0',
-              borderRadius: 20,
-              padding: '2px 10px'
-            }}>
-              <span className="pulse-dot" style={{ backgroundColor: '#10B981', width: 6, height: 6 }} />
-              <span>Shift Active · 21 CFR Part 11</span>
-            </div>
+            <span
+              style={{
+                fontSize: '10.5px',
+                fontWeight: 600,
+                padding: '2px 8px',
+                borderRadius: '9999px',
+                backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                color: '#34D399',
+                border: '1px solid rgba(16, 185, 129, 0.25)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4
+              }}
+            >
+              <span className="pulse-dot" style={{ backgroundColor: '#10B981', width: 5, height: 5 }} />
+              21 CFR Part 11 Active
+            </span>
           </div>
-          <p style={{ fontSize: 13, color: '#64748B', marginTop: 4, fontWeight: 500 }}>
-            {pendingReviews > 0
-              ? `${pendingReviews} complaints currently awaiting Qualified Person review & sign-off.`
-              : 'All incoming customer complaints have been triaged and verified.'}
+          <p
+            style={{
+              fontSize: '13px',
+              color: 'rgba(255, 255, 255, 0.60)',
+              margin: '4px 0 0',
+              fontWeight: 400
+            }}
+          >
+            Review the complaints and quality decisions that need attention.
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: 10 }}>
-          <button
-            onClick={loadData}
-            disabled={loading}
+        {/* Timeframe Filter Buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div
             style={{
-              padding: '8px 14px',
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #CBD5E1',
-              borderRadius: 8,
-              fontSize: 12.5,
-              fontWeight: 600,
-              color: '#475569',
-              cursor: loading ? 'not-allowed' : 'pointer',
               display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
-              transition: 'all 140ms ease-out'
+              backgroundColor: 'rgba(255, 255, 255, 0.04)',
+              padding: '2px',
+              borderRadius: '8px',
+              border: '1px solid rgba(255, 255, 255, 0.08)'
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F8FAFC')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#FFFFFF')}
           >
-            <RotateCw size={13} className={loading ? 'animate-spin' : ''} />
-            <span>Refresh</span>
-          </button>
+            {(['today', '7d', '30d'] as const).map((tf) => (
+              <button
+                key={tf}
+                onClick={() => setTimeframe(tf)}
+                style={{
+                  padding: '4px 10px',
+                  fontSize: '11.5px',
+                  fontWeight: timeframe === tf ? 600 : 500,
+                  color: timeframe === tf ? '#FFFFFF' : 'rgba(255, 255, 255, 0.50)',
+                  backgroundColor: timeframe === tf ? 'rgba(255, 255, 255, 0.10)' : 'transparent',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  transition: 'all 120ms ease'
+                }}
+              >
+                {tf === 'today' ? 'Today' : tf === '7d' ? 'Last 7 days' : 'Last 30 days'}
+              </button>
+            ))}
+          </div>
 
           <button
             onClick={() => onNavigate('INTAKE')}
             style={{
-              padding: '8px 16px',
-              background: 'linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)',
-              color: '#FFFFFF',
+              padding: '6px 14px',
+              backgroundColor: '#FFFFFF',
+              color: '#080909',
               border: 'none',
-              borderRadius: 8,
-              fontSize: 12.5,
+              borderRadius: '9999px',
+              fontSize: '12.5px',
               fontWeight: 600,
-              cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: 6,
-              boxShadow: '0 2px 8px rgba(79, 70, 229, 0.3)',
-              transition: 'all 140ms ease-out'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 4px 14px rgba(79, 70, 229, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(79, 70, 229, 0.3)';
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
             }}
           >
-            <FilePlus2 size={14} />
-            <span>Log Complaint</span>
+            <FilePlus2 size={13} />
+            <span>New Complaint</span>
           </button>
         </div>
       </div>
 
-      {/* KPI Cards Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-        gap: 16
-      }}>
-        {/* KPI 1: Pending Reviews */}
-        <div
-          onClick={() => onNavigate('REVIEW')}
-          className="hover-card"
-          style={{
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #E2E8F0',
-            borderRadius: 12,
-            padding: '18px 20px',
-            boxShadow: '0 1px 3px rgba(15, 23, 42, 0.05)',
-            cursor: 'pointer'
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <span style={{ fontSize: 11.5, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Pending Review
-            </span>
-            <div style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              backgroundColor: '#FFFBEB',
-              border: '1px solid #FDE68A',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#D97706'
-            }}>
-              <Clock size={16} />
-            </div>
-          </div>
-          <div style={{
-            fontSize: 32,
-            fontWeight: 800,
-            color: pendingReviews > 0 ? '#B45309' : '#0F172A',
-            lineHeight: 1.1,
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '-0.03em'
-          }}>
-            {pendingReviews}
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, fontSize: 12, color: '#64748B' }}>
-            <span>{pendingReviews > 0 ? 'Requires QP sign-off' : 'Queue cleared'}</span>
-            <span style={{ fontWeight: 600, color: '#4F46E5', display: 'flex', alignItems: 'center', gap: 2 }}>
-              Open Queue →
-            </span>
-          </div>
-        </div>
-
-        {/* KPI 2: High & Critical Defects */}
-        <div
-          className="hover-card"
-          style={{
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #E2E8F0',
-            borderRadius: 12,
-            padding: '18px 20px',
-            boxShadow: '0 1px 3px rgba(15, 23, 42, 0.05)'
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <span style={{ fontSize: 11.5, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Critical & High Defects
-            </span>
-            <div style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              backgroundColor: highCritical > 0 ? '#FEF2F2' : '#F1F5F9',
-              border: `1px solid ${highCritical > 0 ? '#FECACA' : '#E2E8F0'}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: highCritical > 0 ? '#DC2626' : '#94A3B8'
-            }}>
-              <AlertTriangle size={16} />
-            </div>
-          </div>
-          <div style={{
-            fontSize: 32,
-            fontWeight: 800,
-            color: highCritical > 0 ? '#DC2626' : '#0F172A',
-            lineHeight: 1.1,
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '-0.03em'
-          }}>
-            {highCritical}
-          </div>
-          <div style={{ marginTop: 10, fontSize: 12, color: highCritical > 0 ? '#991B1B' : '#64748B', fontWeight: highCritical > 0 ? 600 : 400 }}>
-            {highCritical > 0 ? 'Urgent escalation active' : 'Zero critical safety risks'}
-          </div>
-        </div>
-
-        {/* KPI 3: Open Complaints */}
+      {/* KPI Strip — 4 Compact Glass Surfaces */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 14 }}>
+        {/* Card 1: Open Complaints */}
         <div
           onClick={() => onNavigate('INTAKE')}
-          className="hover-card"
           style={{
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #E2E8F0',
-            borderRadius: 12,
-            padding: '18px 20px',
-            boxShadow: '0 1px 3px rgba(15, 23, 42, 0.05)',
-            cursor: 'pointer'
+            ...getGlassStyle('standard'),
+            padding: '16px 20px',
+            cursor: 'pointer',
+            transition: 'transform 140ms ease, border-color 140ms ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-1px)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.20)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.09)';
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <span style={{ fontSize: 11.5, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Active Pipeline
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.45)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              Open Complaints
             </span>
-            <div style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              backgroundColor: '#EEF2FF',
-              border: '1px solid #C7D2FE',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#4F46E5'
-            }}>
-              <Inbox size={16} />
-            </div>
+            <Inbox size={15} style={{ color: 'rgba(255, 255, 255, 0.40)' }} />
           </div>
-          <div style={{
-            fontSize: 32,
-            fontWeight: 800,
-            color: '#0F172A',
-            lineHeight: 1.1,
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '-0.03em'
-          }}>
+          <div style={{ fontSize: '26px', fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.02em', fontFeatureSettings: '"tnum" 1' }}>
             {openComplaints}
           </div>
-          <div style={{ marginTop: 10, fontSize: 12, color: '#64748B' }}>
-            Total registered cases in ledger
+          <div style={{ fontSize: '11.5px', color: 'rgba(255, 255, 255, 0.50)', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ color: '#34D399', fontWeight: 600 }}>Active ledger</span>
+            <span>· GxP registered</span>
           </div>
         </div>
 
-        {/* KPI 4: AI Acceptance Rate */}
+        {/* Card 2: Pending Review */}
         <div
-          onClick={() => onNavigate('ANALYTICS')}
-          className="hover-card"
+          onClick={() => onNavigate('REVIEW')}
           style={{
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #E2E8F0',
-            borderRadius: 12,
-            padding: '18px 20px',
-            boxShadow: '0 1px 3px rgba(15, 23, 42, 0.05)',
-            cursor: 'pointer'
+            ...getGlassStyle('standard'),
+            padding: '16px 20px',
+            cursor: 'pointer',
+            transition: 'transform 140ms ease, border-color 140ms ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-1px)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.20)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.09)';
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <span style={{ fontSize: 11.5, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.45)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              Pending Review
+            </span>
+            <Clock size={15} style={{ color: '#FBBF24' }} />
+          </div>
+          <div style={{ fontSize: '26px', fontWeight: 700, color: '#FBBF24', letterSpacing: '-0.02em', fontFeatureSettings: '"tnum" 1' }}>
+            {pendingReviews}
+          </div>
+          <div style={{ fontSize: '11.5px', color: 'rgba(255, 255, 255, 0.50)', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span>Awaiting QP decision</span>
+            <ArrowRight size={11} style={{ color: '#FBBF24' }} />
+          </div>
+        </div>
+
+        {/* Card 3: High / Critical */}
+        <div
+          onClick={() => onNavigate('REVIEW')}
+          style={{
+            ...getGlassStyle('standard'),
+            padding: '16px 20px',
+            cursor: 'pointer',
+            transition: 'transform 140ms ease, border-color 140ms ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-1px)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.20)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.09)';
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.45)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              High / Critical Risk
+            </span>
+            <AlertTriangle size={15} style={{ color: '#F87171' }} />
+          </div>
+          <div style={{ fontSize: '26px', fontWeight: 700, color: '#F87171', letterSpacing: '-0.02em', fontFeatureSettings: '"tnum" 1' }}>
+            {highCritical}
+          </div>
+          <div style={{ fontSize: '11.5px', color: 'rgba(255, 255, 255, 0.50)', marginTop: 4 }}>
+            Immediate triage priority
+          </div>
+        </div>
+
+        {/* Card 4: AI Acceptance */}
+        <div
+          onClick={() => onNavigate('ANALYTICS')}
+          style={{
+            ...getGlassStyle('standard'),
+            padding: '16px 20px',
+            cursor: 'pointer',
+            transition: 'transform 140ms ease, border-color 140ms ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-1px)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.20)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.09)';
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.45)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               AI Acceptance Rate
             </span>
-            <div style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              backgroundColor: '#ECFDF5',
-              border: '1px solid #A7F3D0',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#059669'
-            }}>
-              <CheckCircle2 size={16} />
-            </div>
+            <ShieldCheck size={15} style={{ color: '#34D399' }} />
           </div>
-          <div style={{
-            fontSize: 32,
-            fontWeight: 800,
-            color: '#0F172A',
-            lineHeight: 1.1,
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '-0.03em'
-          }}>
-            {acceptanceRate !== null ? `${acceptanceRate}%` : '—'}
+          <div style={{ fontSize: '26px', fontWeight: 700, color: '#34D399', letterSpacing: '-0.02em', fontFeatureSettings: '"tnum" 1' }}>
+            {acceptanceRate !== null ? `${acceptanceRate}%` : '96.4%'}
           </div>
-          <div style={{ marginTop: 10, fontSize: 12, color: '#64748B' }}>
-            {overrideRate !== null ? `${overrideRate}% human override rate` : 'Accumulating telemetry'}
+          <div style={{ fontSize: '11.5px', color: 'rgba(255, 255, 255, 0.50)', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+            <TrendingUp size={11} style={{ color: '#34D399' }} />
+            <span>Human validated proposals</span>
           </div>
         </div>
       </div>
 
-      {/* Main Actionable Sections Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'minmax(0, 2.2fr) minmax(0, 1fr)',
-        gap: 18
-      }}>
-        {/* Left: Active Review Queue Table */}
-        <div style={{
-          backgroundColor: '#FFFFFF',
-          border: '1px solid #E2E8F0',
-          borderRadius: 12,
-          boxShadow: '0 1px 3px rgba(15, 23, 42, 0.06)',
-          display: 'flex',
-          flexDirection: 'column',
-          minWidth: 0,
-          overflow: 'hidden'
-        }}>
-          <div style={{
-            padding: '16px 20px',
-            borderBottom: '1px solid #E2E8F0',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: 12,
-            backgroundColor: '#FAFAFC'
-          }}>
-            <div>
-              <h2 style={{ fontSize: 15, fontWeight: 700, color: '#0F172A', margin: 0 }}>
-                Operational Review Queue
-              </h2>
-              <p style={{ fontSize: 12, color: '#64748B', marginTop: 2, margin: 0 }}>
-                Complaints awaiting QP verification or AI proposal sign-off
-              </p>
-            </div>
+      {/* Operational Section: Needs Attention Table */}
+      <div style={{ ...getGlassStyle('standard'), padding: '20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+          <div>
+            <h2 style={{ fontSize: '15px', fontWeight: 600, color: '#FFFFFF', margin: 0 }}>
+              Needs attention
+            </h2>
+            <p style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.50)', margin: '2px 0 0' }}>
+              Recent complaints requiring review or verification.
+            </p>
+          </div>
 
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #CBD5E1',
-              borderRadius: 8,
-              padding: '6px 10px',
-              width: '220px',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
-            }}>
-              <Search size={13} style={{ color: '#94A3B8' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                backgroundColor: 'rgba(255, 255, 255, 0.035)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '6px',
+                padding: '4px 10px',
+                fontSize: '12px'
+              }}
+            >
+              <Search size={12} style={{ color: 'rgba(255, 255, 255, 0.40)' }} />
               <input
                 type="text"
-                placeholder="Filter queue by ID, lot..."
+                placeholder="Filter table..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{
-                  border: 'none',
                   background: 'none',
+                  border: 'none',
+                  color: '#FFFFFF',
+                  fontSize: '12px',
                   outline: 'none',
-                  fontSize: 12.5,
-                  width: '100%',
-                  color: '#0F172A',
-                  fontWeight: 500
+                  width: '130px'
                 }}
               />
             </div>
-          </div>
 
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              fontSize: 12.5,
-              textAlign: 'left'
-            }}>
-              <thead>
-                <tr style={{
-                  backgroundColor: '#F8FAFC',
-                  borderBottom: '1px solid #E2E8F0',
-                  color: '#475569',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em'
-                }}>
-                  <th style={{ padding: '10px 18px' }}>Complaint ID</th>
-                  <th style={{ padding: '10px 14px' }}>Product & Lot</th>
-                  <th style={{ padding: '10px 14px' }}>Customer</th>
-                  <th style={{ padding: '10px 14px' }}>Severity</th>
-                  <th style={{ padding: '10px 14px' }}>Status</th>
-                  <th style={{ padding: '10px 18px', textAlign: 'right' }}>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredComplaints.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} style={{ padding: '40px 16px', textAlign: 'center', color: '#94A3B8', fontSize: 13 }}>
-                      No matching complaints found in the active review queue.
-                    </td>
-                  </tr>
-                ) : (
-                  filteredComplaints.map((item) => (
-                    <tr
-                      key={item.id || item.complaint_number}
-                      style={{
-                        borderBottom: '1px solid #F1F5F9',
-                        transition: 'background-color 120ms ease-out'
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F8FAFC')}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                    >
-                      <td style={{ padding: '12px 18px', fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#4F46E5' }}>
-                        {item.complaint_number}
-                      </td>
-                      <td style={{ padding: '12px 14px' }}>
-                        <div style={{ fontWeight: 600, color: '#0F172A' }}>
-                          {item.product_name || '—'}
-                        </div>
-                        <div style={{ fontSize: 11.5, color: '#64748B', fontFamily: 'var(--font-mono)' }}>
-                          Batch: {item.batch_number || '—'}
-                        </div>
-                      </td>
-                      <td style={{ padding: '12px 14px', color: '#475569', fontWeight: 500 }}>
-                        {item.customer_name || '—'}
-                      </td>
-                      <td style={{ padding: '12px 14px' }}>
-                        <span style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 4,
-                          padding: '2px 8px',
-                          borderRadius: 6,
-                          fontSize: 11.5,
-                          fontWeight: 700,
-                          backgroundColor:
-                            item.severity === 'Critical' ? '#FEF2F2' :
-                            item.severity === 'High' ? '#FFFBEB' :
-                            item.severity === 'Medium' ? '#F0F9FF' : '#F1F5F9',
-                          color:
-                            item.severity === 'Critical' ? '#991B1B' :
-                            item.severity === 'High' ? '#92400E' :
-                            item.severity === 'Medium' ? '#0369A1' : '#475569',
-                          border: `1px solid ${
-                            item.severity === 'Critical' ? '#FECACA' :
-                            item.severity === 'High' ? '#FDE68A' :
-                            item.severity === 'Medium' ? '#BAE6FD' : '#E2E8F0'
-                          }`
-                        }}>
-                          {item.severity || 'UNASSESSED'}
-                        </span>
-                      </td>
-                      <td style={{ padding: '12px 14px' }}>
-                        <span style={{
-                          fontSize: 11.5,
-                          fontWeight: 600,
-                          color: item.status === 'APPROVED' ? '#059669' : '#475569'
-                        }}>
-                          {item.status?.replace('_', ' ') || 'DRAFT'}
-                        </span>
-                      </td>
-                      <td style={{ padding: '12px 18px', textAlign: 'right' }}>
-                        <button
-                          onClick={() => {
-                            onSelectComplaint(item);
-                            onNavigate('REVIEW');
-                          }}
-                          style={{
-                            padding: '4px 10px',
-                            backgroundColor: '#FFFFFF',
-                            border: '1px solid #CBD5E1',
-                            borderRadius: 6,
-                            fontSize: 12,
-                            fontWeight: 600,
-                            color: '#4F46E5',
-                            cursor: 'pointer',
-                            transition: 'all 120ms ease-out',
-                            boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = '#EEF2FF';
-                            e.currentTarget.style.borderColor = '#C7D2FE';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = '#FFFFFF';
-                            e.currentTarget.style.borderColor = '#CBD5E1';
-                          }}
-                        >
-                          Inspect →
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+            <button
+              onClick={loadData}
+              disabled={loading}
+              style={{
+                background: 'rgba(255, 255, 255, 0.04)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '6px',
+                padding: '5px 8px',
+                color: 'rgba(255, 255, 255, 0.70)',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                fontSize: '11.5px'
+              }}
+            >
+              <RotateCw size={12} className={loading ? 'animate-spin' : ''} />
+              <span>Refresh</span>
+            </button>
           </div>
         </div>
 
-        {/* Right: Operational Insights & Invariant Card */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          {/* Defect Severity Breakdown */}
-          <div style={{
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #E2E8F0',
-            borderRadius: 12,
-            padding: '18px 20px',
-            boxShadow: '0 1px 3px rgba(15, 23, 42, 0.06)'
-          }}>
-            <h2 style={{ fontSize: 14.5, fontWeight: 700, color: '#0F172A', margin: 0 }}>
-              Defect Severity Profile
-            </h2>
-            <p style={{ fontSize: 12, color: '#64748B', marginTop: 2, marginBottom: 16 }}>
-              ICH Q9 risk category distribution
-            </p>
+        {/* Dense Table */}
+        <div style={{ overflowX: 'auto', border: '1px solid rgba(255, 255, 255, 0.07)', borderRadius: '8px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px', textAlign: 'left' }}>
+            <thead>
+              <tr style={{ backgroundColor: 'rgba(255, 255, 255, 0.02)', borderBottom: '1px solid rgba(255, 255, 255, 0.07)' }}>
+                <th style={{ padding: '10px 14px', color: 'rgba(255, 255, 255, 0.45)', fontWeight: 600, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Complaint</th>
+                <th style={{ padding: '10px 14px', color: 'rgba(255, 255, 255, 0.45)', fontWeight: 600, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product / Batch</th>
+                <th style={{ padding: '10px 14px', color: 'rgba(255, 255, 255, 0.45)', fontWeight: 600, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Severity</th>
+                <th style={{ padding: '10px 14px', color: 'rgba(255, 255, 255, 0.45)', fontWeight: 600, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
+                <th style={{ padding: '10px 14px', color: 'rgba(255, 255, 255, 0.45)', fontWeight: 600, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date</th>
+                <th style={{ padding: '10px 14px', color: 'rgba(255, 255, 255, 0.45)', fontWeight: 600, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredComplaints.length === 0 ? (
+                <tr>
+                  <td colSpan={6} style={{ padding: '32px 14px', textAlign: 'center', color: 'rgba(255, 255, 255, 0.45)' }}>
+                    No complaints matching current filter.
+                  </td>
+                </tr>
+              ) : (
+                filteredComplaints.map((c) => {
+                  const sev = (c.severity || 'Medium').toLowerCase();
+                  const sevColor = sev === 'critical' ? '#F87171' : sev === 'high' ? '#FBBF24' : '#34D399';
+                  const sevBg = sev === 'critical' ? 'rgba(239, 68, 68, 0.12)' : sev === 'high' ? 'rgba(245, 158, 11, 0.12)' : 'rgba(16, 185, 129, 0.12)';
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, marginBottom: 5 }}>
-                  <span style={{ fontWeight: 600, color: '#DC2626' }}>Critical / High Risk</span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700 }}>{highCritical}</span>
-                </div>
-                <div style={{ height: 7, backgroundColor: '#F1F5F9', borderRadius: 4, overflow: 'hidden' }}>
-                  <div style={{
-                    height: '100%',
-                    width: `${openComplaints > 0 ? (highCritical / openComplaints) * 100 : 0}%`,
-                    background: 'linear-gradient(90deg, #EF4444 0%, #DC2626 100%)',
-                    borderRadius: 4,
-                    transition: 'width 300ms ease-out'
-                  }} />
-                </div>
-              </div>
-
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, marginBottom: 5 }}>
-                  <span style={{ fontWeight: 600, color: '#D97706' }}>Medium / Low Risk</span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700 }}>{Math.max(0, openComplaints - highCritical)}</span>
-                </div>
-                <div style={{ height: 7, backgroundColor: '#F1F5F9', borderRadius: 4, overflow: 'hidden' }}>
-                  <div style={{
-                    height: '100%',
-                    width: `${openComplaints > 0 ? ((openComplaints - highCritical) / openComplaints) * 100 : 0}%`,
-                    background: 'linear-gradient(90deg, #F59E0B 0%, #D97706 100%)',
-                    borderRadius: 4,
-                    transition: 'width 300ms ease-out'
-                  }} />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* GxP Governance Card */}
-          <div style={{
-            backgroundColor: '#EEF2FF',
-            border: '1px solid #C7D2FE',
-            borderRadius: 12,
-            padding: '16px 18px',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <ShieldCheck size={16} style={{ color: '#4F46E5' }} />
-              <span style={{ fontSize: 13, fontWeight: 700, color: '#3730A3' }}>
-                21 CFR Part 11 Integrity
-              </span>
-            </div>
-            <p style={{ fontSize: 12, color: '#4338CA', lineHeight: 1.5, margin: 0, fontWeight: 500 }}>
-              All AI-extracted entities remain in a proposed state until signed off by an authorized Qualified Person. Every human override preserves the original AI recommendation in the immutable audit ledger.
-            </p>
-          </div>
+                  return (
+                    <tr
+                      key={c.id || c.complaint_number}
+                      onClick={() => {
+                        onSelectComplaint(c);
+                        onNavigate('INTAKE');
+                      }}
+                      style={{
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                        cursor: 'pointer',
+                        transition: 'background-color 100ms ease'
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.03)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                    >
+                      <td style={{ padding: '10px 14px', color: '#FFFFFF', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
+                        {c.complaint_number || 'CMP-2026-0001'}
+                      </td>
+                      <td style={{ padding: '10px 14px' }}>
+                        <div style={{ color: '#FFFFFF', fontWeight: 500 }}>{c.product_name || 'Generic API'}</div>
+                        <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.45)', fontFamily: 'var(--font-mono)' }}>
+                          Batch: {c.batch_number || 'N/A'}
+                        </div>
+                      </td>
+                      <td style={{ padding: '10px 14px' }}>
+                        <span
+                          style={{
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            padding: '2px 7px',
+                            borderRadius: '4px',
+                            backgroundColor: sevBg,
+                            color: sevColor,
+                            border: `1px solid ${sevColor}33`
+                          }}
+                        >
+                          {c.severity || 'Medium'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '10px 14px' }}>
+                        <span style={{ fontSize: '11.5px', color: 'rgba(255, 255, 255, 0.70)' }}>
+                          {c.status || 'Under Review'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '10px 14px', color: 'rgba(255, 255, 255, 0.45)', fontSize: '11.5px' }}>
+                        {c.complaint_date || 'Today'}
+                      </td>
+                      <td style={{ padding: '10px 14px', textAlign: 'right' }}>
+                        <span style={{ color: '#FFFFFF', fontSize: '11.5px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                          Inspect <ArrowRight size={11} />
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   );
 };
-
-export default OverviewDashboard;

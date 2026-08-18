@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   LayoutDashboard,
   FileText,
@@ -41,13 +42,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
     dispatch(setToast({ type: 'info', message: 'Workspace & Copilot context reset.' }));
   };
 
-  const navItems: { id: WorkspaceView; label: string; icon: React.ReactNode; badge?: number }[] = [
-    { id: 'OVERVIEW', label: 'Overview', icon: <LayoutDashboard size={16} /> },
-    { id: 'INTAKE', label: 'Complaints Intake', icon: <FileText size={16} /> },
-    { id: 'REVIEW', label: 'Review Queue', icon: <CheckSquare size={16} />, badge: pendingReviewCount },
-    { id: 'DOCUMENTS', label: 'Evidence Docs', icon: <FileCode2 size={16} /> },
-    { id: 'ANALYTICS', label: 'QMS Analytics', icon: <BarChart3 size={16} /> },
-    { id: 'TIMELINE', label: '21 CFR Audit', icon: <History size={16} /> }
+  const navGroups: {
+    title: string;
+    items: { id: WorkspaceView; label: string; icon: React.ReactNode; badge?: number }[];
+  }[] = [
+    {
+      title: 'WORKSPACE',
+      items: [
+        { id: 'OVERVIEW', label: 'Overview', icon: <LayoutDashboard size={15} /> },
+        { id: 'INTAKE', label: 'Complaints', icon: <FileText size={15} /> },
+        { id: 'REVIEW', label: 'Review Queue', icon: <CheckSquare size={15} />, badge: pendingReviewCount }
+      ]
+    },
+    {
+      title: 'INTELLIGENCE',
+      items: [
+        { id: 'DOCUMENTS', label: 'Documents', icon: <FileCode2 size={15} /> },
+        { id: 'ANALYTICS', label: 'Analytics', icon: <BarChart3 size={15} /> }
+      ]
+    },
+    {
+      title: 'GOVERNANCE',
+      items: [
+        { id: 'TIMELINE', label: 'Audit Trail', icon: <History size={15} /> },
+        { id: 'SYSTEM_HEALTH', label: 'System Health', icon: <Activity size={15} /> }
+      ]
+    }
   ];
 
   const handleItemClick = (id: WorkspaceView) => {
@@ -63,307 +83,270 @@ export const Sidebar: React.FC<SidebarProps> = ({
           className="sidebar-backdrop"
           onClick={onClose}
           aria-hidden="true"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(8, 9, 9, 0.75)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            zIndex: 45
+          }}
         />
       )}
 
-      <aside className={`sidebar-container ${isOpen ? 'open' : ''}`}>
-        {/* Brand Header */}
-        <div style={{
-          padding: '20px 18px 18px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+      <aside
+        className={`sidebar-container ${isOpen ? 'open' : ''}`}
+        style={{
+          width: '240px',
+          height: '100vh',
+          backgroundColor: 'rgba(255, 255, 255, 0.025)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderRight: '1px solid rgba(255, 255, 255, 0.08)',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              background: 'linear-gradient(135deg, #4F46E5 0%, #3B82F6 100%)',
-              color: '#FFFFFF',
+          flexDirection: 'column',
+          flexShrink: 0,
+          zIndex: 46
+        }}
+      >
+        {/* Brand Header */}
+        <div
+          style={{
+            padding: '18px 20px',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.07)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}
+        >
+          <div
+            onClick={() => handleItemClick('LANDING')}
+            style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 800,
-              fontSize: 15,
-              boxShadow: '0 4px 12px rgba(79, 70, 229, 0.35)',
-              letterSpacing: '-0.03em'
-            }}>
+              gap: 10,
+              cursor: 'pointer'
+            }}
+          >
+            <div
+              style={{
+                width: 24,
+                height: 24,
+                borderRadius: 6,
+                background: '#FFFFFF',
+                color: '#080909',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 800,
+                fontSize: 12,
+                letterSpacing: '-0.03em'
+              }}
+            >
               A
             </div>
             <div>
-              <div style={{
-                fontSize: 14,
-                fontWeight: 700,
-                color: '#FFFFFF',
-                letterSpacing: '-0.02em',
-                lineHeight: 1.2,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6
-              }}>
-                <span>AIVOA</span>
-                <span style={{
-                  fontSize: 9,
-                  fontWeight: 600,
-                  backgroundColor: 'rgba(99, 102, 241, 0.2)',
-                  color: '#A5B4FC',
-                  padding: '1px 5px',
-                  borderRadius: 4,
-                  border: '1px solid rgba(165, 180, 252, 0.3)'
-                }}>
-                  GxP
-                </span>
+              <div
+                style={{
+                  fontSize: 13.5,
+                  fontWeight: 700,
+                  color: '#FFFFFF',
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.2
+                }}
+              >
+                AIVOA
               </div>
-              <div style={{
-                fontSize: 11,
-                color: '#94A3B8',
-                lineHeight: 1.2,
-                marginTop: 2
-              }}>
-                Pharma QMS Intelligence
+              <div
+                style={{
+                  fontSize: 9.5,
+                  fontWeight: 600,
+                  color: 'rgba(255, 255, 255, 0.45)',
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase'
+                }}
+              >
+                Quality Intelligence
               </div>
             </div>
           </div>
 
-          {/* Close button for mobile drawer */}
-          {onClose && (
+          {isOpen && (
             <button
               onClick={onClose}
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#94A3B8',
+                color: 'rgba(255, 255, 255, 0.60)',
                 cursor: 'pointer',
                 padding: 4
               }}
-              className="mobile-close-btn"
+              aria-label="Close sidebar"
             >
-              <X size={16} />
+              <X size={18} />
             </button>
           )}
         </div>
 
-        {/* Navigation List */}
-        <nav style={{
-          flex: 1,
-          padding: '16px 12px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 4,
-          overflowY: 'auto'
-        }}>
-          <div style={{
-            fontSize: 10,
-            fontWeight: 700,
-            color: '#64748B',
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            padding: '4px 10px 8px'
-          }}>
-            Operations
-          </div>
-
-          {navItems.map((item) => {
-            const isActive = activeWorkspace === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleItemClick(item.id)}
+        {/* Navigation Section */}
+        <div
+          style={{
+            flex: 1,
+            padding: '16px 12px',
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 20
+          }}
+        >
+          {navGroups.map((group) => (
+            <div key={group.title}>
+              <div
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                  padding: '9px 12px',
-                  borderRadius: 8,
-                  backgroundColor: isActive ? 'rgba(79, 70, 229, 0.16)' : 'transparent',
-                  color: isActive ? '#FFFFFF' : '#94A3B8',
-                  fontWeight: isActive ? 600 : 500,
-                  fontSize: 13,
-                  border: isActive ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid transparent',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'all 160ms ease-out',
-                  position: 'relative'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-                    e.currentTarget.style.color = '#F8FAFC';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = '#94A3B8';
-                  }
+                  fontSize: 10,
+                  fontWeight: 600,
+                  color: 'rgba(255, 255, 255, 0.35)',
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  padding: '0 8px 6px'
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{
-                    color: isActive ? '#818CF8' : '#64748B',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
-                    {item.icon}
-                  </span>
-                  <span>{item.label}</span>
-                </div>
+                {group.title}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {group.items.map((item) => {
+                  const isActive = activeWorkspace === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleItemClick(item.id)}
+                      style={{
+                        height: '38px',
+                        borderRadius: '10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '0 10px',
+                        backgroundColor: isActive ? 'rgba(255, 255, 255, 0.08)' : 'transparent',
+                        color: isActive ? '#FFFFFF' : 'rgba(255, 255, 255, 0.55)',
+                        border: 'none',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        position: 'relative',
+                        transition: 'all 140ms cubic-bezier(0.16, 1, 0.3, 1)',
+                        fontWeight: isActive ? 600 : 500,
+                        fontSize: '13px'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.color = 'rgba(255, 255, 255, 0.85)';
+                          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.035)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.color = 'rgba(255, 255, 255, 0.55)';
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                    >
+                      {isActive && (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            left: 0,
+                            top: '8px',
+                            bottom: '8px',
+                            width: '2px',
+                            backgroundColor: '#FFFFFF',
+                            borderRadius: '0 2px 2px 0'
+                          }}
+                        />
+                      )}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <span style={{ color: isActive ? '#FFFFFF' : 'inherit' }}>{item.icon}</span>
+                        <span>{item.label}</span>
+                      </div>
+                      {item.badge !== undefined && item.badge > 0 && (
+                        <span
+                          style={{
+                            fontSize: '10.5px',
+                            fontWeight: 700,
+                            padding: '1px 6px',
+                            borderRadius: '9999px',
+                            backgroundColor: isActive ? 'rgba(255, 255, 255, 0.20)' : 'rgba(255, 255, 255, 0.08)',
+                            color: '#FFFFFF'
+                          }}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
 
-                {item.badge !== undefined && item.badge > 0 && (
-                  <span style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    padding: '2px 7px',
-                    borderRadius: 9999,
-                    backgroundColor: isActive ? '#4F46E5' : 'rgba(245, 158, 11, 0.2)',
-                    color: isActive ? '#FFFFFF' : '#FBBF24',
-                    border: isActive ? 'none' : '1px solid rgba(245, 158, 11, 0.35)',
-                    fontFamily: 'var(--font-mono)'
-                  }}>
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-
-          <div style={{
-            fontSize: 10,
-            fontWeight: 700,
-            color: '#64748B',
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            padding: '16px 10px 8px'
-          }}>
-            Diagnostics
-          </div>
-
-          <button
-            onClick={() => handleItemClick('SYSTEM_HEALTH')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              width: '100%',
-              padding: '9px 12px',
-              borderRadius: 8,
-              backgroundColor: activeWorkspace === 'SYSTEM_HEALTH' ? 'rgba(79, 70, 229, 0.16)' : 'transparent',
-              color: activeWorkspace === 'SYSTEM_HEALTH' ? '#FFFFFF' : '#94A3B8',
-              fontWeight: activeWorkspace === 'SYSTEM_HEALTH' ? 600 : 500,
-              fontSize: 13,
-              border: activeWorkspace === 'SYSTEM_HEALTH' ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid transparent',
-              cursor: 'pointer',
-              textAlign: 'left',
-              transition: 'all 160ms ease-out'
-            }}
-          >
-            <Activity size={16} style={{ color: activeWorkspace === 'SYSTEM_HEALTH' ? '#818CF8' : '#64748B' }} />
-            <span>Health & Telemetry</span>
-          </button>
-        </nav>
-
-        {/* Footer Tenant & Actions */}
-        <div style={{
-          padding: '16px 14px',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          backgroundColor: 'rgba(0, 0, 0, 0.2)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 12
-        }}>
-          {/* Qualified Person Card */}
-          <div style={{
-            padding: '10px 12px',
-            backgroundColor: 'rgba(255, 255, 255, 0.04)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: 8,
+        {/* Footer Actions */}
+        <div
+          style={{
+            padding: '12px 14px',
+            borderTop: '1px solid rgba(255, 255, 255, 0.07)',
             display: 'flex',
-            alignItems: 'center',
-            gap: 10
-          }}>
-            <div style={{
-              width: 28,
-              height: 28,
-              borderRadius: '50%',
-              backgroundColor: '#1E293B',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
+            flexDirection: 'column',
+            gap: 8
+          }}
+        >
+          <button
+            onClick={handleResetDemo}
+            style={{
+              height: '32px',
+              borderRadius: '8px',
+              backgroundColor: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              color: 'rgba(255, 255, 255, 0.65)',
+              fontSize: '11.5px',
+              fontWeight: 500,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 11,
-              fontWeight: 700,
-              color: '#818CF8'
-            }}>
-              MV
-            </div>
-            <div style={{ minWidth: 0, flex: 1 }}>
-              <div style={{
-                fontSize: 12,
-                fontWeight: 600,
-                color: '#F8FAFC',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5
-              }}>
-                <span>Dr. Marcus Vance</span>
-                <span className="pulse-dot" style={{ backgroundColor: '#10B981', width: 6, height: 6 }} />
-              </div>
-              <div style={{ fontSize: 10.5, color: '#94A3B8' }}>
-                Lead Qualified Person (QP)
-              </div>
-            </div>
-          </div>
+              gap: 6,
+              cursor: 'pointer',
+              transition: 'all 140ms ease-out'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.07)';
+              e.currentTarget.style.color = '#FFFFFF';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
+              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.65)';
+            }}
+          >
+            <RotateCcw size={12} />
+            <span>Reset Demo State</span>
+          </button>
 
-          {/* Quick Context Reset & Command bar hint */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <button
-              onClick={handleResetDemo}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5,
-                fontSize: 11.5,
-                color: '#94A3B8',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '3px 6px',
-                borderRadius: 4,
-                transition: 'color 140ms ease-out'
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#F8FAFC')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = '#94A3B8')}
-              title="Reset current complaint draft session"
-            >
-              <RotateCcw size={12} />
-              <span>Reset Context</span>
-            </button>
-
-            <span style={{
-              display: 'inline-flex',
+          <div
+            style={{
+              display: 'flex',
               alignItems: 'center',
-              gap: 3,
-              fontSize: 10.5,
-              fontFamily: 'var(--font-mono)',
-              color: '#94A3B8',
-              backgroundColor: 'rgba(255, 255, 255, 0.08)',
-              padding: '2px 6px',
-              borderRadius: 4,
-              border: '1px solid rgba(255, 255, 255, 0.1)'
-            }}>
-              <Command size={10} />K
-            </span>
+              justifyContent: 'space-between',
+              padding: '4px 6px',
+              fontSize: '11px',
+              color: 'rgba(255, 255, 255, 0.35)'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Command size={11} />
+              <span>K for search</span>
+            </div>
+            <span>v2.4.0</span>
           </div>
         </div>
       </aside>
     </>
   );
 };
-
-export default Sidebar;

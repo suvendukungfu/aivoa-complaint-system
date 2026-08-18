@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api';
 import type { AuditTimelineResponse } from '../../types';
-import { History, RotateCw, User, Cpu } from 'lucide-react';
+import { History, RotateCw } from 'lucide-react';
+import { getGlassStyle } from '../../design/glass';
 
 interface AuditTimelineProps {
   complaintId?: number;
@@ -40,12 +41,12 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({
 
   const getEventBadge = (actorType: string) => {
     if (actorType === 'AI') {
-      return { label: 'AI Engine', color: '#4F46E5', bg: '#EEF2FF', border: '#C7D2FE' };
+      return { label: 'AI Engine', color: '#FFFFFF', bg: 'rgba(255, 255, 255, 0.08)', border: 'rgba(255, 255, 255, 0.20)' };
     }
     if (actorType === 'HUMAN' || actorType === 'USER') {
-      return { label: 'Qualified Person', color: '#065F46', bg: '#ECFDF5', border: '#A7F3D0' };
+      return { label: 'Qualified Person', color: '#34D399', bg: 'rgba(16, 185, 129, 0.12)', border: 'rgba(16, 185, 129, 0.30)' };
     }
-    return { label: 'GxP System', color: '#475569', bg: '#F1F5F9', border: '#E2E8F0' };
+    return { label: 'GxP System', color: 'rgba(255, 255, 255, 0.70)', bg: 'rgba(255, 255, 255, 0.04)', border: 'rgba(255, 255, 255, 0.10)' };
   };
 
   const filteredEvents = timeline?.events.filter((e) => {
@@ -54,186 +55,208 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({
   }) || [];
 
   return (
-    <div style={{
-      backgroundColor: '#FFFFFF',
-      borderRadius: 12,
-      border: '1px solid #E2E8F0',
-      boxShadow: '0 1px 3px rgba(15, 23, 42, 0.05)',
-      overflow: 'hidden'
-    }} className="animate-fade-in">
+    <div
+      style={{
+        ...getGlassStyle('standard'),
+        overflow: 'hidden'
+      }}
+      className="animate-fade-in"
+    >
       {/* Header */}
-      <div style={{
-        padding: '16px 20px',
-        borderBottom: '1px solid #E2E8F0',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        backgroundColor: '#FAFAFC'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{
-            width: 32,
-            height: 32,
-            borderRadius: 8,
-            backgroundColor: '#EEF2FF',
-            color: '#4F46E5',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: '1px solid #C7D2FE'
-          }}>
+      <div
+        style={{
+          padding: '18px 24px',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          backgroundColor: 'rgba(255, 255, 255, 0.02)',
+          flexWrap: 'wrap',
+          gap: 12
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 8,
+              backgroundColor: 'rgba(255, 255, 255, 0.06)',
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
             <History size={16} />
           </div>
           <div>
-            <h3 style={{ fontSize: 14.5, fontWeight: 700, color: '#0F172A', margin: 0 }}>
-              21 CFR Part 11 Audit Trail & Event Stream
-            </h3>
-            <p style={{ fontSize: 12, color: '#64748B', margin: '2px 0 0' }}>
-              {complaintNumber ? `Record: ${complaintNumber}` : 'Cryptographically verified timeline'}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <h2 style={{ fontSize: '15px', fontWeight: 600, color: '#FFFFFF', margin: 0 }}>
+                AUDIT TRAIL
+              </h2>
+              {complaintNumber && (
+                <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.45)', fontFamily: 'var(--font-mono)' }}>
+                  · {complaintNumber}
+                </span>
+              )}
+            </div>
+            <p style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.55)', margin: '2px 0 0' }}>
+              Immutable quality event history · 21 CFR Part 11 compliant ledger
             </p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 8 }}>
-          <select
-            value={filterActor}
-            onChange={(e) => setFilterActor(e.target.value as any)}
+        {/* Filters and Actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div
             style={{
-              height: 32,
-              padding: '0 10px',
-              borderRadius: 6,
-              border: '1px solid #CBD5E1',
-              fontSize: 12,
-              fontWeight: 600,
-              color: '#334155',
-              backgroundColor: '#FFFFFF'
+              display: 'flex',
+              backgroundColor: 'rgba(255, 255, 255, 0.04)',
+              padding: '2px',
+              borderRadius: '6px',
+              border: '1px solid rgba(255, 255, 255, 0.08)'
             }}
           >
-            <option value="ALL">All Actors</option>
-            <option value="HUMAN">Human Only</option>
-            <option value="AI">AI Only</option>
-          </select>
+            {(['ALL', 'HUMAN', 'AI'] as const).map((mode) => (
+              <button
+                key={mode}
+                onClick={() => setFilterActor(mode)}
+                style={{
+                  padding: '3px 8px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  color: filterActor === mode ? '#FFFFFF' : 'rgba(255, 255, 255, 0.50)',
+                  backgroundColor: filterActor === mode ? 'rgba(255, 255, 255, 0.10)' : 'transparent',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                {mode}
+              </button>
+            ))}
+          </div>
 
-          {complaintId && (
-            <button
-              onClick={() => {
-                loadTimeline(complaintId);
-                if (onRefresh) onRefresh();
-              }}
-              style={{
-                height: 32,
-                padding: '0 10px',
-                borderRadius: 6,
-                border: '1px solid #CBD5E1',
-                backgroundColor: '#FFFFFF',
-                fontSize: 12,
-                fontWeight: 600,
-                color: '#475569',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5
-              }}
-            >
-              <RotateCw size={12} className={loading ? 'animate-spin' : ''} />
-              <span>Refresh</span>
-            </button>
-          )}
+          <button
+            onClick={() => {
+              if (complaintId) loadTimeline(complaintId);
+              if (onRefresh) onRefresh();
+            }}
+            disabled={loading}
+            style={{
+              height: '28px',
+              padding: '0 8px',
+              backgroundColor: 'rgba(255, 255, 255, 0.04)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRadius: '6px',
+              color: 'rgba(255, 255, 255, 0.70)',
+              fontSize: '11.5px',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4
+            }}
+          >
+            <RotateCw size={12} className={loading ? 'animate-spin' : ''} />
+            <span>Refresh</span>
+          </button>
         </div>
       </div>
 
-      {/* Event Timeline List */}
-      <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {/* Timeline Stream */}
+      <div style={{ padding: '20px 24px' }}>
         {error && (
-          <div style={{ fontSize: 12.5, color: '#DC2626', backgroundColor: '#FEF2F2', padding: '10px 14px', borderRadius: 8, border: '1px solid #FECACA' }}>
+          <div style={{ padding: '12px', borderRadius: '8px', backgroundColor: 'rgba(239, 68, 68, 0.12)', color: '#F87171', fontSize: '12px', marginBottom: 14 }}>
             {error}
           </div>
         )}
 
         {filteredEvents.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px 16px', color: '#94A3B8', fontSize: 13 }}>
-            No audit events recorded for the selected filter.
+          <div style={{ textAlign: 'center', padding: '36px 0', color: 'rgba(255, 255, 255, 0.45)', fontSize: '12.5px' }}>
+            No audit records found for this complaint.
           </div>
         ) : (
-          filteredEvents.map((evt, idx) => {
-            const badge = getEventBadge(evt.actor_type);
-            return (
-              <div
-                key={evt.id || idx}
-                style={{
-                  display: 'flex',
-                  gap: 14,
-                  padding: '14px',
-                  backgroundColor: '#F8FAFC',
-                  borderRadius: 10,
-                  border: '1px solid #E2E8F0'
-                }}
-              >
-                <div style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: '50%',
-                  backgroundColor: badge.bg,
-                  border: `1px solid ${badge.border}`,
-                  color: badge.color,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0
-                }}>
-                  {evt.actor_type === 'AI' ? <Cpu size={15} /> : <User size={15} />}
-                </div>
-
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A' }}>
-                        {evt.event_type?.replace(/_/g, ' ')}
-                      </span>
-                      <span style={{
-                        fontSize: 10.5,
-                        fontWeight: 700,
-                        padding: '1px 6px',
-                        borderRadius: 4,
-                        backgroundColor: badge.bg,
-                        color: badge.color,
-                        border: `1px solid ${badge.border}`
-                      }}>
-                        {badge.label}
-                      </span>
-                    </div>
-                    <span style={{ fontSize: 11.5, color: '#64748B', fontFamily: 'var(--font-mono)' }}>
-                      {evt.timestamp ? new Date(evt.timestamp).toLocaleString() : 'Just now'}
-                    </span>
-                  </div>
-
-                  <div style={{ fontSize: 12.5, color: '#334155', lineHeight: 1.4 }}>
-                    {evt.description || `Performed by ${evt.actor || 'System'}`}
-                  </div>
-
-                  {evt.diffs && Object.keys(evt.diffs).length > 0 && (
-                    <div style={{
-                      marginTop: 8,
-                      padding: '8px 10px',
-                      backgroundColor: '#FFFFFF',
-                      borderRadius: 6,
-                      border: '1px solid #E2E8F0',
-                      fontSize: 11.5,
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {filteredEvents.map((evt, idx) => {
+              const badge = getEventBadge(evt.actor_type);
+              return (
+                <div
+                  key={evt.id || idx}
+                  style={{
+                    display: 'flex',
+                    gap: 14,
+                    alignItems: 'flex-start'
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: '11px',
                       fontFamily: 'var(--font-mono)',
-                      color: '#475569',
-                      overflowX: 'auto'
-                    }}>
-                      {JSON.stringify(evt.diffs, null, 2)}
+                      color: 'rgba(255, 255, 255, 0.40)',
+                      width: '70px',
+                      paddingTop: '2px',
+                      flexShrink: 0
+                    }}
+                  >
+                    {evt.timestamp ? new Date(evt.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '00:00:00'}
+                  </div>
+
+                  <div
+                    style={{
+                      width: '8px',
+                      height: '8px',
+                      borderRadius: '50%',
+                      backgroundColor: evt.actor_type === 'HUMAN' ? '#10B981' : '#FFFFFF',
+                      marginTop: '6px',
+                      flexShrink: 0
+                    }}
+                  />
+
+                  <div
+                    style={{
+                      flex: 1,
+                      backgroundColor: 'rgba(255, 255, 255, 0.025)',
+                      border: '1px solid rgba(255, 255, 255, 0.07)',
+                      borderRadius: '8px',
+                      padding: '10px 14px',
+                      fontSize: '12.5px'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            fontWeight: 700,
+                            padding: '1px 5px',
+                            borderRadius: '3px',
+                            backgroundColor: badge.bg,
+                            color: badge.color,
+                            border: `1px solid ${badge.border}`
+                          }}
+                        >
+                          {badge.label}
+                        </span>
+                        <strong style={{ color: '#FFFFFF', fontWeight: 600 }}>{evt.title || evt.event_type}</strong>
+                      </div>
+                      <span style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.40)' }}>
+                        {evt.actor || 'System Operator'}
+                      </span>
                     </div>
-                  )}
+
+                    {evt.description && (
+                      <div style={{ color: 'rgba(255, 255, 255, 0.70)', marginTop: 4, lineHeight: 1.4 }}>
+                        {evt.description}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })
+              );
+            })}
+          </div>
         )}
       </div>
     </div>
   );
 };
-
-export default AuditTimeline;

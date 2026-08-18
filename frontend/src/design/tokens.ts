@@ -1,93 +1,66 @@
-// Modern Premium Design System Tokens
+// AIVOA Design System — Tokens
 export const tokens = {
   colors: {
-    // Canvas & Neutral Hierarchy
-    bgApp: '#F8FAFC',
-    bgSidebar: '#0F172A',
-    bgSidebarSurface: '#1E293B',
-    bgSurface: '#FFFFFF',
-    bgSubtle: '#F1F5F9',
-    bgHover: '#E2E8F0',
-    bgActive: '#CBD5E1',
+    // Dark Atmospheric Foundation
+    bgBase: '#080909',
+    bgSurface: '#0C0D0E',
+    bgElevated: '#111214',
+    bgSidebar: 'rgba(255, 255, 255, 0.025)',
+    bgTopBar: 'rgba(8, 9, 9, 0.75)',
 
-    // Borders
-    border: '#E2E8F0',
-    borderLight: '#F1F5F9',
-    borderStrong: '#CBD5E1',
-    borderFocus: '#6366F1',
+    // Monochrome Text Hierarchy
+    textPrimary: '#FFFFFF',
+    textSecondary: 'rgba(255, 255, 255, 0.78)',
+    textTertiary: 'rgba(255, 255, 255, 0.55)',
+    textMuted: 'rgba(255, 255, 255, 0.38)',
+    textInverse: '#080909',
 
-    // Typography
-    textPrimary: '#0F172A',
-    textSecondary: '#475569',
-    textMuted: '#94A3B8',
-    textLight: '#CBD5E1',
-    textInverse: '#FFFFFF',
+    // Liquid Glass Hierarchy
+    glassSubtle: 'rgba(255, 255, 255, 0.025)',
+    glassStandard: 'rgba(255, 255, 255, 0.04)',
+    glassStrong: 'rgba(255, 255, 255, 0.065)',
+    glassHighlight: 'rgba(255, 255, 255, 0.12)',
+    glassEdge: 'rgba(255, 255, 255, 0.16)',
+    glassBorder: 'rgba(255, 255, 255, 0.08)',
+    glassShadow: 'rgba(0, 0, 0, 0.30)',
+    shadowModal: '0 24px 48px -12px rgba(0, 0, 0, 0.65)',
 
-    // Primary Accents (Modern Indigo-Blue)
-    primary: '#4F46E5',
-    primaryHover: '#4338CA',
-    primaryLight: '#6366F1',
-    primarySubtle: '#EEF2FF',
-    primaryBorder: '#C7D2FE',
-    primaryText: '#3730A3',
+    // Sparingly Used Semantic QMS Colors
+    critical: '#EF4444',
+    criticalSubtle: 'rgba(239, 68, 68, 0.15)',
+    criticalBorder: 'rgba(239, 68, 68, 0.35)',
 
-    // Semantic States
-    success: '#10B981',
-    successHover: '#059669',
-    successSubtle: '#ECFDF5',
-    successBorder: '#A7F3D0',
-    successText: '#065F46',
+    high: '#F59E0B',
+    highSubtle: 'rgba(245, 158, 11, 0.15)',
+    highBorder: 'rgba(245, 158, 11, 0.35)',
 
-    warning: '#F59E0B',
-    warningHover: '#D97706',
-    warningSubtle: '#FFFBEB',
-    warningBorder: '#FDE68A',
-    warningText: '#92400E',
+    medium: '#EAB308',
+    mediumSubtle: 'rgba(234, 179, 8, 0.12)',
+    mediumBorder: 'rgba(234, 179, 8, 0.30)',
 
-    danger: '#EF4444',
-    dangerHover: '#DC2626',
-    dangerSubtle: '#FEF2F2',
-    dangerBorder: '#FECACA',
-    dangerText: '#991B1B',
+    low: '#10B981',
+    lowSubtle: 'rgba(16, 185, 129, 0.12)',
+    lowBorder: 'rgba(16, 185, 129, 0.30)',
 
-    info: '#0EA5E9',
-    infoSubtle: '#F0F9FF',
-    infoBorder: '#BAE6FD',
-    infoText: '#0369A1',
-
-    // Monochrome Liquid Glass (Landing Experience)
-    glassWhite: 'rgba(255, 255, 255, 0.02)',
-    glassWhiteSoft: 'rgba(255, 255, 255, 0.01)',
-    glassBorder: 'rgba(255, 255, 255, 0.12)',
-    glassBorderHighlight: 'rgba(255, 255, 255, 0.25)',
-    glassShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
-    landingBackground: '#080B10',
-    landingTextPrimary: '#FFFFFF',
-    landingTextSecondary: 'rgba(255, 255, 255, 0.80)',
-    landingTextMuted: 'rgba(255, 255, 255, 0.60)',
-    landingTextVeryMuted: 'rgba(255, 255, 255, 0.45)'
+    approved: '#10B981',
+    approvedSubtle: 'rgba(16, 185, 129, 0.12)',
+    rejected: '#EF4444',
+    rejectedSubtle: 'rgba(239, 68, 68, 0.12)',
+    pending: '#F59E0B',
+    pendingSubtle: 'rgba(245, 158, 11, 0.12)'
   },
 
   radii: {
     xs: '4px',
     sm: '6px',
-    md: '8px',
-    lg: '12px',
-    xl: '16px',
+    md: '10px',
+    lg: '14px',
+    xl: '18px',
     full: '9999px'
   },
 
-  shadows: {
-    subtle: '0 1px 2px 0 rgba(15, 23, 42, 0.05)',
-    card: '0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.04)',
-    elevated: '0 4px 12px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04)',
-    popover: '0 10px 25px -3px rgba(15, 23, 42, 0.12), 0 4px 10px -2px rgba(15, 23, 42, 0.04)',
-    modal: '0 20px 35px -5px rgba(15, 23, 42, 0.2), 0 10px 15px -5px rgba(15, 23, 42, 0.08)'
-  },
-
-  transitions: {
-    fast: '120ms cubic-bezier(0.16, 1, 0.3, 1)',
-    normal: '200ms cubic-bezier(0.16, 1, 0.3, 1)',
-    slow: '300ms cubic-bezier(0.16, 1, 0.3, 1)'
+  spacing: {
+    sidebarWidth: '240px',
+    topBarHeight: '58px'
   }
-} as const;
+};
