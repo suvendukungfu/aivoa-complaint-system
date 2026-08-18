@@ -9,7 +9,8 @@ import {
   Database,
   ChevronDown,
   Command,
-  Plus
+  Plus,
+  Menu
 } from 'lucide-react';
 import type { WorkspaceView } from '../App';
 
@@ -32,12 +33,14 @@ interface TopBarProps {
   activeWorkspace: WorkspaceView;
   onOpenCommandBar: () => void;
   onNewComplaint: () => void;
+  onToggleMobileMenu?: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
   activeWorkspace,
   onOpenCommandBar,
-  onNewComplaint
+  onNewComplaint,
+  onToggleMobileMenu
 }) => {
   const dispatch = useAppDispatch();
   const complaintData = useAppSelector((state) => state.complaint.data);
@@ -120,31 +123,52 @@ export const TopBar: React.FC<TopBarProps> = ({
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      padding: '0 20px',
+      padding: '0 16px',
       flexShrink: 0,
-      zIndex: 10
+      zIndex: 10,
+      gap: 12
     }}>
-      {/* Breadcrumb Context */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Workspace</span>
-        <span style={{ fontSize: 12, color: 'var(--text-light)' }}>/</span>
-        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
-          {workspaceLabels[activeWorkspace]}
-        </span>
-        {activeWorkspace === 'INTAKE' && complaintData.complaint_number && (
-          <span style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: 11,
-            fontWeight: 600,
-            color: 'var(--primary)',
-            backgroundColor: 'var(--primary-subtle)',
-            padding: '1px 6px',
-            borderRadius: 'var(--radius-xs)',
-            marginLeft: 4
-          }}>
-            {complaintData.complaint_number}
-          </span>
+      {/* Mobile Drawer Trigger & Breadcrumbs */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+        {onToggleMobileMenu && (
+          <button
+            onClick={onToggleMobileMenu}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '4px'
+            }}
+            aria-label="Toggle navigation menu"
+          >
+            <Menu size={16} />
+          </button>
         )}
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Workspace</span>
+          <span style={{ fontSize: 12, color: 'var(--text-light)' }}>/</span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+            {workspaceLabels[activeWorkspace]}
+          </span>
+          {activeWorkspace === 'INTAKE' && complaintData.complaint_number && (
+            <span style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: 11,
+              fontWeight: 600,
+              color: 'var(--primary)',
+              backgroundColor: 'var(--primary-subtle)',
+              padding: '1px 6px',
+              borderRadius: 'var(--radius-xs)',
+              marginLeft: 4
+            }}>
+              {complaintData.complaint_number}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Global Search Command Bar Trigger */}
@@ -161,14 +185,15 @@ export const TopBar: React.FC<TopBarProps> = ({
           color: 'var(--text-muted)',
           fontSize: 12,
           cursor: 'pointer',
-          width: '280px',
+          maxWidth: '280px',
+          flex: '1 1 auto',
           justifyContent: 'space-between',
           transition: 'border-color var(--transition-fast)'
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Search size={13} />
-          <span>Search or jump to...</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
+          <Search size={13} style={{ flexShrink: 0 }} />
+          <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>Search or jump to...</span>
         </div>
         <span style={{
           display: 'inline-flex',
@@ -179,14 +204,15 @@ export const TopBar: React.FC<TopBarProps> = ({
           backgroundColor: 'var(--bg-surface)',
           border: '1px solid var(--border)',
           borderRadius: 'var(--radius-xs)',
-          padding: '1px 4px'
+          padding: '1px 4px',
+          flexShrink: 0
         }}>
           <Command size={9} />K
         </span>
       </button>
 
       {/* Action Controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
         {/* Scenario Loader Dropdown */}
         <div style={{ position: 'relative' }}>
           <button
@@ -194,8 +220,8 @@ export const TopBar: React.FC<TopBarProps> = ({
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 5,
-              padding: '5px 10px',
+              gap: 4,
+              padding: '5px 9px',
               backgroundColor: 'var(--bg-surface)',
               border: '1px solid var(--border)',
               borderRadius: 'var(--radius-sm)',
@@ -260,14 +286,14 @@ export const TopBar: React.FC<TopBarProps> = ({
           )}
         </div>
 
-        {/* Database Complaints */}
+        {/* Database Ledger */}
         <button
           onClick={handleOpenDatabaseModal}
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 5,
-            padding: '5px 10px',
+            gap: 4,
+            padding: '5px 9px',
             backgroundColor: 'var(--bg-surface)',
             border: '1px solid var(--border)',
             borderRadius: 'var(--radius-sm)',
@@ -289,7 +315,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             display: 'flex',
             alignItems: 'center',
             gap: 4,
-            padding: '5px 11px',
+            padding: '5px 10px',
             backgroundColor: 'var(--text-primary)',
             color: '#FFFFFF',
             border: 'none',
@@ -301,7 +327,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           }}
         >
           <Plus size={13} />
-          <span>New Intake</span>
+          <span>New</span>
         </button>
       </div>
     </header>

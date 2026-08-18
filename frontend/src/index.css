@@ -125,6 +125,7 @@ button, input, textarea, select {
   width: 100vw;
   overflow: hidden;
   background-color: var(--bg-app);
+  position: relative;
 }
 
 .main-viewport {
@@ -140,7 +141,54 @@ button, input, textarea, select {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 24px;
+  padding: 20px;
+}
+
+/* Responsive Sidebar Drawer */
+.sidebar-container {
+  width: 230px;
+  height: 100vh;
+  flex-shrink: 0;
+  transition: transform var(--transition-normal);
+  z-index: 40;
+}
+
+@media (max-width: 1024px) {
+  .workspace-scrollable {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    box-shadow: var(--shadow-modal);
+    transform: translateX(-100%);
+  }
+
+  .sidebar-container.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(17, 24, 39, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 39;
+  }
+
+  .intake-layout-grid {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+  }
+
+  .review-cockpit-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 /* Provenance Indicator Badge */

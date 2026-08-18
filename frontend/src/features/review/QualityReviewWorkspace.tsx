@@ -400,7 +400,7 @@ export const QualityReviewWorkspace: React.FC<QualityReviewWorkspaceProps> = ({
             />
 
             {/* 3-Column Review Grid: Left: Meta, Center: Evidence & Details, Right: AI Proposals & Actions */}
-            <div style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.2fr 1fr', gap: 12, alignItems: 'start' }}>
+            <div className="review-cockpit-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12, alignItems: 'start' }}>
               
               {/* LEFT COLUMN: Complaint Information & Scope */}
               <div style={{ backgroundColor: '#FFFFFF', borderRadius: 4, border: '1px solid #E5E7EB', padding: '14px', display: 'flex', flexDirection: 'column', gap: 10 }}>

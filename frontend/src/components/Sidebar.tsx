@@ -9,7 +9,8 @@ import {
   Activity,
   RotateCcw,
   ShieldCheck,
-  Command
+  Command,
+  X
 } from 'lucide-react';
 import type { WorkspaceView } from '../App';
 import { useAppDispatch } from '../store';
@@ -22,12 +23,16 @@ interface SidebarProps {
   activeWorkspace: WorkspaceView;
   onSelectWorkspace: (view: WorkspaceView) => void;
   pendingReviewCount?: number;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   activeWorkspace,
   onSelectWorkspace,
-  pendingReviewCount = 3
+  pendingReviewCount = 3,
+  isOpen = false,
+  onClose
 }) => {
   const dispatch = useAppDispatch();
 
@@ -47,94 +52,117 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'TIMELINE', label: 'Audit Trail', icon: <History size={15} /> }
   ];
 
+  const handleItemClick = (id: WorkspaceView) => {
+    onSelectWorkspace(id);
+    if (onClose) onClose();
+  };
+
   return (
-    <aside style={{
-      width: '230px',
-      backgroundColor: 'var(--bg-sidebar)',
-      borderRight: '1px solid var(--border)',
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100vh',
-      flexShrink: 0,
-      userSelect: 'none'
-    }}>
-      {/* Brand & Workspace Identity */}
-      <div style={{
-        padding: '16px 18px 14px',
-        borderBottom: '1px solid var(--border)',
+    <>
+      {/* Mobile Backdrop */}
+      {isOpen && (
+        <div
+          className="sidebar-backdrop"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
+
+      <aside className={`sidebar-container ${isOpen ? 'open' : ''}`} style={{
+        backgroundColor: 'var(--bg-sidebar)',
+        borderRight: '1px solid var(--border)',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
+        flexDirection: 'column',
+        userSelect: 'none'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{
-            width: 22,
-            height: 22,
-            borderRadius: 4,
-            backgroundColor: 'var(--text-primary)',
-            color: '#FFFFFF',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 700,
-            fontSize: 11,
-            letterSpacing: '-0.02em'
-          }}>
-            A
-          </div>
-          <div>
+        {/* Brand & Workspace Identity */}
+        <div style={{
+          padding: '16px 18px 14px',
+          borderBottom: '1px solid var(--border)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{
-              fontSize: 13,
-              fontWeight: 600,
-              color: 'var(--text-primary)',
-              letterSpacing: '-0.01em',
-              lineHeight: 1.2
-            }}>
-              AIVOA
-            </div>
-            <div style={{
+              width: 22,
+              height: 22,
+              borderRadius: 4,
+              backgroundColor: 'var(--text-primary)',
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 700,
               fontSize: 11,
-              color: 'var(--text-muted)',
-              lineHeight: 1.2
+              letterSpacing: '-0.02em'
             }}>
-              Quality Operations
+              A
+            </div>
+            <div>
+              <div style={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+                letterSpacing: '-0.01em',
+                lineHeight: 1.2
+              }}>
+                AIVOA
+              </div>
+              <div style={{
+                fontSize: 11,
+                color: 'var(--text-muted)',
+                lineHeight: 1.2
+              }}>
+                Quality Operations
+              </div>
             </div>
           </div>
+
+          {/* Close button for mobile drawer */}
+          {onClose && (
+            <button
+              onClick={onClose}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                display: 'none'
+              }}
+              className="mobile-close-btn"
+            >
+              <X size={15} />
+            </button>
+          )}
         </div>
 
-        <div style={{
-          fontSize: 10,
-          fontWeight: 600,
-          color: 'var(--success-text)',
-          backgroundColor: 'var(--success-subtle)',
-          border: '1px solid var(--success-border)',
-          borderRadius: 'var(--radius-xs)',
-          padding: '1px 5px'
+        {/* Navigation Item List */}
+        <nav style={{
+          flex: 1,
+          padding: '12px 10px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+          overflowY: 'auto'
         }}>
-          GxP
-        </div>
-      </div>
+          <div style={{
+            fontSize: 10,
+            fontWeight: 600,
+            color: 'var(--text-muted)',
+            letterSpacing: '0.04em',
+            textTransform: 'uppercase',
+            padding: '4px 8px 6px'
+          }}>
+            Workspace
+          </div>
 
-      {/* Primary Navigation Items */}
-      <div style={{ flex: 1, padding: '12px 8px', overflowY: 'auto' }}>
-        <div style={{
-          fontSize: 10,
-          fontWeight: 600,
-          letterSpacing: '0.06em',
-          textTransform: 'uppercase',
-          color: 'var(--text-muted)',
-          padding: '4px 10px 8px'
-        }}>
-          Workspaces
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {navItems.map((item) => {
             const isActive = activeWorkspace === item.id;
             return (
               <button
                 key={item.id}
-                onClick={() => onSelectWorkspace(item.id)}
+                onClick={() => handleItemClick(item.id)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -142,14 +170,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   width: '100%',
                   padding: '7px 10px',
                   borderRadius: 'var(--radius-sm)',
-                  border: 'none',
-                  backgroundColor: isActive ? 'var(--bg-surface)' : 'transparent',
+                  backgroundColor: isActive ? 'var(--bg-subtle)' : 'transparent',
                   color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  fontWeight: isActive ? 600 : 500,
+                  fontWeight: isActive ? 600 : 450,
                   fontSize: 12.5,
+                  border: 'none',
                   cursor: 'pointer',
-                  boxShadow: isActive ? 'var(--shadow-subtle)' : 'none',
-                  transition: 'background-color var(--transition-fast)'
+                  textAlign: 'left',
+                  transition: 'background-color var(--transition-fast), color var(--transition-fast)'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
@@ -163,11 +197,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span style={{
                     fontSize: 10.5,
                     fontWeight: 600,
-                    backgroundColor: isActive ? 'var(--primary-subtle)' : 'var(--bg-subtle)',
-                    color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
-                    borderRadius: 10,
-                    padding: '1px 6px',
-                    fontVariantNumeric: 'tabular-nums'
+                    padding: '1px 5px',
+                    borderRadius: 'var(--radius-xs)',
+                    backgroundColor: isActive ? 'var(--primary)' : 'var(--border-strong)',
+                    color: isActive ? '#FFFFFF' : 'var(--text-primary)',
+                    fontFamily: 'var(--font-mono)'
                   }}>
                     {item.badge}
                   </span>
@@ -175,130 +209,108 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
             );
           })}
-        </div>
 
-        {/* System & Secondary Navigation */}
-        <div style={{
-          fontSize: 10,
-          fontWeight: 600,
-          letterSpacing: '0.06em',
-          textTransform: 'uppercase',
-          color: 'var(--text-muted)',
-          padding: '18px 10px 8px'
-        }}>
-          System
-        </div>
+          <div style={{
+            fontSize: 10,
+            fontWeight: 600,
+            color: 'var(--text-muted)',
+            letterSpacing: '0.04em',
+            textTransform: 'uppercase',
+            padding: '14px 8px 6px'
+          }}>
+            Infrastructure
+          </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <button
-            onClick={() => onSelectWorkspace('SYSTEM_HEALTH')}
+            onClick={() => handleItemClick('SYSTEM_HEALTH')}
             style={{
               display: 'flex',
               alignItems: 'center',
+              gap: 9,
               width: '100%',
               padding: '7px 10px',
               borderRadius: 'var(--radius-sm)',
-              border: 'none',
-              backgroundColor: activeWorkspace === 'SYSTEM_HEALTH' ? 'var(--bg-surface)' : 'transparent',
+              backgroundColor: activeWorkspace === 'SYSTEM_HEALTH' ? 'var(--bg-subtle)' : 'transparent',
               color: activeWorkspace === 'SYSTEM_HEALTH' ? 'var(--text-primary)' : 'var(--text-secondary)',
-              fontWeight: activeWorkspace === 'SYSTEM_HEALTH' ? 600 : 500,
+              fontWeight: activeWorkspace === 'SYSTEM_HEALTH' ? 600 : 450,
               fontSize: 12.5,
-              cursor: 'pointer',
-              boxShadow: activeWorkspace === 'SYSTEM_HEALTH' ? 'var(--shadow-subtle)' : 'none'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-              <span style={{ color: activeWorkspace === 'SYSTEM_HEALTH' ? 'var(--primary)' : 'var(--text-muted)' }}>
-                <Activity size={15} />
-              </span>
-              <span>System Health</span>
-            </div>
-          </button>
-
-          <button
-            onClick={handleResetDemo}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              width: '100%',
-              padding: '7px 10px',
-              borderRadius: 'var(--radius-sm)',
               border: 'none',
-              backgroundColor: 'transparent',
-              color: 'var(--text-secondary)',
-              fontWeight: 500,
-              fontSize: 12.5,
               cursor: 'pointer',
+              textAlign: 'left',
               transition: 'background-color var(--transition-fast)'
             }}
-            title="Reset active complaint and copilot draft"
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-              <RotateCcw size={14} style={{ color: 'var(--text-muted)' }} />
-              <span>Reset Context</span>
-            </div>
+            <Activity size={15} style={{ color: activeWorkspace === 'SYSTEM_HEALTH' ? 'var(--primary)' : 'var(--text-muted)' }} />
+            <span>Diagnostics</span>
           </button>
-        </div>
-      </div>
+        </nav>
 
-      {/* Footer User Info & Shortcut */}
-      <div style={{
-        padding: '12px 14px',
-        borderTop: '1px solid var(--border)',
-        backgroundColor: 'var(--bg-surface)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-            <div style={{
-              width: 20,
-              height: 20,
-              borderRadius: '50%',
-              backgroundColor: '#EFF6FF',
-              color: 'var(--primary)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 10,
-              fontWeight: 600
-            }}>
-              QP
-            </div>
-            <div>
-              <div style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.2 }}>
-                Elena Vance
+        {/* Footer Tenant & Utility */}
+        <div style={{
+          padding: '12px 14px',
+          borderTop: '1px solid var(--border)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 10
+        }}>
+          {/* Active Tenant / QP Badge */}
+          <div style={{
+            padding: '8px 10px',
+            backgroundColor: 'var(--bg-subtle)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius-sm)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8
+          }}>
+            <ShieldCheck size={14} style={{ color: 'var(--success)', flexShrink: 0 }} />
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                Dr. Marcus Vance, QP
               </div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.2 }}>
-                Qualified Person
+              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                Qualified Person · GxP
               </div>
             </div>
           </div>
-          <ShieldCheck size={14} style={{ color: 'var(--success)' }} />
-        </div>
 
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          fontSize: 10.5,
-          color: 'var(--text-muted)',
-          paddingTop: 6,
-          borderTop: '1px solid var(--bg-subtle)'
-        }}>
-          <span>Command Bar</span>
-          <span style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 2,
-            backgroundColor: 'var(--bg-subtle)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-xs)',
-            padding: '1px 4px',
-            fontFamily: 'var(--font-mono)'
-          }}>
-            <Command size={9} />K
-          </span>
+          {/* Reset Demo / Re-seed action */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <button
+              onClick={handleResetDemo}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
+                fontSize: 11,
+                color: 'var(--text-muted)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '2px 4px',
+                borderRadius: 'var(--radius-xs)'
+              }}
+              title="Reset current complaint draft session"
+            >
+              <RotateCcw size={11} />
+              <span>Reset Context</span>
+            </button>
+
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 2,
+              fontSize: 10,
+              fontFamily: 'var(--font-mono)',
+              color: 'var(--text-muted)'
+            }}>
+              <Command size={9} />K
+            </span>
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 };
+
+export default Sidebar;
