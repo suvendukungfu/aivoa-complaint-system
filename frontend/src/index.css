@@ -273,3 +273,26 @@ button, input, textarea, select {
 .animate-slide-up {
   animation: slideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@media (max-width: 768px) {
+  .landing-desktop-nav {
+    display: none !important;
+  }
+  .landing-mobile-btn {
+    display: block !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

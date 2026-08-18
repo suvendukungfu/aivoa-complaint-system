@@ -107,6 +107,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   };
 
   const workspaceLabels: Record<WorkspaceView, string> = {
+    LANDING: 'AIVOA Home',
     OVERVIEW: 'Overview Dashboard',
     INTAKE: 'Complaint Intake & Copilot',
     REVIEW: 'Quality Review Queue',

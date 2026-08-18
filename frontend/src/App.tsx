@@ -22,6 +22,8 @@ import {
 } from 'lucide-react';
 import type { ComplaintData } from './types';
 
+import { LandingPage } from './features/landing/LandingPage';
+
 // Performance optimization: Lazy-load secondary analytical views
 const DocumentsView = lazy(() => import('./features/documents/DocumentsView').then((m) => ({ default: m.DocumentsView })));
 const AnalyticsDashboard = lazy(() => import('./features/analytics/AnalyticsDashboard').then((m) => ({ default: m.AnalyticsDashboard })));
@@ -29,7 +31,7 @@ const AuditTimeline = lazy(() => import('./features/review/AuditTimeline').then(
 const SystemHealthView = lazy(() => import('./features/system/SystemHealthView').then((m) => ({ default: m.SystemHealthView })));
 const AnalyticsModal = lazy(() => import('./features/analytics/AnalyticsModal').then((m) => ({ default: m.AnalyticsModal })));
 
-export type WorkspaceView = 'OVERVIEW' | 'INTAKE' | 'REVIEW' | 'DOCUMENTS' | 'ANALYTICS' | 'TIMELINE' | 'SYSTEM_HEALTH';
+export type WorkspaceView = 'LANDING' | 'OVERVIEW' | 'INTAKE' | 'REVIEW' | 'DOCUMENTS' | 'ANALYTICS' | 'TIMELINE' | 'SYSTEM_HEALTH';
 
 export const App: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -48,13 +50,15 @@ export const App: React.FC = () => {
     if (hash === 'analytics') return 'ANALYTICS';
     if (hash === 'timeline' || hash === 'audit') return 'TIMELINE';
     if (hash === 'system' || hash === 'health') return 'SYSTEM_HEALTH';
-    return 'OVERVIEW';
+    if (hash === 'overview' || hash === 'app') return 'OVERVIEW';
+    return 'LANDING';
   });
 
   const handleWorkspaceChange = (view: WorkspaceView) => {
     setActiveWorkspace(view);
     setIsMobileSidebarOpen(false);
     const hashMapping: Record<WorkspaceView, string> = {
+      LANDING: '#landing',
       OVERVIEW: '#overview',
       INTAKE: '#complaints',
       REVIEW: '#review',
@@ -75,7 +79,8 @@ export const App: React.FC = () => {
       else if (hash === 'analytics') setActiveWorkspace('ANALYTICS');
       else if (hash === 'timeline' || hash === 'audit') setActiveWorkspace('TIMELINE');
       else if (hash === 'system' || hash === 'health') setActiveWorkspace('SYSTEM_HEALTH');
-      else if (hash === 'overview') setActiveWorkspace('OVERVIEW');
+      else if (hash === 'overview' || hash === 'app') setActiveWorkspace('OVERVIEW');
+      else if (hash === 'landing' || hash === '') setActiveWorkspace('LANDING');
     };
 
     window.addEventListener('hashchange', handleHashChange);
@@ -126,6 +131,14 @@ export const App: React.FC = () => {
     dispatch(resetComplaint());
     handleWorkspaceChange('INTAKE');
   };
+
+  if (activeWorkspace === 'LANDING') {
+    return (
+      <ErrorBoundary>
+        <LandingPage onEnterWorkspace={(view) => handleWorkspaceChange(view || 'OVERVIEW')} />
+      </ErrorBoundary>
+    );
+  }
 
   return (
     <ErrorBoundary>
