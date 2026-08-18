@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './store';
-import { clearToast } from './store/uiSlice';
+import { clearToast, setSelectedFieldForEvidence } from './store/uiSlice';
 import { setAnalyticsOpen } from './store/aiSlice';
-import { setComplaintData } from './store/complaintSlice';
-import { Header } from './components/Header';
+import { setComplaintData, resetComplaint } from './store/complaintSlice';
+import { Sidebar } from './components/Sidebar';
+import { TopBar } from './components/TopBar';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { OverviewDashboard } from './features/overview/OverviewDashboard';
 import { ComplaintForm } from './features/complaint/ComplaintForm';
@@ -21,14 +22,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Info,
-  X,
-  LayoutDashboard,
-  FileText,
-  CheckSquare,
-  FileCode2,
-  BarChart3,
-  History,
-  Activity
+  X
 } from 'lucide-react';
 import type { ComplaintData } from './types';
 
@@ -88,6 +82,7 @@ export const App: React.FC = () => {
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') {
         return;
       }
+
       if (e.key === 'n' || e.key === 'N') {
         e.preventDefault();
         handleWorkspaceChange('INTAKE');
@@ -121,9 +116,14 @@ export const App: React.FC = () => {
     dispatch(setComplaintData(complaint));
   };
 
+  const handleNewComplaint = () => {
+    dispatch(resetComplaint());
+    handleWorkspaceChange('INTAKE');
+  };
+
   return (
     <ErrorBoundary>
-      <div className="app-container">
+      <div className="app-layout">
         {/* Toast Notification Banner */}
         {toast && (
           <div style={{
@@ -131,17 +131,17 @@ export const App: React.FC = () => {
             top: 16,
             right: 20,
             zIndex: 100,
-            backgroundColor: toast.type === 'success' ? '#065F46' : toast.type === 'error' ? '#991B1B' : '#1E3A8A',
+            backgroundColor: toast.type === 'success' ? 'var(--success-text)' : toast.type === 'error' ? 'var(--danger-text)' : 'var(--primary-text)',
             color: '#FFFFFF',
             padding: '8px 14px',
-            borderRadius: 4,
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            borderRadius: 'var(--radius-sm)',
+            boxShadow: 'var(--shadow-modal)',
             display: 'flex',
             alignItems: 'center',
             gap: 8,
             fontSize: 12,
             fontWeight: 500,
-            animation: 'slideUp 0.2s ease-out'
+            animation: 'slideUp 0.18s ease-out'
           }}>
             {toast.type === 'success' && <CheckCircle2 size={14} />}
             {toast.type === 'error' && <AlertCircle size={14} />}
@@ -162,231 +162,88 @@ export const App: React.FC = () => {
           </div>
         )}
 
-        {/* Enterprise Application Header */}
-        <Header />
+        {/* Quiet Desktop Left Sidebar */}
+        <Sidebar
+          activeWorkspace={activeWorkspace}
+          onSelectWorkspace={handleWorkspaceChange}
+        />
 
-        {/* Primary Workflow Navigation Bar */}
-        <nav style={{
-          backgroundColor: '#FFFFFF',
-          borderBottom: '1px solid #E5E7EB',
-          padding: '0 20px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap'
-        }}>
-          <div style={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-            <button
-              onClick={() => handleWorkspaceChange('OVERVIEW')}
-              style={{
-                padding: '10px 12px',
-                border: 'none',
-                background: 'none',
-                fontSize: 12,
-                fontWeight: activeWorkspace === 'OVERVIEW' ? 600 : 500,
-                color: activeWorkspace === 'OVERVIEW' ? '#1D4ED8' : '#6B7280',
-                borderBottom: activeWorkspace === 'OVERVIEW' ? '2px solid #1D4ED8' : '2px solid transparent',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5
-              }}
-            >
-              <LayoutDashboard size={13} />
-              <span>Overview</span>
-            </button>
-
-            <button
-              onClick={() => handleWorkspaceChange('INTAKE')}
-              style={{
-                padding: '10px 12px',
-                border: 'none',
-                background: 'none',
-                fontSize: 12,
-                fontWeight: activeWorkspace === 'INTAKE' ? 600 : 500,
-                color: activeWorkspace === 'INTAKE' ? '#1D4ED8' : '#6B7280',
-                borderBottom: activeWorkspace === 'INTAKE' ? '2px solid #1D4ED8' : '2px solid transparent',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5
-              }}
-            >
-              <FileText size={13} />
-              <span>Complaints</span>
-            </button>
-
-            <button
-              onClick={() => handleWorkspaceChange('REVIEW')}
-              style={{
-                padding: '10px 12px',
-                border: 'none',
-                background: 'none',
-                fontSize: 12,
-                fontWeight: activeWorkspace === 'REVIEW' ? 600 : 500,
-                color: activeWorkspace === 'REVIEW' ? '#1D4ED8' : '#6B7280',
-                borderBottom: activeWorkspace === 'REVIEW' ? '2px solid #1D4ED8' : '2px solid transparent',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5
-              }}
-            >
-              <CheckSquare size={13} />
-              <span>Review Queue</span>
-            </button>
-
-            <button
-              onClick={() => handleWorkspaceChange('DOCUMENTS')}
-              style={{
-                padding: '10px 12px',
-                border: 'none',
-                background: 'none',
-                fontSize: 12,
-                fontWeight: activeWorkspace === 'DOCUMENTS' ? 600 : 500,
-                color: activeWorkspace === 'DOCUMENTS' ? '#1D4ED8' : '#6B7280',
-                borderBottom: activeWorkspace === 'DOCUMENTS' ? '2px solid #1D4ED8' : '2px solid transparent',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5
-              }}
-            >
-              <FileCode2 size={13} />
-              <span>Documents</span>
-            </button>
-
-            <button
-              onClick={() => handleWorkspaceChange('ANALYTICS')}
-              style={{
-                padding: '10px 12px',
-                border: 'none',
-                background: 'none',
-                fontSize: 12,
-                fontWeight: activeWorkspace === 'ANALYTICS' ? 600 : 500,
-                color: activeWorkspace === 'ANALYTICS' ? '#1D4ED8' : '#6B7280',
-                borderBottom: activeWorkspace === 'ANALYTICS' ? '2px solid #1D4ED8' : '2px solid transparent',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5
-              }}
-            >
-              <BarChart3 size={13} />
-              <span>Analytics</span>
-            </button>
-
-            <button
-              onClick={() => handleWorkspaceChange('TIMELINE')}
-              style={{
-                padding: '10px 12px',
-                border: 'none',
-                background: 'none',
-                fontSize: 12,
-                fontWeight: activeWorkspace === 'TIMELINE' ? 600 : 500,
-                color: activeWorkspace === 'TIMELINE' ? '#1D4ED8' : '#6B7280',
-                borderBottom: activeWorkspace === 'TIMELINE' ? '2px solid #1D4ED8' : '2px solid transparent',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5
-              }}
-            >
-              <History size={13} />
-              <span>Audit Trail</span>
-            </button>
-
-            <button
-              onClick={() => handleWorkspaceChange('SYSTEM_HEALTH')}
-              style={{
-                padding: '10px 12px',
-                border: 'none',
-                background: 'none',
-                fontSize: 12,
-                fontWeight: activeWorkspace === 'SYSTEM_HEALTH' ? 600 : 500,
-                color: activeWorkspace === 'SYSTEM_HEALTH' ? '#1D4ED8' : '#6B7280',
-                borderBottom: activeWorkspace === 'SYSTEM_HEALTH' ? '2px solid #1D4ED8' : '2px solid transparent',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5
-              }}
-            >
-              <Activity size={13} />
-              <span>System Health</span>
-            </button>
-          </div>
-
-          <div style={{ fontSize: 11, color: '#6B7280', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 0' }}>
-            <span>Active Record: <strong style={{ color: '#111827' }}>{complaintData?.complaint_number || 'Unsaved Draft'}</strong></span>
-            {complaintData?.status && (
-              <span style={{
-                fontSize: 10,
-                padding: '1px 5px',
-                borderRadius: 3,
-                background: '#EFF6FF',
-                color: '#1D4ED8',
-                border: '1px solid #BFDBFE',
-                fontWeight: 600
-              }}>
-                {complaintData.status}
-              </span>
-            )}
-          </div>
-        </nav>
-
-        {/* Primary Workspace View Switcher */}
-        {activeWorkspace === 'OVERVIEW' && (
-          <OverviewDashboard
-            onNavigate={(view) => handleWorkspaceChange(view as WorkspaceView)}
-            onSelectComplaint={handleSelectFromOverview}
+        {/* Main Viewport Container */}
+        <div className="main-viewport">
+          <TopBar
+            activeWorkspace={activeWorkspace}
+            onOpenCommandBar={() => {
+              // Trigger command bar via key event or global state
+              const evt = new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true });
+              window.dispatchEvent(evt);
+            }}
+            onNewComplaint={handleNewComplaint}
           />
-        )}
 
-        {activeWorkspace === 'INTAKE' && (
-          <main className="main-content">
-            <section aria-label="Complaint Intake Form">
-              <ComplaintForm />
-            </section>
-            <aside aria-label="AIVOA Quality Copilot">
-              <CopilotPanel />
-            </aside>
+          <main className="workspace-scrollable">
+            {/* WORKSPACE 1: OVERVIEW DASHBOARD */}
+            {activeWorkspace === 'OVERVIEW' && (
+              <OverviewDashboard
+                onNavigate={handleWorkspaceChange}
+                onSelectComplaint={handleSelectFromOverview}
+              />
+            )}
+
+            {/* WORKSPACE 2: COMPLAINT INTAKE & COPILOT */}
+            {activeWorkspace === 'INTAKE' && (
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'minmax(0, 1.4fr) minmax(320px, 400px)',
+                gap: 16,
+                height: 'calc(100vh - 100px)',
+                maxWidth: 1440,
+                margin: '0 auto'
+              }}>
+                <div style={{ overflowY: 'auto', paddingRight: 4 }}>
+                  <ComplaintForm />
+                </div>
+                <div style={{ height: '100%', overflow: 'hidden', borderRadius: 'var(--radius-card)' }}>
+                  <CopilotPanel />
+                </div>
+              </div>
+            )}
+
+            {/* WORKSPACE 3: QUALITY REVIEW QUEUE */}
+            {activeWorkspace === 'REVIEW' && (
+              <QualityReviewWorkspace
+                currentComplaint={complaintData.id ? complaintData : null}
+                onComplaintUpdated={handleComplaintUpdated}
+              />
+            )}
+
+            {/* WORKSPACE 4: DOCUMENT EVIDENCE VIEWER */}
+            {activeWorkspace === 'DOCUMENTS' && (
+              <DocumentsView />
+            )}
+
+            {/* WORKSPACE 5: OPERATIONAL ANALYTICS */}
+            {activeWorkspace === 'ANALYTICS' && (
+              <AnalyticsDashboard />
+            )}
+
+            {/* WORKSPACE 6: 21 CFR PART 11 AUDIT TRAIL */}
+            {activeWorkspace === 'TIMELINE' && (
+              <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+                <AuditTimeline complaintId={complaintData.id} />
+              </div>
+            )}
+
+            {/* WORKSPACE 7: SYSTEM DIAGNOSTICS & TELEMETRY */}
+            {activeWorkspace === 'SYSTEM_HEALTH' && (
+              <SystemHealthView />
+            )}
           </main>
-        )}
+        </div>
 
-        {activeWorkspace === 'REVIEW' && (
-          <div style={{ maxWidth: 1600, margin: '16px auto', padding: '0 20px', width: '100%', boxSizing: 'border-box' }}>
-            <QualityReviewWorkspace
-              currentComplaint={complaintData}
-              onComplaintUpdated={handleComplaintUpdated}
-            />
-          </div>
-        )}
-
-        {activeWorkspace === 'DOCUMENTS' && (
-          <DocumentsView />
-        )}
-
-        {activeWorkspace === 'ANALYTICS' && (
-          <AnalyticsDashboard />
-        )}
-
-        {activeWorkspace === 'TIMELINE' && (
-          <div style={{ maxWidth: 1200, margin: '16px auto', padding: '0 20px', width: '100%', boxSizing: 'border-box' }}>
-            <AuditTimeline
-              complaintId={complaintData?.id}
-              complaintNumber={complaintData?.complaint_number}
-              onRefresh={() => {}}
-            />
-          </div>
-        )}
-
-        {activeWorkspace === 'SYSTEM_HEALTH' && (
-          <SystemHealthView />
-        )}
-
-        {/* Global Dialogs & Tooling */}
+        {/* Global Command Bar / Quick Palette */}
         <CommandBar />
+
+        {/* Supporting Modal Overlays */}
         <SavedComplaintsModal />
         <AnalyticsModal
           isOpen={isAnalyticsOpen}
@@ -395,35 +252,11 @@ export const App: React.FC = () => {
         {selectedEvidence && (
           <DocumentEvidenceViewer
             isOpen={Boolean(selectedEvidence)}
-            onClose={() => dispatch(clearToast())}
-            documentText={complaintData?.detailed_description || ''}
+            onClose={() => dispatch(setSelectedFieldForEvidence(null))}
             activeProvenance={selectedEvidence}
-            allProvenance={complaintData?.field_provenance || {}}
+            allProvenance={complaintData.field_provenance}
           />
         )}
-
-        {/* Minimal Enterprise Footer */}
-        <footer style={{
-          backgroundColor: '#FFFFFF',
-          borderTop: '1px solid #E5E7EB',
-          padding: '10px 20px',
-          marginTop: 'auto',
-          fontSize: 11,
-          color: '#6B7280'
-        }}>
-          <div style={{
-            maxWidth: 1600,
-            margin: '0 auto',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 8
-          }}>
-            <span>AIVOA QMS • Pharmaceutical Quality Management System</span>
-            <span>Intake Engine: LangGraph + Groq • Persistence: PostgreSQL</span>
-          </div>
-        </footer>
       </div>
     </ErrorBoundary>
   );
