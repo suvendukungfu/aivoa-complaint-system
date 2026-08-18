@@ -1,0 +1,202 @@
+[
+  {
+    "id": "RSK-01",
+    "name": "Microbial Sterility Failure",
+    "complaint": {
+      "product_name": "Ciprofloxacin Sterile Infusion",
+      "detailed_description": "Microbial growth and endotoxin sterility test failure discovered during hospital usage."
+    },
+    "expected_severity": "Critical",
+    "expected_priority": "Urgent"
+  },
+  {
+    "id": "RSK-02",
+    "name": "Toxic Cross-Contamination",
+    "complaint": {
+      "product_name": "Metformin HCl",
+      "detailed_description": "Toxic solvent residue detected exceeding regulatory limits."
+    },
+    "expected_severity": "Critical",
+    "expected_priority": "Urgent"
+  },
+  {
+    "id": "RSK-03",
+    "name": "Wrong Active Ingredient",
+    "complaint": {
+      "product_name": "Paracetamol 500mg",
+      "detailed_description": "Wrong active ingredient filled in blister packaging with patient safety incident."
+    },
+    "expected_severity": "Critical",
+    "expected_priority": "Urgent"
+  },
+  {
+    "id": "RSK-04",
+    "name": "Anaphylaxis Adverse Event",
+    "complaint": {
+      "product_name": "Amoxicillin Trihydrate",
+      "detailed_description": "Severe unexpected anaphylaxis allergic reaction reported in clinical trial."
+    },
+    "expected_severity": "Critical",
+    "expected_priority": "Urgent"
+  },
+  {
+    "id": "RSK-05",
+    "name": "Visible Black Particulate Matter in API",
+    "complaint": {
+      "product_name": "Paracetamol API 99.5%",
+      "detailed_description": "Visible black specks and foreign particles found in top layer of 25 kg fiber drum."
+    },
+    "expected_severity": "High",
+    "expected_priority": "Urgent"
+  },
+  {
+    "id": "RSK-06",
+    "name": "Glass Fragments in Liquid Solution",
+    "complaint": {
+      "product_name": "Ibuprofen Oral Suspension",
+      "detailed_description": "Glass particles observed inside multiple bottles upon opening."
+    },
+    "expected_severity": "High",
+    "expected_priority": "Urgent"
+  },
+  {
+    "id": "RSK-07",
+    "name": "Assay Potency 72% OOS Failure",
+    "complaint": {
+      "product_name": "Ibuprofen DC Granules",
+      "detailed_description": "Sub-potent assay result of 72.4% against 98.0-102.0% specification."
+    },
+    "expected_severity": "High",
+    "expected_priority": "Urgent"
+  },
+  {
+    "id": "RSK-08",
+    "name": "Compromised Primary Container Closure",
+    "complaint": {
+      "product_name": "Ciprofloxacin Vials",
+      "detailed_description": "Liquid leakage and compromised rubber stopper seal during cold chain transport."
+    },
+    "expected_severity": "High",
+    "expected_priority": "Urgent"
+  },
+  {
+    "id": "RSK-09",
+    "name": "Foreign Metal Shavings in Powder",
+    "complaint": {
+      "product_name": "Aspirin Bulk Powder",
+      "detailed_description": "Metal shavings found during sifting operation at manufacturing facility."
+    },
+    "expected_severity": "High",
+    "expected_priority": "Urgent"
+  },
+  {
+    "id": "RSK-10",
+    "name": "Secondary Carton Damage",
+    "complaint": {
+      "product_name": "Amoxicillin 500mg",
+      "detailed_description": "Secondary outer shipping cartons were crushed in warehouse pallet stacking."
+    },
+    "expected_severity": "Medium",
+    "expected_priority": "Normal"
+  },
+  {
+    "id": "RSK-11",
+    "name": "Chipped Tablets in Blister Pack",
+    "complaint": {
+      "product_name": "Metformin 850mg",
+      "detailed_description": "Minor edge chipped tablets observed in 5 out of 100 blister pockets."
+    },
+    "expected_severity": "Medium",
+    "expected_priority": "Normal"
+  },
+  {
+    "id": "RSK-12",
+    "name": "Illegible Expiry Date Print",
+    "complaint": {
+      "product_name": "Paracetamol Tablets",
+      "detailed_description": "Inkjet expiry date printing is smudged on outer cardboard boxes."
+    },
+    "expected_severity": "Medium",
+    "expected_priority": "Normal"
+  },
+  {
+    "id": "RSK-13",
+    "name": "Barcode Scanning Failure",
+    "complaint": {
+      "product_name": "Ibuprofen 400mg",
+      "detailed_description": "Pharmacy distribution scanner unable to read 2D Datamatrix barcode on outer sleeve."
+    },
+    "expected_severity": "Medium",
+    "expected_priority": "Normal"
+  },
+  {
+    "id": "RSK-14",
+    "name": "Certificate of Analysis Request",
+    "complaint": {
+      "product_name": "Paracetamol API",
+      "detailed_description": "Customer requesting updated digital copy of Certificate of Analysis."
+    },
+    "expected_severity": "Low",
+    "expected_priority": "Normal"
+  },
+  {
+    "id": "RSK-15",
+    "name": "Shipping Invoice Discrepancy",
+    "complaint": {
+      "product_name": "Amoxicillin Trihydrate",
+      "detailed_description": "Quantity on commercial invoice lists 500 kg while delivery receipt states 498 kg."
+    },
+    "expected_severity": "Low",
+    "expected_priority": "Normal"
+  },
+  {
+    "id": "RSK-16",
+    "name": "Packaging Leaflet In French Needed",
+    "complaint": {
+      "product_name": "Aspirin 100mg",
+      "detailed_description": "Request for French translation of patient information leaflet."
+    },
+    "expected_severity": "Low",
+    "expected_priority": "Normal"
+  },
+  {
+    "id": "RSK-17",
+    "name": "Color Shade Variation in Tablets",
+    "complaint": {
+      "product_name": "Metformin HCl",
+      "detailed_description": "Slightly darker white shade observed in current batch compared to previous retention."
+    },
+    "expected_severity": "Medium",
+    "expected_priority": "Normal"
+  },
+  {
+    "id": "RSK-18",
+    "name": "High Dissolution Variation",
+    "complaint": {
+      "product_name": "Ciprofloxacin 500mg",
+      "detailed_description": "Dissolution rate tested out of specification at 45 minute stage."
+    },
+    "expected_severity": "High",
+    "expected_priority": "Urgent"
+  },
+  {
+    "id": "RSK-19",
+    "name": "Unsealed Induction Foil on Bulk Drum",
+    "complaint": {
+      "product_name": "Paracetamol DC Grade",
+      "detailed_description": "Inner polyethylene bag seal was loose and induction foil was unbonded."
+    },
+    "expected_severity": "High",
+    "expected_priority": "Urgent"
+  },
+  {
+    "id": "RSK-20",
+    "name": "Hospital Adverse Event Under Investigation",
+    "complaint": {
+      "product_name": "Metformin 500mg",
+      "detailed_description": "Patient reported acute gastrointestinal toxicity after ingestion of tablet from batch MET-09."
+    },
+    "expected_severity": "Critical",
+    "expected_priority": "Urgent"
+  }
+]

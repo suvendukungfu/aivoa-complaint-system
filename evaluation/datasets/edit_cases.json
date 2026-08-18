@@ -1,0 +1,247 @@
+[
+  {
+    "id": "EDT-01",
+    "name": "Change Affected Quantity to 40 kg",
+    "base_complaint": {
+      "customer_name": "ABC Pharma",
+      "product_name": "Paracetamol API",
+      "batch_number": "PA240812",
+      "quantity_affected": "25",
+      "quantity_unit": "kg",
+      "severity": "High"
+    },
+    "instruction": "Change the affected quantity to 40 kg",
+    "expected_changes": { "quantity_affected": "40", "quantity_unit": "kg" },
+    "untouched_must_preserve": ["customer_name", "product_name", "batch_number", "severity"]
+  },
+  {
+    "id": "EDT-02",
+    "name": "Change Batch Number to PA240813",
+    "base_complaint": {
+      "customer_name": "ABC Pharma",
+      "product_name": "Paracetamol API",
+      "batch_number": "PA240812",
+      "quantity_affected": "25",
+      "quantity_unit": "kg"
+    },
+    "instruction": "Change batch number to PA240813",
+    "expected_changes": { "batch_number": "PA240813" },
+    "untouched_must_preserve": ["customer_name", "product_name", "quantity_affected", "quantity_unit"]
+  },
+  {
+    "id": "EDT-03",
+    "name": "Update Customer Name",
+    "base_complaint": {
+      "customer_name": "ABC Pharma",
+      "product_name": "Paracetamol API",
+      "batch_number": "PA240812"
+    },
+    "instruction": "Update customer name to Zenith Health Corp",
+    "expected_changes": { "customer_name": "Zenith Health Corp" },
+    "untouched_must_preserve": ["product_name", "batch_number"]
+  },
+  {
+    "id": "EDT-04",
+    "name": "Update Product Strength",
+    "base_complaint": {
+      "customer_name": "BioHealth",
+      "product_name": "Amoxicillin",
+      "product_strength": "250mg",
+      "batch_number": "AMX-001"
+    },
+    "instruction": "Change strength to 500mg",
+    "expected_changes": { "product_strength": "500mg" },
+    "untouched_must_preserve": ["customer_name", "product_name", "batch_number"]
+  },
+  {
+    "id": "EDT-05",
+    "name": "Set Severity to Critical",
+    "base_complaint": {
+      "customer_name": "Hospital Care",
+      "product_name": "Ciprofloxacin",
+      "batch_number": "CIP-101",
+      "severity": "Medium"
+    },
+    "instruction": "Set severity to Critical",
+    "expected_changes": { "severity": "Critical" },
+    "untouched_must_preserve": ["customer_name", "product_name", "batch_number"]
+  },
+  {
+    "id": "EDT-06",
+    "name": "Set Priority to Urgent",
+    "base_complaint": {
+      "customer_name": "Apex Labs",
+      "batch_number": "MET-01",
+      "priority": "Normal"
+    },
+    "instruction": "Set priority to Urgent",
+    "expected_changes": { "priority": "Urgent" },
+    "untouched_must_preserve": ["customer_name", "batch_number"]
+  },
+  {
+    "id": "EDT-07",
+    "name": "Change Quantity Unit to Cartons",
+    "base_complaint": {
+      "customer_name": "Nordic Care",
+      "quantity_affected": "50",
+      "quantity_unit": "kg"
+    },
+    "instruction": "Change quantity to 50 cartons",
+    "expected_changes": { "quantity_affected": "50", "quantity_unit": "cartons" },
+    "untouched_must_preserve": ["customer_name"]
+  },
+  {
+    "id": "EDT-08",
+    "name": "Change Complaint Date",
+    "base_complaint": {
+      "customer_name": "Allied Care",
+      "batch_number": "B-990",
+      "complaint_date": "10 August 2026"
+    },
+    "instruction": "Change complaint date to 15 August 2026",
+    "expected_changes": { "complaint_date": "15 August 2026" },
+    "untouched_must_preserve": ["customer_name", "batch_number"]
+  },
+  {
+    "id": "EDT-09",
+    "name": "Update Manufacturing Date",
+    "base_complaint": {
+      "product_name": "Paracetamol",
+      "batch_number": "P-101",
+      "manufacturing_date": "01 May 2026"
+    },
+    "instruction": "Change manufacturing date to 10 May 2026",
+    "expected_changes": { "manufacturing_date": "10 May 2026" },
+    "untouched_must_preserve": ["product_name", "batch_number"]
+  },
+  {
+    "id": "EDT-10",
+    "name": "Update Expiry Date",
+    "base_complaint": {
+      "product_name": "Ibuprofen",
+      "batch_number": "IB-20",
+      "expiry_date": "May 2028"
+    },
+    "instruction": "Change expiry date to June 2029",
+    "expected_changes": { "expiry_date": "June 2029" },
+    "untouched_must_preserve": ["product_name", "batch_number"]
+  },
+  {
+    "id": "EDT-11",
+    "name": "Update Batch Number with Hyphens",
+    "base_complaint": {
+      "customer_name": "Bayer",
+      "batch_number": "LOT123"
+    },
+    "instruction": "Change lot number to LOT-2026-X99",
+    "expected_changes": { "batch_number": "LOT-2026-X99" },
+    "untouched_must_preserve": ["customer_name"]
+  },
+  {
+    "id": "EDT-12",
+    "name": "Change Quantity Affected to 1200 Drums",
+    "base_complaint": {
+      "customer_name": "Novartis",
+      "quantity_affected": "800",
+      "quantity_unit": "kg"
+    },
+    "instruction": "Change quantity to 1200 drums",
+    "expected_changes": { "quantity_affected": "1200", "quantity_unit": "drums" },
+    "untouched_must_preserve": ["customer_name"]
+  },
+  {
+    "id": "EDT-13",
+    "name": "Update Complaint Source",
+    "base_complaint": {
+      "complaint_source": "Direct Email",
+      "batch_number": "B-1"
+    },
+    "instruction": "Change complaint source to Health Authority Alert",
+    "expected_changes": { "complaint_source": "Health Authority Alert" },
+    "untouched_must_preserve": ["batch_number"]
+  },
+  {
+    "id": "EDT-14",
+    "name": "Update Product Name to Metformin DC 95%",
+    "base_complaint": {
+      "customer_name": "Sun Pharma",
+      "product_name": "Metformin HCl",
+      "batch_number": "MET-01"
+    },
+    "instruction": "Change product to Metformin DC 95%",
+    "expected_changes": { "product_name": "Metformin DC 95%" },
+    "untouched_must_preserve": ["customer_name", "batch_number"]
+  },
+  {
+    "id": "EDT-15",
+    "name": "Set Quantity to 0 for Document Inquiries",
+    "base_complaint": {
+      "customer_name": "Pfizer",
+      "quantity_affected": "10",
+      "quantity_unit": "kg"
+    },
+    "instruction": "Change affected quantity to 0 kg",
+    "expected_changes": { "quantity_affected": "0", "quantity_unit": "kg" },
+    "untouched_must_preserve": ["customer_name"]
+  },
+  {
+    "id": "EDT-16",
+    "name": "Update Customer with Legal Suffix",
+    "base_complaint": {
+      "customer_name": "Meridian",
+      "batch_number": "M-1"
+    },
+    "instruction": "Change customer name to Meridian Laboratories GmbH",
+    "expected_changes": { "customer_name": "Meridian Laboratories GmbH" },
+    "untouched_must_preserve": ["batch_number"]
+  },
+  {
+    "id": "EDT-17",
+    "name": "Change Severity to Low",
+    "base_complaint": {
+      "customer_name": "Allied Health",
+      "severity": "High",
+      "batch_number": "AL-01"
+    },
+    "instruction": "Set severity to Low",
+    "expected_changes": { "severity": "Low" },
+    "untouched_must_preserve": ["customer_name", "batch_number"]
+  },
+  {
+    "id": "EDT-18",
+    "name": "Change Priority to Low",
+    "base_complaint": {
+      "customer_name": "Global Pharma",
+      "priority": "Urgent",
+      "batch_number": "GP-99"
+    },
+    "instruction": "Set priority to Low",
+    "expected_changes": { "priority": "Low" },
+    "untouched_must_preserve": ["customer_name", "batch_number"]
+  },
+  {
+    "id": "EDT-19",
+    "name": "Change Strength to IP Grade",
+    "base_complaint": {
+      "product_name": "Paracetamol",
+      "product_strength": "BP Grade",
+      "batch_number": "P-90"
+    },
+    "instruction": "Change product strength to IP Grade",
+    "expected_changes": { "product_strength": "IP Grade" },
+    "untouched_must_preserve": ["product_name", "batch_number"]
+  },
+  {
+    "id": "EDT-20",
+    "name": "Change Quantity to 500 Vials",
+    "base_complaint": {
+      "customer_name": "St Jude",
+      "product_name": "Ciprofloxacin",
+      "quantity_affected": "100",
+      "quantity_unit": "vials"
+    },
+    "instruction": "Change quantity to 500 vials",
+    "expected_changes": { "quantity_affected": "500", "quantity_unit": "vials" },
+    "untouched_must_preserve": ["customer_name", "product_name"]
+  }
+]

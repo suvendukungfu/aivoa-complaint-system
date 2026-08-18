@@ -1,0 +1,28 @@
+CUSTOMER COMPLAINT TRANSMISSION
+=====================================================
+TO: Quality Assurance & Regulatory Compliance Team
+FROM: BioHealth Distribution Corp
+DATE: 14 August 2026
+SUBJECT: Packaging Defect Notification - Amoxicillin Trihydrate 500mg Capsules
+
+Customer Details:
+- Customer Name: BioHealth Distribution Corp
+- Receiving Facility: Central Logistics Hub 3, Dallas TX
+
+Product & Batch Details:
+- Product Name: Amoxicillin Trihydrate Capsules
+- Strength: 500mg
+- Batch / Lot Number: AMX-2026-884
+- Manufacturing Date: 10 May 2026
+- Expiry Date: May 2029
+- Quantity Received: 5,000 cartons
+- Quantity Affected: 350 cartons (compromised secondary packaging)
+
+Incident Description:
+Upon receiving shipping container #CONT-88219, our warehouse inspectors identified that 350 outer shipping cartons of Amoxicillin Trihydrate 500mg (Batch AMX-2026-884) exhibited crushed corners and compromised tamper-evident security tape. Preliminary inspection showed the inner primary blister foils remained intact without moisture ingress, but the secondary packaging fails commercial GDP presentation standards and cannot be distributed to hospital pharmacies.
+
+Complaint Classification: Packaging / Labeling Defect
+Severity: Medium
+Priority: Normal
+
+Please provide return merchandise authorization (RMA) and replacement packaging units.

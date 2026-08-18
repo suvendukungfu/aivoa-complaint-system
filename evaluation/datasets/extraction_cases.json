@@ -1,0 +1,257 @@
+[
+  {
+    "id": "EXT-01",
+    "name": "Complete Paracetamol API Contamination",
+    "input_text": "ABC Pharma reported visible black particles in Paracetamol API 99.5%, batch PA240812. Manufacturing date was 12 August 2026 and expiry is August 2028. 25 kg is affected.",
+    "expected": {
+      "customer_name": "ABC Pharma",
+      "product_name": "Paracetamol API",
+      "product_strength": "99.5%",
+      "batch_number": "PA240812",
+      "quantity_affected": "25",
+      "quantity_unit": "kg",
+      "severity": "High",
+      "priority": "Urgent"
+    }
+  },
+  {
+    "id": "EXT-02",
+    "name": "Amoxicillin Damaged Secondary Packaging",
+    "input_text": "BioHealth Distribution Corp reported damaged cartons and compromised security seals on Amoxicillin Trihydrate 500mg, batch AMX-2026-884. Manufactured on 10 May 2026, expiry May 2029. 350 cartons affected.",
+    "expected": {
+      "customer_name": "BioHealth Distribution Corp",
+      "product_name": "Amoxicillin Trihydrate",
+      "product_strength": "500mg",
+      "batch_number": "AMX-2026-884",
+      "quantity_affected": "350",
+      "quantity_unit": "cartons",
+      "severity": "Medium",
+      "priority": "Normal"
+    }
+  },
+  {
+    "id": "EXT-03",
+    "name": "Ibuprofen Potency OOS Failure",
+    "input_text": "Nordic Care Pharmaceuticals reported assay potency failure of 72.4% on Ibuprofen DC Granules (Batch IBU-DC-9011, Mfg: 01 June 2026, Exp: June 2029). 1200 kg under quarantine.",
+    "expected": {
+      "customer_name": "Nordic Care Pharmaceuticals",
+      "product_name": "Ibuprofen DC",
+      "batch_number": "IBU-DC-9011",
+      "quantity_affected": "1200",
+      "quantity_unit": "kg",
+      "severity": "High",
+      "priority": "Urgent"
+    }
+  },
+  {
+    "id": "EXT-04",
+    "name": "Metformin Dissolution Failure",
+    "input_text": "Apex Laboratories flagged dissolution failure in Metformin HCl 850mg (Batch MET-850-2026, Mfg: 15 March 2026, Exp: March 2028). Affected quantity is 80 kg.",
+    "expected": {
+      "customer_name": "Apex Laboratories",
+      "product_name": "Metformin HCl",
+      "product_strength": "850mg",
+      "batch_number": "MET-850-2026",
+      "quantity_affected": "80",
+      "quantity_unit": "kg",
+      "severity": "High",
+      "priority": "Urgent"
+    }
+  },
+  {
+    "id": "EXT-05",
+    "name": "Ciprofloxacin Sterility Failure (Critical)",
+    "input_text": "Hospital Central Quality Audit reported microbial endotoxin sterility failure on Ciprofloxacin Infusion batch CIP-STER-099. 450 vials affected.",
+    "expected": {
+      "customer_name": "Hospital Central Quality Audit",
+      "product_name": "Ciprofloxacin",
+      "batch_number": "CIP-STER-099",
+      "quantity_affected": "450",
+      "quantity_unit": "vials",
+      "severity": "Critical",
+      "priority": "Urgent"
+    }
+  },
+  {
+    "id": "EXT-06",
+    "name": "Missing Customer Name",
+    "input_text": "Customer reported discoloration in Aspirin 100mg tablets, batch ASP-2026-01. 50 boxes affected.",
+    "expected": {
+      "customer_name": null,
+      "product_name": "Aspirin",
+      "product_strength": "100mg",
+      "batch_number": "ASP-2026-01",
+      "quantity_affected": "50",
+      "quantity_unit": "boxes"
+    }
+  },
+  {
+    "id": "EXT-07",
+    "name": "Missing Batch Number",
+    "input_text": "Zenith Pharma reported leaking drums of Glycerin BP. Total 6 drums received with broken bung seals.",
+    "expected": {
+      "customer_name": "Zenith Pharma",
+      "batch_number": null,
+      "quantity_affected": "6",
+      "quantity_unit": "drums"
+    }
+  },
+  {
+    "id": "EXT-08",
+    "name": "Ambiguous Dates (Verbal format)",
+    "input_text": "Global Health Labs received Azithromycin 250mg lot AZI-901 manufactured in mid-July 2026 and expiring by late 2029. 15 kg affected.",
+    "expected": {
+      "customer_name": "Global Health Labs",
+      "product_name": "Azithromycin",
+      "batch_number": "AZI-901",
+      "quantity_affected": "15",
+      "quantity_unit": "kg"
+    }
+  },
+  {
+    "id": "EXT-09",
+    "name": "Multiple Quantities Mentioned",
+    "input_text": "We ordered 500 kg of Paracetamol API batch PARA-77, but 40 kg was damaged during unloading with black particles visible.",
+    "expected": {
+      "product_name": "Paracetamol API",
+      "batch_number": "PARA-77",
+      "quantity_affected": "40",
+      "quantity_unit": "kg",
+      "severity": "High"
+    }
+  },
+  {
+    "id": "EXT-10",
+    "name": "Email-Style Complaint Header",
+    "input_text": "From: qa@meridianlabs.com\nSubject: Defect Notice\nTo whom it may concern, Meridian Labs rejects Batch MET-500-A of Metformin HCl due to capping in 10000 tablets.",
+    "expected": {
+      "customer_name": "Meridian Labs",
+      "product_name": "Metformin HCl",
+      "batch_number": "MET-500-A",
+      "quantity_affected": "10000",
+      "quantity_unit": "tablets"
+    }
+  },
+  {
+    "id": "EXT-11",
+    "name": "Noisy Text with Small Talk",
+    "input_text": "Good morning team, hope you are having a nice week! Our technician noticed foreign particulate matter in Paracetamol batch PR-991 yesterday morning. 10 kg is set aside. Let's discuss.",
+    "expected": {
+      "product_name": "Paracetamol",
+      "batch_number": "PR-991",
+      "quantity_affected": "10",
+      "quantity_unit": "kg",
+      "severity": "High"
+    }
+  },
+  {
+    "id": "EXT-12",
+    "name": "Glass Fragment in Injectable (Critical)",
+    "input_text": "St. Jude Hospital found glass particles inside sealed vials of Ciprofloxacin sterile solution, lot CIP-GL-44. 120 vials held.",
+    "expected": {
+      "product_name": "Ciprofloxacin",
+      "batch_number": "CIP-GL-44",
+      "quantity_affected": "120",
+      "quantity_unit": "vials",
+      "severity": "Critical",
+      "priority": "Urgent"
+    }
+  },
+  {
+    "id": "EXT-13",
+    "name": "Labeling Print Illegible",
+    "input_text": "Allied Care reports barcode print illegible on Amoxicillin 250mg cartons, batch AMX-LBL-12. 600 cartons affected.",
+    "expected": {
+      "customer_name": "Allied Care",
+      "product_name": "Amoxicillin",
+      "batch_number": "AMX-LBL-12",
+      "quantity_affected": "600",
+      "quantity_unit": "cartons",
+      "severity": "Medium"
+    }
+  },
+  {
+    "id": "EXT-14",
+    "name": "Assay Potency 104.5% OOS",
+    "input_text": "Quality Control report from Bayer Health: Paracetamol API batch PA-OOS-99 assay potency tested 104.5% against 98.0-102.0% specification. 500 kg quarantined.",
+    "expected": {
+      "product_name": "Paracetamol API",
+      "batch_number": "PA-OOS-99",
+      "quantity_affected": "500",
+      "quantity_unit": "kg",
+      "severity": "High"
+    }
+  },
+  {
+    "id": "EXT-15",
+    "name": "Crushed Boxes in Transit",
+    "input_text": "Courier logistics incident: 40 boxes of Ibuprofen tablets batch IBU-BX-01 were crushed during freight transport.",
+    "expected": {
+      "product_name": "Ibuprofen",
+      "batch_number": "IBU-BX-01",
+      "quantity_affected": "40",
+      "quantity_unit": "boxes",
+      "severity": "Medium"
+    }
+  },
+  {
+    "id": "EXT-16",
+    "name": "Sub-Potent Degradation",
+    "input_text": "Pfizer QA flagged sub-potent degradation product in Aspirin batch ASP-DEG-88. 30 kg affected.",
+    "expected": {
+      "product_name": "Aspirin",
+      "batch_number": "ASP-DEG-88",
+      "quantity_affected": "30",
+      "quantity_unit": "kg",
+      "severity": "High"
+    }
+  },
+  {
+    "id": "EXT-17",
+    "name": "Toxic Impurity Detected (Critical)",
+    "input_text": "Toxic nitrosamine impurity detected above allowable limit in Metformin HCl lot MET-TOX-01 by Health Authority. Immediate recall for 1500 kg.",
+    "expected": {
+      "product_name": "Metformin HCl",
+      "batch_number": "MET-TOX-01",
+      "quantity_affected": "1500",
+      "quantity_unit": "kg",
+      "severity": "Critical",
+      "priority": "Urgent"
+    }
+  },
+  {
+    "id": "EXT-18",
+    "name": "Administrative CoA Inquiry",
+    "input_text": "Vertex Health requested an updated Certificate of Analysis for Amoxicillin Trihydrate batch AMX-COA-09. No defect reported.",
+    "expected": {
+      "customer_name": "Vertex Health",
+      "product_name": "Amoxicillin Trihydrate",
+      "batch_number": "AMX-COA-09",
+      "severity": "Low",
+      "priority": "Normal"
+    }
+  },
+  {
+    "id": "EXT-19",
+    "name": "ISO Metric Quantities",
+    "input_text": "Novartis Logistics confirmed 2.5 metric tons (2500 kg) of Paracetamol API lot PA-NOV-01 has moisture clump defects.",
+    "expected": {
+      "product_name": "Paracetamol API",
+      "batch_number": "PA-NOV-01",
+      "severity": "High"
+    }
+  },
+  {
+    "id": "EXT-20",
+    "name": "Color Variation Yellowing",
+    "input_text": "Sun Pharma noticed yellow discoloration in Metformin HCl granules batch MET-DIS-02. 75 kg under review.",
+    "expected": {
+      "customer_name": "Sun Pharma",
+      "product_name": "Metformin HCl",
+      "batch_number": "MET-DIS-02",
+      "quantity_affected": "75",
+      "quantity_unit": "kg",
+      "severity": "High"
+    }
+  }
+]

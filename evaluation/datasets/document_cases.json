@@ -1,0 +1,126 @@
+[
+  {
+    "id": "DOC-01",
+    "filename": "Paracetamol_Contamination_Report.pdf",
+    "document_type": "PDF",
+    "text_content": "QUALITY DEFECT COMPLAINT REPORT\nCustomer: ABC Pharma International\nProduct: Paracetamol API Grade\nStrength: 99.5% USP\nBatch Number: PA240812\nManufacturing Date: 12 August 2026\nExpiry Date: August 2028\nAffected Quantity: 25 kg in 1 fiber drum\nIncident Description: Quality inspection noted visible black particulate contamination on surface layer.",
+    "expected": {
+      "customer_name": "ABC Pharma",
+      "product_name": "Paracetamol API",
+      "batch_number": "PA240812",
+      "quantity_affected": "25",
+      "severity": "High"
+    }
+  },
+  {
+    "id": "DOC-02",
+    "filename": "Amoxicillin_Packaging_Deviation.docx",
+    "document_type": "DOCX",
+    "text_content": "PACKAGING DEVIATION NOTIFICATION\nCustomer Name: BioHealth Distribution\nProduct: Amoxicillin Trihydrate 500mg\nBatch: AMX-2026-884\nQuantity Compromised: 350 cartons\nObservations: Crushed cartons with intact inner foil blisters.",
+    "expected": {
+      "customer_name": "BioHealth Distribution",
+      "product_name": "Amoxicillin Trihydrate",
+      "batch_number": "AMX-2026-884",
+      "quantity_affected": "350",
+      "severity": "Medium"
+    }
+  },
+  {
+    "id": "DOC-03",
+    "filename": "Ibuprofen_Assay_OOS_Summary.txt",
+    "document_type": "TXT",
+    "text_content": "Certificate of Analysis Retest Failure\nCustomer: Nordic Care Pharmaceuticals\nProduct: Ibuprofen DC 90%\nLot: IBU-DC-9011\nAssay Result: 72.4% (Specification: 98.0% - 102.0%)\nTotal Lot Volume Quarantined: 1200 kg.",
+    "expected": {
+      "customer_name": "Nordic Care Pharmaceuticals",
+      "product_name": "Ibuprofen DC",
+      "batch_number": "IBU-DC-9011",
+      "quantity_affected": "1200",
+      "severity": "High"
+    }
+  },
+  {
+    "id": "DOC-04",
+    "filename": "Metformin_Color_Discrepancy.eml",
+    "document_type": "EML",
+    "text_content": "From: qa-team@apexlabs.com\nTo: complaints@aivoa.com\nDate: 17 Aug 2026\nSubject: Yellow discoloration in Metformin HCl\n\nDear QA Team,\nWe observed slight yellowing in Metformin HCl batch MET-850-2026 (80 kg). Please initiate deviation.",
+    "expected": {
+      "product_name": "Metformin HCl",
+      "batch_number": "MET-850-2026",
+      "quantity_affected": "80",
+      "severity": "High"
+    }
+  },
+  {
+    "id": "DOC-05",
+    "filename": "Sterility_Failure_Notice.pdf",
+    "document_type": "PDF",
+    "text_content": "URGENT RECALL ALERT\nProduct: Ciprofloxacin Infusion 200mg/100ml\nBatch Number: CIP-STER-099\nAffected Quantity: 450 vials\nDefect: Positive microbial growth in 14-day sterility test.",
+    "expected": {
+      "product_name": "Ciprofloxacin",
+      "batch_number": "CIP-STER-099",
+      "quantity_affected": "450",
+      "severity": "Critical"
+    }
+  },
+  {
+    "id": "DOC-06",
+    "filename": "Aspirin_Chipped_Tablets.docx",
+    "document_type": "DOCX",
+    "text_content": "Physical Inspection Report\nProduct: Aspirin 100mg Tablets\nBatch: ASP-2026-01\nQuantity: 50 boxes\nIssue: Chipped tablet edges in blister cavities.",
+    "expected": {
+      "product_name": "Aspirin",
+      "batch_number": "ASP-2026-01",
+      "quantity_affected": "50",
+      "severity": "Medium"
+    }
+  },
+  {
+    "id": "DOC-07",
+    "filename": "Azithromycin_Seal_Integrity.txt",
+    "document_type": "TXT",
+    "text_content": "Logistics Quality Audit\nCustomer: Global Health Labs\nProduct: Azithromycin 250mg\nLot: AZI-901\nAffected: 15 kg\nCondition: Loose tamper-evident closure.",
+    "expected": {
+      "customer_name": "Global Health Labs",
+      "product_name": "Azithromycin",
+      "batch_number": "AZI-901",
+      "quantity_affected": "15"
+    }
+  },
+  {
+    "id": "DOC-08",
+    "filename": "Metformin_Capping_Defect.eml",
+    "document_type": "EML",
+    "text_content": "From: complaints@meridianlabs.com\nSubject: Batch Rejection - Capping\nProduct: Metformin HCl 500mg\nBatch: MET-500-A\nQuantity: 10000 tablets\nDefect: Severe tablet capping on compression line.",
+    "expected": {
+      "customer_name": "Meridian Labs",
+      "product_name": "Metformin HCl",
+      "batch_number": "MET-500-A",
+      "quantity_affected": "10000"
+    }
+  },
+  {
+    "id": "DOC-09",
+    "filename": "Glass_Vial_Complaint.pdf",
+    "document_type": "PDF",
+    "text_content": "Hospital Pharmacovigilance Report\nCustomer: St. Jude Hospital\nProduct: Ciprofloxacin\nLot: CIP-GL-44\nQuantity: 120 vials\nDefect: Glass shard observed floating in sterile solution.",
+    "expected": {
+      "product_name": "Ciprofloxacin",
+      "batch_number": "CIP-GL-44",
+      "quantity_affected": "120",
+      "severity": "Critical"
+    }
+  },
+  {
+    "id": "DOC-10",
+    "filename": "Label_Barcode_Issue.docx",
+    "document_type": "DOCX",
+    "text_content": "Packaging Line Inspection\nCustomer: Allied Care\nProduct: Amoxicillin Trihydrate\nBatch: AMX-LBL-12\nQuantity: 600 cartons\nDefect: Barcode unreadable by warehouse handheld scanner.",
+    "expected": {
+      "customer_name": "Allied Care",
+      "product_name": "Amoxicillin",
+      "batch_number": "AMX-LBL-12",
+      "quantity_affected": "600",
+      "severity": "Medium"
+    }
+  }
+]
