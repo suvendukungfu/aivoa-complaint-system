@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, ArrowUpRight } from 'lucide-react';
+import { Menu, X, ArrowRight } from 'lucide-react';
 import type { WorkspaceView } from '../../App';
 
 interface LandingNavProps {
@@ -10,23 +10,25 @@ export const LandingNav: React.FC<LandingNavProps> = ({ onNavigate }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      height: '64px',
-      zIndex: 50,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '0 32px',
-      borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-      backgroundColor: 'rgba(8, 11, 16, 0.65)',
-      backdropFilter: 'blur(16px)',
-      WebkitBackdropFilter: 'blur(16px)'
-    }}>
-      {/* Left: Brand Identity */}
+    <header
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '64px',
+        zIndex: 50,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 32px',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        backgroundColor: 'rgba(8, 11, 16, 0.65)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)'
+      }}
+    >
+      {/* Left: AIVOA Brand Identity */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <button
           onClick={() => onNavigate('OVERVIEW')}
@@ -42,49 +44,59 @@ export const LandingNav: React.FC<LandingNavProps> = ({ onNavigate }) => {
           }}
           aria-label="AIVOA Home"
         >
-          <div style={{
-            width: 24,
-            height: 24,
-            borderRadius: 6,
-            background: 'linear-gradient(135deg, #4F46E5 0%, #3B82F6 100%)',
-            color: '#FFFFFF',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 800,
-            fontSize: 12,
-            letterSpacing: '-0.03em'
-          }}>
+          <div
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: 6,
+              background: '#FFFFFF',
+              color: '#080B10',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 800,
+              fontSize: 12,
+              letterSpacing: '-0.03em'
+            }}
+          >
             A
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em', color: '#FFFFFF' }}>
               AIVOA
             </span>
-            <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255, 255, 255, 0.45)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            <span
+              style={{
+                fontSize: 10.5,
+                fontWeight: 600,
+                color: 'rgba(255, 255, 255, 0.50)',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase'
+              }}
+            >
               Quality Intelligence
             </span>
           </div>
         </button>
       </div>
 
-      {/* Center/Right Desktop Navigation */}
-      <nav style={{ display: 'flex', alignItems: 'center', gap: 28 }} className="landing-desktop-nav">
+      {/* Right Desktop Navigation: Product | Workflow | Evidence | Open Workspace */}
+      <nav style={{ display: 'flex', alignItems: 'center', gap: 24 }} className="landing-desktop-nav">
         <button
           onClick={() => onNavigate('OVERVIEW')}
           style={{
             background: 'none',
             border: 'none',
-            color: 'rgba(255, 255, 255, 0.7)',
+            color: 'rgba(255, 255, 255, 0.70)',
             fontSize: 13,
             fontWeight: 500,
             cursor: 'pointer',
             transition: 'color 140ms ease-out'
           }}
           onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255, 255, 255, 0.70)')}
         >
-          Overview
+          Product
         </button>
 
         <button
@@ -92,64 +104,58 @@ export const LandingNav: React.FC<LandingNavProps> = ({ onNavigate }) => {
           style={{
             background: 'none',
             border: 'none',
-            color: 'rgba(255, 255, 255, 0.7)',
+            color: 'rgba(255, 255, 255, 0.70)',
             fontSize: 13,
             fontWeight: 500,
             cursor: 'pointer',
             transition: 'color 140ms ease-out'
           }}
           onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255, 255, 255, 0.70)')}
         >
-          Complaints
+          Workflow
         </button>
 
         <button
-          onClick={() => onNavigate('REVIEW')}
+          onClick={() => onNavigate('DOCUMENTS')}
           style={{
             background: 'none',
             border: 'none',
-            color: 'rgba(255, 255, 255, 0.7)',
+            color: 'rgba(255, 255, 255, 0.70)',
             fontSize: 13,
             fontWeight: 500,
             cursor: 'pointer',
             transition: 'color 140ms ease-out'
           }}
           onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255, 255, 255, 0.70)')}
         >
-          Review Queue
+          Evidence
         </button>
 
-        {/* Action Button */}
+        {/* Liquid Glass Pill Button */}
         <button
           onClick={() => onNavigate('OVERVIEW')}
+          className="landing-cta-pill"
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '7px 14px',
-            backgroundColor: '#FFFFFF',
-            color: '#080B10',
-            border: 'none',
-            borderRadius: 6,
+            padding: '6px 14px',
+            borderRadius: '9999px',
+            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid rgba(255, 255, 255, 0.16)',
+            color: '#FFFFFF',
             fontSize: 12.5,
             fontWeight: 600,
             cursor: 'pointer',
-            transition: 'all 140ms ease-out',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
-            e.currentTarget.style.transform = 'translateY(-1px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#FFFFFF';
-            e.currentTarget.style.transform = 'translateY(0)';
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.15)'
           }}
         >
           <span>Open Workspace</span>
-          <ArrowUpRight size={13} />
+          <ArrowRight size={13} style={{ color: 'rgba(255, 255, 255, 0.85)' }} />
         </button>
       </nav>
 
@@ -159,102 +165,120 @@ export const LandingNav: React.FC<LandingNavProps> = ({ onNavigate }) => {
         className="landing-mobile-btn"
         style={{
           display: 'none',
-          background: 'none',
-          border: 'none',
+          background: 'rgba(255, 255, 255, 0.04)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          borderRadius: 6,
+          padding: '6px 10px',
           color: '#FFFFFF',
-          cursor: 'pointer',
-          padding: 6
+          cursor: 'pointer'
         }}
         aria-label="Toggle navigation menu"
       >
-        {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+        {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
       </button>
 
-      {/* Mobile Drawer Dropdown */}
+      {/* Mobile Navigation Drawer */}
       {isMobileMenuOpen && (
-        <div style={{
-          position: 'absolute',
-          top: '100%',
-          left: 0,
-          right: 0,
-          backgroundColor: '#0A0E14',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-          padding: '20px 24px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 14,
-          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5)'
-        }}>
+        <div
+          style={{
+            position: 'fixed',
+            top: '64px',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(8, 11, 16, 0.96)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            zIndex: 49,
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '24px 32px',
+            gap: 16
+          }}
+        >
           <button
-            onClick={() => { onNavigate('OVERVIEW'); setIsMobileMenuOpen(false); }}
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              onNavigate('OVERVIEW');
+            }}
             style={{
+              padding: '12px 0',
+              textAlign: 'left',
               background: 'none',
               border: 'none',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
               color: '#FFFFFF',
-              fontSize: 14,
-              fontWeight: 500,
-              textAlign: 'left',
-              padding: '6px 0',
+              fontSize: 16,
+              fontWeight: 600,
               cursor: 'pointer'
             }}
           >
-            Overview
+            Product
           </button>
           <button
-            onClick={() => { onNavigate('INTAKE'); setIsMobileMenuOpen(false); }}
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              onNavigate('INTAKE');
+            }}
             style={{
+              padding: '12px 0',
+              textAlign: 'left',
               background: 'none',
               border: 'none',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
               color: '#FFFFFF',
-              fontSize: 14,
-              fontWeight: 500,
-              textAlign: 'left',
-              padding: '6px 0',
+              fontSize: 16,
+              fontWeight: 600,
               cursor: 'pointer'
             }}
           >
-            Complaints Intake
+            Workflow
           </button>
           <button
-            onClick={() => { onNavigate('REVIEW'); setIsMobileMenuOpen(false); }}
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              onNavigate('DOCUMENTS');
+            }}
             style={{
+              padding: '12px 0',
+              textAlign: 'left',
               background: 'none',
               border: 'none',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
               color: '#FFFFFF',
-              fontSize: 14,
-              fontWeight: 500,
-              textAlign: 'left',
-              padding: '6px 0',
+              fontSize: 16,
+              fontWeight: 600,
               cursor: 'pointer'
             }}
           >
-            Review Queue
+            Evidence
           </button>
           <button
-            onClick={() => { onNavigate('OVERVIEW'); setIsMobileMenuOpen(false); }}
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              onNavigate('OVERVIEW');
+            }}
             style={{
-              marginTop: 6,
-              padding: '10px 16px',
+              marginTop: 16,
+              padding: '12px 16px',
               backgroundColor: '#FFFFFF',
               color: '#080B10',
+              borderRadius: 8,
               border: 'none',
-              borderRadius: 6,
-              fontSize: 13,
-              fontWeight: 600,
-              cursor: 'pointer',
+              fontSize: 14,
+              fontWeight: 700,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 6
+              gap: 8,
+              cursor: 'pointer'
             }}
           >
             <span>Open Workspace</span>
-            <ArrowUpRight size={14} />
+            <ArrowRight size={16} />
           </button>
         </div>
       )}
     </header>
   );
 };
-
-export default LandingNav;

@@ -53,7 +53,19 @@ export const tokens = {
     info: '#0EA5E9',
     infoSubtle: '#F0F9FF',
     infoBorder: '#BAE6FD',
-    infoText: '#0369A1'
+    infoText: '#0369A1',
+
+    // Monochrome Liquid Glass (Landing Experience)
+    glassWhite: 'rgba(255, 255, 255, 0.02)',
+    glassWhiteSoft: 'rgba(255, 255, 255, 0.01)',
+    glassBorder: 'rgba(255, 255, 255, 0.12)',
+    glassBorderHighlight: 'rgba(255, 255, 255, 0.25)',
+    glassShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+    landingBackground: '#080B10',
+    landingTextPrimary: '#FFFFFF',
+    landingTextSecondary: 'rgba(255, 255, 255, 0.80)',
+    landingTextMuted: 'rgba(255, 255, 255, 0.60)',
+    landingTextVeryMuted: 'rgba(255, 255, 255, 0.45)'
   },
 
   radii: {

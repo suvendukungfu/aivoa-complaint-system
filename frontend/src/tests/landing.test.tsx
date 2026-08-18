@@ -34,11 +34,11 @@ describe('AIVOA Cinematic Landing Page Tests', () => {
     const onEnter = vi.fn();
     render(<LandingPage onEnterWorkspace={onEnter} />);
 
-    expect(screen.getByText(/AI SYSTEM READY/i)).toBeInTheDocument();
-    expect(screen.getByText(/AIVOA turns unstructured pharmaceutical complaints into/i)).toBeInTheDocument();
-    expect(screen.getByText(/AI-assisted · Evidence-grounded · Human-controlled/i)).toBeInTheDocument();
-    expect(screen.getByText(/Evidence grounded/i)).toBeInTheDocument();
-    expect(screen.getByText(/AIVOA \/ QUALITY INTELLIGENCE/i)).toBeInTheDocument();
+    expect(screen.getByText(/QUALITY INTELLIGENCE PLATFORM/i)).toBeInTheDocument();
+    expect(screen.getByText(/Turn unstructured pharmaceutical complaints into structured/i)).toBeInTheDocument();
+    expect(screen.getByText(/CMP-2026-0001/i)).toBeInTheDocument();
+    expect(screen.getByText(/SYSTEM STATUS/i)).toBeInTheDocument();
+    expect(screen.getByText(/EVIDENCE GROUNDED/i)).toBeInTheDocument();
   });
 
   it('test_landing_actions_navigation: triggers workspace entry', () => {
@@ -49,29 +49,33 @@ describe('AIVOA Cinematic Landing Page Tests', () => {
     fireEvent.click(openBtn);
     expect(onNavigate).toHaveBeenCalledWith('OVERVIEW');
 
-    const reviewBtn = screen.getByText('Explore Review Queue');
+    const reviewBtn = screen.getByText('View Review Queue');
     fireEvent.click(reviewBtn);
     expect(onNavigate).toHaveBeenCalledWith('REVIEW');
 
-    const evidenceBtn = screen.getByText('Evidence Workflow');
+    const evidenceBtn = screen.getByText('Explore Evidence');
     fireEvent.click(evidenceBtn);
     expect(onNavigate).toHaveBeenCalledWith('DOCUMENTS');
+
+    const auditBtn = screen.getByText('See Audit Trail');
+    fireEvent.click(auditBtn);
+    expect(onNavigate).toHaveBeenCalledWith('TIMELINE');
   });
 
   it('test_landing_nav_navigation: triggers workspace navigation from header', () => {
     const onNavigate = vi.fn();
     render(<LandingNav onNavigate={onNavigate} />);
 
-    const overviewBtn = screen.getByText('Overview');
-    fireEvent.click(overviewBtn);
+    const productBtn = screen.getByText('Product');
+    fireEvent.click(productBtn);
     expect(onNavigate).toHaveBeenCalledWith('OVERVIEW');
 
-    const complaintsBtn = screen.getByText('Complaints');
-    fireEvent.click(complaintsBtn);
+    const workflowBtn = screen.getByText('Workflow');
+    fireEvent.click(workflowBtn);
     expect(onNavigate).toHaveBeenCalledWith('INTAKE');
 
-    const reviewBtn = screen.getByText('Review Queue');
-    fireEvent.click(reviewBtn);
-    expect(onNavigate).toHaveBeenCalledWith('REVIEW');
+    const evidenceBtn = screen.getByText('Evidence');
+    fireEvent.click(evidenceBtn);
+    expect(onNavigate).toHaveBeenCalledWith('DOCUMENTS');
   });
 });
