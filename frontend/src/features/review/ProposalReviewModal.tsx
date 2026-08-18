@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import type { AIProposalItem } from '../../types';
-import { X, AlertTriangle, Edit3, FileText, CheckCircle2 } from 'lucide-react';
+import { X, AlertTriangle, Edit3, CheckCircle2 } from 'lucide-react';
 
 interface ProposalReviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   proposal: AIProposalItem | null;
-  onApprove: (proposalId: string, notes?: string) => Promise<void>;
-  onReject: (proposalId: string, reason: string) => Promise<void>;
-  onModify: (proposalId: string, humanValue: string, reason: string) => Promise<void>;
+  onApprove?: (proposalId: string, notes?: string) => Promise<void>;
+  onReject?: (proposalId: string, reason: string) => Promise<void>;
+  onModify?: (proposalId: string, humanValue: string, reason: string) => Promise<void>;
+  onDecision?: (proposalId: string, decision: 'APPROVE' | 'REJECT' | 'OVERRIDE', overrideValue?: string, notes?: string) => Promise<void>;
 }
 
 export const ProposalReviewModal: React.FC<ProposalReviewModalProps> = ({
@@ -17,7 +18,8 @@ export const ProposalReviewModal: React.FC<ProposalReviewModalProps> = ({
   proposal,
   onApprove,
   onReject,
-  onModify
+  onModify,
+  onDecision
 }) => {
   const [activeTab, setActiveTab] = useState<'APPROVE' | 'REJECT' | 'MODIFY'>('APPROVE');
   const [rejectReason, setRejectReason] = useState('');
@@ -45,14 +47,22 @@ export const ProposalReviewModal: React.FC<ProposalReviewModalProps> = ({
     setError(null);
     try {
       if (activeTab === 'APPROVE') {
-        await onApprove(proposal.proposal_id, 'Approved by Quality Reviewer');
+        if (onDecision) {
+          await onDecision(proposal.proposal_id, 'APPROVE', undefined, 'Approved by Quality Reviewer');
+        } else if (onApprove) {
+          await onApprove(proposal.proposal_id, 'Approved by Quality Reviewer');
+        }
       } else if (activeTab === 'REJECT') {
         if (!rejectReason.trim()) {
           setError('Mandatory documented justification required for proposal rejection.');
           setSubmitting(false);
           return;
         }
-        await onReject(proposal.proposal_id, rejectReason.trim());
+        if (onDecision) {
+          await onDecision(proposal.proposal_id, 'REJECT', undefined, rejectReason.trim());
+        } else if (onReject) {
+          await onReject(proposal.proposal_id, rejectReason.trim());
+        }
       } else if (activeTab === 'MODIFY') {
         const finalVal = modifiedValue.trim() || (proposal.field_name === 'severity' ? 'Critical' : proposal.field_name === 'priority' ? 'Urgent' : proposal.proposed_value);
         if (!finalVal) {
@@ -65,7 +75,11 @@ export const ProposalReviewModal: React.FC<ProposalReviewModalProps> = ({
           setSubmitting(false);
           return;
         }
-        await onModify(proposal.proposal_id, finalVal, modifyReason.trim());
+        if (onDecision) {
+          await onDecision(proposal.proposal_id, 'OVERRIDE', finalVal, modifyReason.trim());
+        } else if (onModify) {
+          await onModify(proposal.proposal_id, finalVal, modifyReason.trim());
+        }
       }
       onClose();
     } catch (err: any) {
@@ -80,7 +94,8 @@ export const ProposalReviewModal: React.FC<ProposalReviewModalProps> = ({
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(15, 23, 42, 0.5)',
+        backgroundColor: 'rgba(15, 23, 42, 0.6)',
+        backdropFilter: 'blur(4px)',
         zIndex: 250,
         display: 'flex',
         justifyContent: 'center',
@@ -92,378 +107,327 @@ export const ProposalReviewModal: React.FC<ProposalReviewModalProps> = ({
       <div
         style={{
           backgroundColor: '#FFFFFF',
-          borderRadius: 6,
+          borderRadius: 12,
           width: '100%',
           maxWidth: '580px',
-          boxShadow: '0 12px 24px -4px rgba(16, 24, 40, 0.16)',
-          border: '1px solid #E5E7EB',
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column'
+          boxShadow: 'var(--shadow-modal)',
+          border: '1px solid #E2E8F0',
+          overflow: 'hidden'
         }}
+        className="animate-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header */}
-        <div
-          style={{
-            padding: '12px 16px',
-            borderBottom: '1px solid #E5E7EB',
-            backgroundColor: '#F9FAFB',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}
-        >
+        {/* Header */}
+        <div style={{
+          padding: '16px 22px',
+          borderBottom: '1px solid #E2E8F0',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          backgroundColor: '#FAFAFC'
+        }}>
           <div>
-            <h3 style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#111827' }}>
-              Review AI Proposal: {proposal.field_name.replace(/_/g, ' ').toUpperCase()}
+            <h3 style={{ fontSize: 15, fontWeight: 700, color: '#0F172A', margin: 0 }}>
+              Review AI Proposal: {proposal.field_name?.toUpperCase()}
             </h3>
-            <p style={{ margin: '2px 0 0 0', fontSize: 11, color: '#6B7280' }}>
-              Proposal ID: <strong>{proposal.proposal_id}</strong> • AI Run: {proposal.ai_run_id || 'AI-93D22C'}
+            <p style={{ fontSize: 12, color: '#64748B', margin: '2px 0 0' }}>
+              Field: <strong style={{ color: '#4F46E5', textTransform: 'capitalize' }}>{proposal.field_name.replace('_', ' ')}</strong> · <span style={{ color: '#059669', fontWeight: 600 }}>{Math.round((proposal.confidence_score || 0.98) * 100)}% Conf</span>
             </p>
           </div>
-
           <button
             onClick={onClose}
             style={{
               background: 'none',
               border: 'none',
-              color: '#6B7280',
+              color: '#64748B',
               cursor: 'pointer',
-              padding: '4px',
-              borderRadius: 3
+              padding: 4,
+              borderRadius: 6
             }}
           >
             <X size={16} />
           </button>
         </div>
 
-        {/* Modal Body */}
-        <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {/* Comparison Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <div
-              style={{
-                padding: '10px 12px',
-                borderRadius: 4,
-                border: '1px solid #E5E7EB',
-                backgroundColor: '#F9FAFB'
-              }}
-            >
-              <span style={{ fontSize: 10, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase' }}>
+        {/* Comparison Block */}
+        <div style={{ padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 12,
+            backgroundColor: '#F8FAFC',
+            padding: '14px',
+            borderRadius: 10,
+            border: '1px solid #E2E8F0'
+          }}>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Current Record Value
-              </span>
-              <div style={{ fontSize: 13, fontWeight: 500, color: '#374151', marginTop: 2 }}>
-                {proposal.current_value || 'None / Default'}
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#0F172A', marginTop: 4 }}>
+                {proposal.current_value || 'None (Unset)'}
               </div>
             </div>
-
-            <div
-              style={{
-                padding: '10px 12px',
-                borderRadius: 4,
-                border: '1px solid #BFDBFE',
-                backgroundColor: '#EFF6FF'
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 10, fontWeight: 600, color: '#1D4ED8', textTransform: 'uppercase' }}>
-                  AI Recommendation
-                </span>
-                <span style={{ fontSize: 10, fontWeight: 600, color: '#1D4ED8' }}>
-                  {Math.round(proposal.confidence_score * 100)}% Conf
-                </span>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#4F46E5', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                AI Proposed Value
               </div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: '#1E40AF', marginTop: 2 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#4F46E5', marginTop: 4 }}>
                 {proposal.proposed_value}
               </div>
             </div>
           </div>
 
-          {/* AI Rationale */}
           {proposal.reason && (
-            <div style={{ fontSize: 11, color: '#374151', backgroundColor: '#F9FAFB', padding: '8px 10px', borderRadius: 4, border: '1px solid #E5E7EB' }}>
-              <strong>AI Rationale: </strong> {proposal.reason}
+            <div style={{
+              fontSize: 12,
+              color: '#475569',
+              backgroundColor: '#EEF2FF',
+              padding: '10px 12px',
+              borderRadius: 8,
+              border: '1px solid #C7D2FE',
+              lineHeight: 1.4
+            }}>
+              <strong>AI Model Rationale:</strong> {proposal.reason}
             </div>
           )}
 
-          {/* Verbatim Evidence Citation */}
-          {proposal.reason && (
-            <div
+          {/* Action Tabs */}
+          <div style={{
+            display: 'flex',
+            gap: 6,
+            backgroundColor: '#F1F5F9',
+            padding: 4,
+            borderRadius: 8,
+            border: '1px solid #E2E8F0'
+          }}>
+            <button
+              onClick={() => setActiveTab('APPROVE')}
               style={{
-                backgroundColor: '#FFFFFF',
-                borderLeft: '3px solid #1D4ED8',
-                padding: '8px 10px',
-                borderRadius: '0 4px 4px 0',
-                border: '1px solid #E5E7EB',
-                borderLeftWidth: '3px'
+                flex: 1,
+                padding: '7px 12px',
+                fontSize: 12.5,
+                fontWeight: 600,
+                border: 'none',
+                borderRadius: 6,
+                backgroundColor: activeTab === 'APPROVE' ? '#FFFFFF' : 'transparent',
+                color: activeTab === 'APPROVE' ? '#059669' : '#64748B',
+                boxShadow: activeTab === 'APPROVE' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 5
               }}
             >
-              <div style={{ fontSize: 10, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 4 }}>
-                <FileText size={11} /> Supporting Evidence Citation
-              </div>
-              <div style={{ fontFamily: 'monospace', fontSize: 11, color: '#111827' }}>
-                "{proposal.reason}"
-              </div>
-            </div>
-          )}
+              <CheckCircle2 size={13} />
+              <span>Approve AI Value</span>
+            </button>
 
-          {/* Decision Mode Selector Tabs */}
-          <div>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#111827', marginBottom: 6 }}>
-              Quality Reviewer Disposition
-            </label>
-            <div style={{ display: 'flex', gap: 6 }}>
-              <button
-                type="button"
-                onClick={() => setActiveTab('APPROVE')}
-                style={{
-                  flex: 1,
-                  height: 32,
-                  borderRadius: 4,
-                  border: activeTab === 'APPROVE' ? '1px solid #059669' : '1px solid #D1D5DB',
-                  backgroundColor: activeTab === 'APPROVE' ? '#ECFDF5' : '#FFFFFF',
-                  color: activeTab === 'APPROVE' ? '#065F46' : '#4B5563',
-                  fontWeight: activeTab === 'APPROVE' ? 600 : 400,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 4,
-                  fontSize: 12
-                }}
-              >
-                <CheckCircle2 size={13} color={activeTab === 'APPROVE' ? '#059669' : '#6B7280'} />
-                <span>Approve AI Value</span>
-              </button>
+            <button
+              onClick={() => setActiveTab('MODIFY')}
+              style={{
+                flex: 1,
+                padding: '7px 12px',
+                fontSize: 12.5,
+                fontWeight: 600,
+                border: 'none',
+                borderRadius: 6,
+                backgroundColor: activeTab === 'MODIFY' ? '#FFFFFF' : 'transparent',
+                color: activeTab === 'MODIFY' ? '#4F46E5' : '#64748B',
+                boxShadow: activeTab === 'MODIFY' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 5
+              }}
+            >
+              <Edit3 size={13} />
+              <span>Human Override</span>
+            </button>
 
-              <button
-                type="button"
-                onClick={() => setActiveTab('MODIFY')}
-                style={{
-                  flex: 1,
-                  height: 32,
-                  borderRadius: 4,
-                  border: activeTab === 'MODIFY' ? '1px solid #1D4ED8' : '1px solid #D1D5DB',
-                  backgroundColor: activeTab === 'MODIFY' ? '#EFF6FF' : '#FFFFFF',
-                  color: activeTab === 'MODIFY' ? '#1E40AF' : '#4B5563',
-                  fontWeight: activeTab === 'MODIFY' ? 600 : 400,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 4,
-                  fontSize: 12
-                }}
-              >
-                <Edit3 size={13} color={activeTab === 'MODIFY' ? '#1D4ED8' : '#6B7280'} />
-                <span>Human Override</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveTab('REJECT')}
-                style={{
-                  flex: 1,
-                  height: 32,
-                  borderRadius: 4,
-                  border: activeTab === 'REJECT' ? '1px solid #DC2626' : '1px solid #D1D5DB',
-                  backgroundColor: activeTab === 'REJECT' ? '#FEF2F2' : '#FFFFFF',
-                  color: activeTab === 'REJECT' ? '#991B1B' : '#4B5563',
-                  fontWeight: activeTab === 'REJECT' ? 600 : 400,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 4,
-                  fontSize: 12
-                }}
-              >
-                <AlertTriangle size={13} color={activeTab === 'REJECT' ? '#DC2626' : '#6B7280'} />
-                <span>Reject Proposal</span>
-              </button>
-            </div>
+            <button
+              onClick={() => setActiveTab('REJECT')}
+              style={{
+                flex: 1,
+                padding: '7px 12px',
+                fontSize: 12.5,
+                fontWeight: 600,
+                border: 'none',
+                borderRadius: 6,
+                backgroundColor: activeTab === 'REJECT' ? '#FFFFFF' : 'transparent',
+                color: activeTab === 'REJECT' ? '#DC2626' : '#64748B',
+                boxShadow: activeTab === 'REJECT' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 5
+              }}
+            >
+              <AlertTriangle size={13} />
+              <span>Reject Proposal</span>
+            </button>
           </div>
 
-          {/* Conditional Input Fields */}
+          {/* Tab Content Fields */}
           {activeTab === 'APPROVE' && (
-            <div style={{ padding: '8px 10px', backgroundColor: '#ECFDF5', borderRadius: 4, border: '1px solid #A7F3D0', fontSize: 11, color: '#065F46' }}>
-              Approving will apply <strong>'{proposal.proposed_value}'</strong> to the complaint record and log an immutable <code>USER_APPROVED</code> audit event.
-            </div>
-          )}
-
-          {activeTab === 'REJECT' && (
-            <div>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: '#374151', marginBottom: 4 }}>
-                Documented Rejection Justification (Mandatory GxP Record)
-              </label>
-              <textarea
-                rows={2}
-                placeholder="Reviewer determined that evidence indicates cosmetic packaging defect only, not bulk API contamination."
-                value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px 10px',
-                  borderRadius: 4,
-                  border: '1px solid #D1D5DB',
-                  fontSize: 12,
-                  color: '#111827',
-                  outline: 'none',
-                  boxSizing: 'border-box'
-                }}
-              />
+            <div style={{
+              fontSize: 12.5,
+              color: '#334155',
+              backgroundColor: '#ECFDF5',
+              padding: '12px',
+              borderRadius: 8,
+              border: '1px solid #A7F3D0',
+              lineHeight: 1.5
+            }}>
+              Adopting the proposed value <strong style={{ color: '#065F46' }}>"{proposal.proposed_value}"</strong> will update the official complaint record and log an immutable signature to the 21 CFR Part 11 audit ledger.
             </div>
           )}
 
           {activeTab === 'MODIFY' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: '#374151', marginBottom: 4 }}>
-                  Reviewer Override Value
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                  Reviewer Override Value *
                 </label>
                 {proposal.field_name === 'severity' ? (
                   <select
-                    value={modifiedValue || 'Critical'}
+                    value={modifiedValue}
                     onChange={(e) => setModifiedValue(e.target.value)}
                     style={{
                       width: '100%',
-                      height: 32,
-                      padding: '0 8px',
-                      borderRadius: 4,
-                      border: '1px solid #1D4ED8',
-                      fontSize: 12,
-                      fontWeight: 500,
-                      backgroundColor: '#FFFFFF'
+                      height: 36,
+                      padding: '0 10px',
+                      borderRadius: 6,
+                      border: '1px solid #CBD5E1',
+                      fontSize: 12.5,
+                      fontWeight: 600
                     }}
                   >
-                    <option value="Critical">Critical (Immediate Quarantine)</option>
-                    <option value="High">High (Foreign Particulate / OOS)</option>
-                    <option value="Medium">Medium (Secondary Packaging)</option>
-                    <option value="Low">Low (Minor Documentation)</option>
-                  </select>
-                ) : proposal.field_name === 'priority' ? (
-                  <select
-                    value={modifiedValue || 'Urgent'}
-                    onChange={(e) => setModifiedValue(e.target.value)}
-                    style={{
-                      width: '100%',
-                      height: 32,
-                      padding: '0 8px',
-                      borderRadius: 4,
-                      border: '1px solid #1D4ED8',
-                      fontSize: 12,
-                      fontWeight: 500,
-                      backgroundColor: '#FFFFFF'
-                    }}
-                  >
-                    <option value="Urgent">Urgent</option>
+                    <option value="Critical">Critical</option>
                     <option value="High">High</option>
-                    <option value="Normal">Normal</option>
+                    <option value="Medium">Medium</option>
                     <option value="Low">Low</option>
                   </select>
                 ) : (
                   <input
                     type="text"
-                    placeholder={`Enter override value for ${proposal.field_name}...`}
                     value={modifiedValue}
                     onChange={(e) => setModifiedValue(e.target.value)}
                     style={{
                       width: '100%',
-                      height: 32,
-                      padding: '0 8px',
-                      borderRadius: 4,
-                      border: '1px solid #1D4ED8',
-                      fontSize: 12,
-                      boxSizing: 'border-box'
+                      height: 36,
+                      padding: '0 12px',
+                      borderRadius: 6,
+                      border: '1px solid #CBD5E1',
+                      fontSize: 12.5,
+                      fontWeight: 600
                     }}
                   />
                 )}
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: '#374151', marginBottom: 4 }}>
-                  Documented Override Rationale (Preserves both AI & Human values)
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                  Documented Justification (Mandatory GxP Rationale) *
                 </label>
                 <textarea
-                  rows={2}
-                  placeholder="Potential batch-wide particulate contamination requires immediate critical escalation."
                   value={modifyReason}
                   onChange={(e) => setModifyReason(e.target.value)}
+                  placeholder="Potential batch-wide particulate contamination requires immediate critical escalation..."
+                  rows={3}
                   style={{
                     width: '100%',
-                    padding: '6px 8px',
-                    borderRadius: 4,
-                    border: '1px solid #D1D5DB',
-                    fontSize: 12,
-                    boxSizing: 'border-box'
+                    padding: '8px 10px',
+                    borderRadius: 6,
+                    border: '1px solid #CBD5E1',
+                    fontSize: 12.5,
+                    lineHeight: 1.4
                   }}
                 />
               </div>
             </div>
           )}
 
+          {activeTab === 'REJECT' && (
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+                Rejection Justification (Mandatory GxP Reason) *
+              </label>
+              <textarea
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                placeholder="Reviewer determined that evidence indicates packaging defect only..."
+                rows={3}
+                style={{
+                  width: '100%',
+                  padding: '8px 10px',
+                  borderRadius: 6,
+                  border: '1px solid #CBD5E1',
+                  fontSize: 12.5,
+                  lineHeight: 1.4
+                }}
+              />
+            </div>
+          )}
+
           {error && (
-            <div style={{ padding: '6px 10px', backgroundColor: '#FEF2F2', color: '#991B1B', borderRadius: 4, border: '1px solid #FECACA', fontSize: 11, fontWeight: 500 }}>
+            <div style={{ fontSize: 12, color: '#DC2626', fontWeight: 600, backgroundColor: '#FEF2F2', padding: '8px 12px', borderRadius: 6, border: '1px solid #FECACA' }}>
               {error}
             </div>
           )}
         </div>
 
-        {/* Modal Footer */}
-        <div
-          style={{
-            padding: '10px 16px',
-            borderTop: '1px solid #E5E7EB',
-            backgroundColor: '#F9FAFB',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}
-        >
-          <span style={{ fontSize: 10, color: '#6B7280' }}>
-            21 CFR Part 11 Electronic Signature & Decision Enforcement
-          </span>
+        {/* Footer Actions */}
+        <div style={{
+          padding: '14px 22px',
+          borderTop: '1px solid #E2E8F0',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          gap: 10,
+          backgroundColor: '#FAFAFC'
+        }}>
+          <button
+            onClick={onClose}
+            style={{
+              padding: '7px 14px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #CBD5E1',
+              borderRadius: 7,
+              fontSize: 12.5,
+              fontWeight: 600,
+              color: '#475569',
+              cursor: 'pointer'
+            }}
+          >
+            Cancel
+          </button>
 
-          <div style={{ display: 'flex', gap: 6 }}>
-            <button
-              onClick={onClose}
-              disabled={submitting}
-              style={{
-                height: 30,
-                padding: '0 12px',
-                borderRadius: 4,
-                border: '1px solid #D1D5DB',
-                backgroundColor: '#FFFFFF',
-                color: '#4B5563',
-                fontSize: 12,
-                fontWeight: 500,
-                cursor: 'pointer'
-              }}
-            >
-              Cancel
-            </button>
-
-            <button
-              onClick={handleExecuteDecision}
-              disabled={submitting}
-              style={{
-                height: 30,
-                padding: '0 14px',
-                borderRadius: 4,
-                border: 'none',
-                backgroundColor: activeTab === 'REJECT' ? '#DC2626' : '#1D4ED8',
-                color: '#FFFFFF',
-                fontSize: 12,
-                fontWeight: 500,
-                cursor: submitting ? 'not-allowed' : 'pointer'
-              }}
-            >
-              {submitting ? 'Submitting...' : activeTab === 'APPROVE' ? 'Confirm Approval' : activeTab === 'REJECT' ? 'Confirm Rejection' : 'Apply Human Override'}
-            </button>
-          </div>
+          <button
+            onClick={handleExecuteDecision}
+            disabled={submitting}
+            style={{
+              padding: '7px 18px',
+              background: activeTab === 'REJECT'
+                ? 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)'
+                : 'linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)',
+              color: '#FFFFFF',
+              border: 'none',
+              borderRadius: 7,
+              fontSize: 12.5,
+              fontWeight: 600,
+              cursor: submitting ? 'not-allowed' : 'pointer',
+              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)'
+            }}
+          >
+            {submitting ? 'Signing...' : activeTab === 'APPROVE' ? 'Confirm Approval' : activeTab === 'MODIFY' ? 'Apply Human Override' : 'Confirm Rejection'}
+          </button>
         </div>
       </div>
     </div>
   );
 };
+
+export default ProposalReviewModal;

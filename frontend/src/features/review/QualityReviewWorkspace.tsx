@@ -5,17 +5,16 @@ import { LifecycleStepper } from './LifecycleStepper';
 import { ComplaintActivityTimeline } from './ComplaintActivityTimeline';
 import type { ComplaintData, AIProposalItem, AuditTimelineResponse, PaginatedComplaintList } from '../../types';
 import {
-  ShieldCheck,
   CheckCircle2,
   AlertTriangle,
   History,
   Clock,
   TrendingUp,
-  UserCheck,
   RotateCw,
   Search,
   Eye,
-  Filter
+  Filter,
+  FileText
 } from 'lucide-react';
 
 interface QualityReviewWorkspaceProps {
@@ -108,134 +107,105 @@ export const QualityReviewWorkspace: React.FC<QualityReviewWorkspaceProps> = ({
     }
   };
 
-  const handleApprove = async (proposalId: string, notes?: string) => {
-    try {
-      const res = await api.decideProposal(proposalId, 'APPROVE', undefined, notes || 'Approved by Quality Reviewer');
-      setFeedbackMessage({ type: 'success', text: `Proposal ${proposalId} approved and applied.` });
-      setComplaint(res.complaint);
-      onComplaintUpdated(res.complaint);
-      if (complaint?.id) {
-        await loadProposals(complaint.id);
-        await loadTimeline(complaint.id);
-      }
-      await loadDashboardMetrics();
-      await loadQueue();
-    } catch (err: any) {
-      setFeedbackMessage({ type: 'error', text: err.message || 'Failed to approve proposal' });
-      throw err;
+  const handleSelectComplaintFromQueue = (item: ComplaintData) => {
+    setComplaint(item);
+    onComplaintUpdated(item);
+    if (item.id) {
+      loadProposals(item.id);
+      loadTimeline(item.id);
     }
+    setActiveSubTab('REVIEW_DETAIL');
   };
 
-  const handleReject = async (proposalId: string, reason: string) => {
-    try {
-      const res = await api.decideProposal(proposalId, 'REJECT', undefined, reason);
-      setFeedbackMessage({ type: 'success', text: `Proposal ${proposalId} rejected.` });
-      setComplaint(res.complaint);
-      onComplaintUpdated(res.complaint);
-      if (complaint?.id) {
-        await loadProposals(complaint.id);
-        await loadTimeline(complaint.id);
-      }
-      await loadDashboardMetrics();
-      await loadQueue();
-    } catch (err: any) {
-      setFeedbackMessage({ type: 'error', text: err.message || 'Failed to reject proposal' });
-      throw err;
-    }
+  const handleOpenReviewModal = (proposal: AIProposalItem) => {
+    setSelectedProposal(proposal);
+    setIsReviewModalOpen(true);
   };
 
-  const handleModify = async (proposalId: string, humanValue: string, reason: string) => {
-    try {
-      const res = await api.decideProposal(proposalId, 'MODIFY', humanValue, reason);
-      setFeedbackMessage({
-        type: 'success',
-        text: `Proposal ${proposalId} modified to "${humanValue}" (Human Override applied).`
-      });
-      setComplaint(res.complaint);
-      onComplaintUpdated(res.complaint);
-      if (complaint?.id) {
-        await loadProposals(complaint.id);
-        await loadTimeline(complaint.id);
-      }
-      await loadDashboardMetrics();
-      await loadQueue();
-    } catch (err: any) {
-      setFeedbackMessage({ type: 'error', text: err.message || 'Failed to modify proposal' });
-      throw err;
-    }
-  };
-
-  const handleLifecycleTransition = async (targetState: string, reason?: string) => {
+  const handleProposalDecision = async (
+    proposalId: string,
+    decision: 'APPROVE' | 'REJECT' | 'OVERRIDE',
+    overrideValue?: string,
+    notes?: string
+  ) => {
     if (!complaint?.id) return;
+
     try {
-      const res = await api.transitionComplaint(complaint.id, targetState, reason, 'qa_manager_01');
-      setFeedbackMessage({ type: 'success', text: res.message });
-      setComplaint(res.complaint);
-      onComplaintUpdated(res.complaint);
+      const res = await api.decideProposal(
+        proposalId,
+        decision === 'OVERRIDE' ? 'MODIFY' : decision,
+        overrideValue,
+        notes,
+        'Dr. Marcus Vance (QP)'
+      );
+
+      const updated = res.complaint;
+      setComplaint(updated);
+      onComplaintUpdated(updated);
+      await loadProposals(complaint.id);
       await loadTimeline(complaint.id);
       await loadDashboardMetrics();
       await loadQueue();
+
+      setIsReviewModalOpen(false);
+      setSelectedProposal(null);
+      setFeedbackMessage({
+        type: 'success',
+        text: `Proposal decision '${decision}' successfully applied and logged to 21 CFR Part 11 ledger.`
+      });
+
+      setTimeout(() => setFeedbackMessage(null), 5000);
     } catch (err: any) {
-      setFeedbackMessage({ type: 'error', text: err.message || 'Failed state transition' });
-      throw err;
+      setFeedbackMessage({
+        type: 'error',
+        text: err.message || 'Failed to submit review decision.'
+      });
     }
   };
 
-  const filteredQueue = (queueList?.items || []).filter((item) => {
-    const q = queueSearch.toLowerCase();
-    const matchSearch = !queueSearch || (
-      (item.complaint_number || '').toLowerCase().includes(q) ||
-      (item.customer_name || '').toLowerCase().includes(q) ||
-      (item.product_name || '').toLowerCase().includes(q) ||
-      (item.batch_number || '').toLowerCase().includes(q)
-    );
-    const matchSeverity = filterSeverity === 'ALL' || item.severity === filterSeverity;
-    const matchStatus = filterStatus === 'ALL' || item.status === filterStatus;
-    return matchSearch && matchSeverity && matchStatus;
+  const filteredQueue = (queueList?.items || []).filter((c) => {
+    const matchesSearch =
+      !queueSearch ||
+      (c.complaint_number || '').toLowerCase().includes(queueSearch.toLowerCase()) ||
+      (c.customer_name || '').toLowerCase().includes(queueSearch.toLowerCase()) ||
+      (c.product_name || '').toLowerCase().includes(queueSearch.toLowerCase()) ||
+      (c.batch_number || '').toLowerCase().includes(queueSearch.toLowerCase());
+
+    const matchesSeverity = filterSeverity === 'ALL' || c.severity === filterSeverity;
+    const matchesStatus = filterStatus === 'ALL' || c.status === filterStatus;
+
+    return matchesSearch && matchesSeverity && matchesStatus;
   });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      {/* Top Banner */}
-      <div
-        style={{
-          padding: '8px 14px',
-          backgroundColor: '#EFF6FF',
-          border: '1px solid #BFDBFE',
-          borderRadius: 4,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          color: '#1E40AF',
-          fontSize: 12
-        }}
-      >
-        <ShieldCheck size={15} color="#1D4ED8" style={{ flexShrink: 0 }} />
-        <span>
-          <strong>Quality Review Invariant:</strong> AI triage proposals require Qualified Person review. Changes create immutable 21 CFR Part 11 audit records.
-        </span>
-      </div>
-
-      {/* Feedback Messages */}
+    <div style={{
+      maxWidth: 1360,
+      margin: '0 auto',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 18
+    }} className="animate-fade-in">
+      {/* Feedback Banner */}
       {feedbackMessage && (
         <div
           style={{
-            padding: '8px 14px',
-            borderRadius: 4,
+            padding: '12px 18px',
+            borderRadius: 8,
             backgroundColor: feedbackMessage.type === 'success' ? '#ECFDF5' : '#FEF2F2',
             border: `1px solid ${feedbackMessage.type === 'success' ? '#A7F3D0' : '#FECACA'}`,
             color: feedbackMessage.type === 'success' ? '#065F46' : '#991B1B',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            fontSize: 12,
-            fontWeight: 500
+            fontSize: 13,
+            fontWeight: 600
           }}
+          className="animate-slide-up"
         >
           <span>{feedbackMessage.text}</span>
           <button
             onClick={() => setFeedbackMessage(null)}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontWeight: 600 }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontWeight: 700 }}
           >
             ✕
           </button>
@@ -244,118 +214,121 @@ export const QualityReviewWorkspace: React.FC<QualityReviewWorkspaceProps> = ({
 
       {/* KPI Metrics Dashboard Bar */}
       {dashboardMetrics && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8 }}>
-          <div style={{ backgroundColor: '#FFFFFF', padding: '10px 12px', borderRadius: 4, border: '1px solid #E5E7EB' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#6B7280', fontSize: 10, fontWeight: 600, textTransform: 'uppercase' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+          <div style={{ backgroundColor: '#FFFFFF', padding: '14px 16px', borderRadius: 10, border: '1px solid #E2E8F0', boxShadow: '0 1px 2px rgba(0,0,0,0.03)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748B', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               <span>Pending Reviews</span>
-              <Clock size={12} />
+              <Clock size={14} style={{ color: '#D97706' }} />
             </div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: '#D97706', marginTop: 2 }}>
+            <div style={{ fontSize: 24, fontWeight: 800, color: '#B45309', marginTop: 4, fontFamily: 'var(--font-mono)' }}>
               {dashboardMetrics.pending_ai_reviews}
             </div>
           </div>
 
-          <div style={{ backgroundColor: '#FFFFFF', padding: '10px 12px', borderRadius: 4, border: '1px solid #E5E7EB' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#6B7280', fontSize: 10, fontWeight: 600, textTransform: 'uppercase' }}>
+          <div style={{ backgroundColor: '#FFFFFF', padding: '14px 16px', borderRadius: 10, border: '1px solid #E2E8F0', boxShadow: '0 1px 2px rgba(0,0,0,0.03)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748B', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               <span>AI Override Rate</span>
-              <TrendingUp size={12} />
+              <TrendingUp size={14} style={{ color: '#64748B' }} />
             </div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: '#4B5563', marginTop: 2 }}>
+            <div style={{ fontSize: 24, fontWeight: 800, color: '#0F172A', marginTop: 4, fontFamily: 'var(--font-mono)' }}>
               {dashboardMetrics.ai_override_rate_pct}%
             </div>
           </div>
 
-          <div style={{ backgroundColor: '#FFFFFF', padding: '10px 12px', borderRadius: 4, border: '1px solid #E5E7EB' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#6B7280', fontSize: 10, fontWeight: 600, textTransform: 'uppercase' }}>
+          <div style={{ backgroundColor: '#FFFFFF', padding: '14px 16px', borderRadius: 10, border: '1px solid #E2E8F0', boxShadow: '0 1px 2px rgba(0,0,0,0.03)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748B', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               <span>Acceptance Rate</span>
-              <CheckCircle2 size={12} />
+              <CheckCircle2 size={14} style={{ color: '#10B981' }} />
             </div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: '#059669', marginTop: 2 }}>
+            <div style={{ fontSize: 24, fontWeight: 800, color: '#059669', marginTop: 4, fontFamily: 'var(--font-mono)' }}>
               {dashboardMetrics.ai_acceptance_rate_pct}%
             </div>
           </div>
 
-          <div style={{ backgroundColor: '#FFFFFF', padding: '10px 12px', borderRadius: 4, border: '1px solid #E5E7EB' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#6B7280', fontSize: 10, fontWeight: 600, textTransform: 'uppercase' }}>
-              <span>High / Critical</span>
-              <AlertTriangle size={12} />
+          <div style={{ backgroundColor: '#FFFFFF', padding: '14px 16px', borderRadius: 10, border: '1px solid #E2E8F0', boxShadow: '0 1px 2px rgba(0,0,0,0.03)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748B', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <span>Critical / High Risk</span>
+              <AlertTriangle size={14} style={{ color: '#DC2626' }} />
             </div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: '#DC2626', marginTop: 2 }}>
+            <div style={{ fontSize: 24, fontWeight: 800, color: '#DC2626', marginTop: 4, fontFamily: 'var(--font-mono)' }}>
               {dashboardMetrics.high_critical_complaints}
-            </div>
-          </div>
-
-          <div style={{ backgroundColor: '#FFFFFF', padding: '10px 12px', borderRadius: 4, border: '1px solid #E5E7EB' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#6B7280', fontSize: 10, fontWeight: 600, textTransform: 'uppercase' }}>
-              <span>Avg Review Time</span>
-              <UserCheck size={12} />
-            </div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: '#1D4ED8', marginTop: 2 }}>
-              {dashboardMetrics.average_review_time_seconds}s
             </div>
           </div>
         </div>
       )}
 
-      {/* Sub-Tab Navigation: Review Detail vs Queue List vs Audit Timeline */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #E5E7EB' }}>
+      {/* Primary Tab Navigation & Action Bar */}
+      <div style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        border: '1px solid #E2E8F0',
+        padding: '8px 16px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
+      }}>
         <div style={{ display: 'flex', gap: 6 }}>
           <button
             onClick={() => setActiveSubTab('REVIEW_DETAIL')}
             style={{
-              padding: '8px 12px',
+              padding: '8px 14px',
               border: 'none',
-              background: 'none',
+              borderRadius: 7,
+              backgroundColor: activeSubTab === 'REVIEW_DETAIL' ? '#EEF2FF' : 'transparent',
               fontSize: 13,
-              fontWeight: activeSubTab === 'REVIEW_DETAIL' ? 600 : 500,
-              color: activeSubTab === 'REVIEW_DETAIL' ? '#1D4ED8' : '#6B7280',
-              borderBottom: activeSubTab === 'REVIEW_DETAIL' ? '2px solid #1D4ED8' : '2px solid transparent',
+              fontWeight: activeSubTab === 'REVIEW_DETAIL' ? 700 : 500,
+              color: activeSubTab === 'REVIEW_DETAIL' ? '#4F46E5' : '#64748B',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: 6
+              gap: 6,
+              transition: 'all 120ms ease-out'
             }}
           >
-            <span>Review Detail ({complaint?.complaint_number || 'Current'})</span>
+            <Eye size={14} />
+            <span>Review Cockpit {complaint?.complaint_number ? `(${complaint.complaint_number})` : ''}</span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('QUEUE_LIST')}
             style={{
-              padding: '8px 12px',
+              padding: '8px 14px',
               border: 'none',
-              background: 'none',
+              borderRadius: 7,
+              backgroundColor: activeSubTab === 'QUEUE_LIST' ? '#EEF2FF' : 'transparent',
               fontSize: 13,
-              fontWeight: activeSubTab === 'QUEUE_LIST' ? 600 : 500,
-              color: activeSubTab === 'QUEUE_LIST' ? '#1D4ED8' : '#6B7280',
-              borderBottom: activeSubTab === 'QUEUE_LIST' ? '2px solid #1D4ED8' : '2px solid transparent',
+              fontWeight: activeSubTab === 'QUEUE_LIST' ? 700 : 500,
+              color: activeSubTab === 'QUEUE_LIST' ? '#4F46E5' : '#64748B',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: 6
+              gap: 6,
+              transition: 'all 120ms ease-out'
             }}
           >
-            <Filter size={13} />
+            <Filter size={14} />
             <span>Operational Queue ({queueList?.total || 0})</span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('TIMELINE')}
             style={{
-              padding: '8px 12px',
+              padding: '8px 14px',
               border: 'none',
-              background: 'none',
+              borderRadius: 7,
+              backgroundColor: activeSubTab === 'TIMELINE' ? '#EEF2FF' : 'transparent',
               fontSize: 13,
-              fontWeight: activeSubTab === 'TIMELINE' ? 600 : 500,
-              color: activeSubTab === 'TIMELINE' ? '#1D4ED8' : '#6B7280',
-              borderBottom: activeSubTab === 'TIMELINE' ? '2px solid #1D4ED8' : '2px solid transparent',
+              fontWeight: activeSubTab === 'TIMELINE' ? 700 : 500,
+              color: activeSubTab === 'TIMELINE' ? '#4F46E5' : '#64748B',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: 6
+              gap: 6,
+              transition: 'all 120ms ease-out'
             }}
           >
-            <History size={13} />
+            <History size={14} />
             <span>Audit Trail</span>
           </button>
         </div>
@@ -370,299 +343,346 @@ export const QualityReviewWorkspace: React.FC<QualityReviewWorkspaceProps> = ({
             loadDashboardMetrics();
           }}
           style={{
-            height: 28,
-            padding: '0 10px',
-            borderRadius: 4,
-            border: '1px solid #D1D5DB',
+            height: 32,
+            padding: '0 12px',
+            borderRadius: 7,
+            border: '1px solid #CBD5E1',
             backgroundColor: '#FFFFFF',
-            color: '#374151',
-            fontSize: 11,
-            fontWeight: 500,
+            color: '#475569',
+            fontSize: 12,
+            fontWeight: 600,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: 4
+            gap: 5,
+            transition: 'all 120ms ease-out'
           }}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F8FAFC')}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#FFFFFF')}
         >
-          <RotateCw size={11} />
+          <RotateCw size={12} className={loadingProposals ? 'animate-spin' : ''} />
           <span>Refresh</span>
         </button>
       </div>
 
-      {/* SUBTAB 1: 3-COLUMN REVIEW WORKSPACE */}
+      {/* SUBTAB 1: REVIEW COCKPIT */}
       {activeSubTab === 'REVIEW_DETAIL' && (
-        complaint ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {/* Lifecycle State Stepper */}
-            <LifecycleStepper
-              currentStatus={complaint.status || 'PENDING_TRIAGE'}
-              onTransition={handleLifecycleTransition}
-            />
+        <>
+          {!complaint ? (
+            <div style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 12,
+              border: '1px solid #E2E8F0',
+              padding: '60px 20px',
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 12
+            }}>
+              <FileText size={40} style={{ color: '#CBD5E1' }} />
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0F172A', margin: 0 }}>
+                No Complaint Selected for Review
+              </h3>
+              <p style={{ fontSize: 13, color: '#64748B', maxWidth: 420, margin: 0 }}>
+                Select a pending complaint from the Operational Queue to inspect evidence, review AI proposals, or submit a quality decision.
+              </p>
+              <button
+                onClick={() => setActiveSubTab('QUEUE_LIST')}
+                style={{
+                  padding: '8px 16px',
+                  background: 'linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: 8,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  marginTop: 6,
+                  boxShadow: '0 2px 8px rgba(79, 70, 229, 0.3)'
+                }}
+              >
+                Open Operational Queue
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {/* Lifecycle Stage Header Bar */}
+              <LifecycleStepper
+                currentStatus={complaint.status || 'DRAFT'}
+                onTransition={async (targetStatus: string, reason?: string) => {
+                  if (!complaint.id) return;
+                  const res = await api.transitionComplaint(complaint.id, targetStatus, reason, 'Dr. Marcus Vance (QP)');
+                  if (res.complaint) {
+                    setComplaint(res.complaint);
+                    onComplaintUpdated(res.complaint);
+                    loadTimeline(complaint.id);
+                    loadDashboardMetrics();
+                  }
+                }}
+              />
 
-            {/* 3-Column Review Grid: Left: Meta, Center: Evidence & Details, Right: AI Proposals & Actions */}
-            <div className="review-cockpit-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12, alignItems: 'start' }}>
-              
-              {/* LEFT COLUMN: Complaint Information & Scope */}
-              <div style={{ backgroundColor: '#FFFFFF', borderRadius: 4, border: '1px solid #E5E7EB', padding: '14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #F3F4F6', paddingBottom: 6 }}>
-                  <h4 style={{ margin: 0, fontSize: 12, fontWeight: 600, color: '#111827' }}>
-                    Record Information
-                  </h4>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#1D4ED8', fontWeight: 600 }}>
-                    {complaint.complaint_number || 'DRAFT'}
-                  </span>
+              {/* 3-Column Review Grid: Left: Meta, Center: Evidence & Details, Right: AI Proposals & Actions */}
+              <div className="review-cockpit-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, alignItems: 'start' }}>
+                
+                {/* LEFT COLUMN: Complaint Information & Scope */}
+                <div style={{ backgroundColor: '#FFFFFF', borderRadius: 12, border: '1px solid #E2E8F0', padding: '18px', display: 'flex', flexDirection: 'column', gap: 14, boxShadow: '0 1px 3px rgba(15, 23, 42, 0.05)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #F1F5F9', paddingBottom: 8 }}>
+                    <h4 style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: '#0F172A' }}>
+                      Record Information
+                    </h4>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11.5, color: '#4F46E5', fontWeight: 700, backgroundColor: '#EEF2FF', padding: '2px 6px', borderRadius: 4 }}>
+                      {complaint.complaint_number || 'DRAFT'}
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 12.5 }}>
+                    <div>
+                      <span style={{ color: '#64748B', fontWeight: 500 }}>Customer:</span>
+                      <div style={{ fontWeight: 600, color: '#0F172A', marginTop: 1 }}>{complaint.customer_name || 'N/A'}</div>
+                    </div>
+                    <div>
+                      <span style={{ color: '#64748B', fontWeight: 500 }}>Product Name:</span>
+                      <div style={{ fontWeight: 600, color: '#0F172A', marginTop: 1 }}>{complaint.product_name || 'N/A'}</div>
+                    </div>
+                    <div>
+                      <span style={{ color: '#64748B', fontWeight: 500 }}>Strength / Grade:</span>
+                      <div style={{ fontWeight: 600, color: '#0F172A', marginTop: 1 }}>{complaint.product_strength || 'N/A'}</div>
+                    </div>
+                    <div>
+                      <span style={{ color: '#64748B', fontWeight: 500 }}>Batch / Lot:</span>
+                      <div style={{ fontWeight: 700, color: '#0F172A', fontFamily: 'var(--font-mono)', marginTop: 1 }}>{complaint.batch_number || 'N/A'}</div>
+                    </div>
+                    <div>
+                      <span style={{ color: '#64748B', fontWeight: 500 }}>Quantity Affected:</span>
+                      <div style={{ fontWeight: 600, color: '#0F172A', marginTop: 1 }}>{complaint.quantity_affected || 'N/A'} {complaint.quantity_unit || 'kg'}</div>
+                    </div>
+                    <div>
+                      <span style={{ color: '#64748B', fontWeight: 500 }}>Manufacturing Date:</span>
+                      <div style={{ fontWeight: 600, color: '#0F172A', marginTop: 1 }}>{complaint.manufacturing_date || 'N/A'}</div>
+                    </div>
+                    <div>
+                      <span style={{ color: '#64748B', fontWeight: 500 }}>Expiry Date:</span>
+                      <div style={{ fontWeight: 600, color: '#0F172A', marginTop: 1 }}>{complaint.expiry_date || 'N/A'}</div>
+                    </div>
+                  </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 11 }}>
-                  <div>
-                    <span style={{ color: '#6B7280' }}>Customer:</span>
-                    <div style={{ fontWeight: 500, color: '#111827' }}>{complaint.customer_name || 'N/A'}</div>
+                {/* CENTER COLUMN: Evidence & Narrative Scope */}
+                <div style={{ backgroundColor: '#FFFFFF', borderRadius: 12, border: '1px solid #E2E8F0', padding: '18px', display: 'flex', flexDirection: 'column', gap: 14, boxShadow: '0 1px 3px rgba(15, 23, 42, 0.05)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #F1F5F9', paddingBottom: 8 }}>
+                    <h4 style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: '#0F172A' }}>
+                      Observation & Traceability
+                    </h4>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#059669', backgroundColor: '#ECFDF5', padding: '2px 8px', borderRadius: 20 }}>
+                      Grounded
+                    </span>
                   </div>
-                  <div>
-                    <span style={{ color: '#6B7280' }}>Product Name:</span>
-                    <div style={{ fontWeight: 500, color: '#111827' }}>{complaint.product_name || 'N/A'}</div>
-                  </div>
-                  <div>
-                    <span style={{ color: '#6B7280' }}>Strength / Grade:</span>
-                    <div style={{ fontWeight: 500, color: '#111827' }}>{complaint.product_strength || 'N/A'}</div>
-                  </div>
-                  <div>
-                    <span style={{ color: '#6B7280' }}>Batch / Lot:</span>
-                    <div style={{ fontWeight: 600, color: '#111827', fontFamily: 'var(--font-mono)' }}>{complaint.batch_number || 'N/A'}</div>
-                  </div>
-                  <div>
-                    <span style={{ color: '#6B7280' }}>Quantity Affected:</span>
-                    <div style={{ fontWeight: 500, color: '#111827' }}>{complaint.quantity_affected || 'N/A'} {complaint.quantity_unit || 'kg'}</div>
-                  </div>
-                  <div>
-                    <span style={{ color: '#6B7280' }}>Manufacturing Date:</span>
-                    <div style={{ fontWeight: 500, color: '#111827' }}>{complaint.manufacturing_date || 'N/A'}</div>
-                  </div>
-                  <div>
-                    <span style={{ color: '#6B7280' }}>Expiry Date:</span>
-                    <div style={{ fontWeight: 500, color: '#111827' }}>{complaint.expiry_date || 'N/A'}</div>
-                  </div>
-                </div>
-              </div>
 
-              {/* CENTER COLUMN: Evidence & Narrative Scope */}
-              <div style={{ backgroundColor: '#FFFFFF', borderRadius: 4, border: '1px solid #E5E7EB', padding: '14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #F3F4F6', paddingBottom: 6 }}>
-                  <h4 style={{ margin: 0, fontSize: 12, fontWeight: 600, color: '#111827' }}>
-                    Evidence & Narrative Details
-                  </h4>
-                  <span style={{ fontSize: 11, color: '#6B7280' }}>
-                    Type: <strong style={{ color: '#111827' }}>{complaint.complaint_type || 'Foreign Matter'}</strong>
-                  </span>
-                </div>
-
-                <div>
-                  <span style={{ color: '#6B7280', fontSize: 10, textTransform: 'uppercase', fontWeight: 600 }}>Customer Narrative</span>
-                  <p style={{
-                    margin: '4px 0 0 0',
-                    fontSize: 11,
-                    color: '#111827',
-                    backgroundColor: '#F9FAFB',
-                    padding: '8px 10px',
-                    borderRadius: 4,
-                    border: '1px solid #E5E7EB',
-                    lineHeight: 1.4
-                  }}>
-                    {complaint.detailed_description || 'No detailed description provided.'}
-                  </p>
-                </div>
-
-                {complaint.ai_reasoning && (
                   <div>
-                    <span style={{ color: '#6B7280', fontSize: 10, textTransform: 'uppercase', fontWeight: 600 }}>ICH Q9 Quality Rationale</span>
-                    <p style={{
-                      margin: '4px 0 0 0',
-                      fontSize: 11,
-                      color: '#1E40AF',
-                      backgroundColor: '#EFF6FF',
-                      padding: '8px 10px',
-                      borderRadius: 4,
-                      border: '1px solid #BFDBFE',
-                      lineHeight: 1.4
+                    <span style={{ color: '#64748B', fontSize: 12, fontWeight: 600 }}>Classification:</span>
+                    <div style={{ fontWeight: 700, color: '#0F172A', marginTop: 2, fontSize: 13 }}>
+                      {complaint.complaint_type || 'Foreign Matter'}
+                    </div>
+                  </div>
+
+                  <div>
+                    <span style={{ color: '#64748B', fontSize: 12, fontWeight: 600 }}>Observation Description:</span>
+                    <div style={{
+                      backgroundColor: '#F8FAFC',
+                      padding: '12px',
+                      borderRadius: 8,
+                      border: '1px solid #E2E8F0',
+                      fontSize: 12.5,
+                      lineHeight: 1.5,
+                      color: '#1E293B',
+                      marginTop: 4,
+                      fontWeight: 500
                     }}>
-                      {complaint.ai_reasoning}
-                    </p>
+                      {complaint.detailed_description || 'No description recorded.'}
+                    </div>
                   </div>
-                )}
-              </div>
 
-              {/* RIGHT COLUMN: AI Proposals & Decision Hierarchy */}
-              <div style={{ backgroundColor: '#FFFFFF', borderRadius: 4, border: '1px solid #E5E7EB', padding: '14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #F3F4F6', paddingBottom: 6 }}>
-                  <h4 style={{ margin: 0, fontSize: 12, fontWeight: 600, color: '#111827' }}>
-                    AI Proposals Queue ({proposals.length})
-                  </h4>
-                  <span style={{ fontSize: 10, color: '#1D4ED8', backgroundColor: '#EFF6FF', padding: '1px 5px', borderRadius: 3, border: '1px solid #BFDBFE' }}>
-                    Conf: {Math.round((complaint.ai_confidence || 0.94) * 100)}%
-                  </span>
+                  <div>
+                    <span style={{ color: '#64748B', fontSize: 12, fontWeight: 600 }}>ICH Q9 Risk Level:</span>
+                    <div style={{ marginTop: 4 }}>
+                      <span style={{
+                        padding: '3px 10px',
+                        borderRadius: 6,
+                        fontSize: 12,
+                        fontWeight: 700,
+                        backgroundColor: complaint.severity === 'Critical' ? '#FEF2F2' : '#FFFBEB',
+                        color: complaint.severity === 'Critical' ? '#991B1B' : '#92400E',
+                        border: `1px solid ${complaint.severity === 'Critical' ? '#FECACA' : '#FDE68A'}`
+                      }}>
+                        {complaint.severity || 'High'} Severity
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
-                {loadingProposals ? (
-                  <div style={{ textAlign: 'center', padding: '20px', color: '#9CA3AF', fontSize: 11 }}>Loading proposals...</div>
-                ) : proposals.length === 0 ? (
-                  <div style={{ padding: '20px', textAlign: 'center', backgroundColor: '#F9FAFB', borderRadius: 4, border: '1px dashed #D1D5DB', color: '#6B7280', fontSize: 11 }}>
-                    No pending AI proposals for this complaint.
+                {/* RIGHT COLUMN: AI Proposal Decision Cockpit */}
+                <div style={{ backgroundColor: '#FFFFFF', borderRadius: 12, border: '1px solid #E2E8F0', padding: '18px', display: 'flex', flexDirection: 'column', gap: 14, boxShadow: '0 1px 3px rgba(15, 23, 42, 0.05)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #F1F5F9', paddingBottom: 8 }}>
+                    <h4 style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: '#0F172A' }}>
+                      AI Proposal Decision
+                    </h4>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#4F46E5', backgroundColor: '#EEF2FF', padding: '2px 8px', borderRadius: 20 }}>
+                      HITL
+                    </span>
                   </div>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {proposals.map((prop) => {
-                      const isPending = prop.status === 'PROPOSED' || prop.status === 'AI_PROPOSED';
-                      const isApproved = prop.status === 'APPROVED' || prop.status === 'APPLIED';
-                      const isRejected = prop.status === 'REJECTED';
 
-                      return (
+                  {loadingProposals ? (
+                    <div style={{ textAlign: 'center', padding: '24px 0', color: '#94A3B8', fontSize: 12.5 }}>
+                      Loading pending proposals...
+                    </div>
+                  ) : proposals.length === 0 ? (
+                    <div style={{
+                      textAlign: 'center',
+                      padding: '24px 12px',
+                      backgroundColor: '#F8FAFC',
+                      borderRadius: 8,
+                      border: '1px dashed #CBD5E1',
+                      color: '#64748B',
+                      fontSize: 12.5
+                    }}>
+                      No pending AI proposals for this record. All values verified.
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {proposals.map((prop) => (
                         <div
-                          key={prop.id || prop.proposal_id}
+                          key={prop.proposal_id}
                           style={{
-                            backgroundColor: isPending ? '#FFFBEB' : '#F9FAFB',
-                            borderRadius: 4,
-                            border: `1px solid ${isPending ? '#FDE68A' : '#E5E7EB'}`,
-                            padding: '10px'
+                            padding: '14px',
+                            backgroundColor: '#F8FAFC',
+                            borderRadius: 10,
+                            border: '1px solid #E2E8F0',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 8
                           }}
                         >
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, fontSize: 11, color: '#111827' }}>
-                              {prop.proposal_id}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A', textTransform: 'capitalize' }}>
+                              {prop.field_name.replace('_', ' ')}
                             </span>
-                            <span
-                              style={{
-                                padding: '1px 5px',
-                                borderRadius: 3,
-                                fontSize: 10,
-                                fontWeight: 600,
-                                color: isPending ? '#92400E' : isApproved ? '#065F46' : isRejected ? '#991B1B' : '#4B5563',
-                                backgroundColor: isPending ? '#FEF3C7' : isApproved ? '#ECFDF5' : isRejected ? '#FEF2F2' : '#F3F4F6'
-                              }}
-                            >
-                              {prop.status}
+                            <span style={{
+                              fontSize: 11,
+                              fontWeight: 700,
+                              color: '#059669',
+                              backgroundColor: '#ECFDF5',
+                              padding: '1px 6px',
+                              borderRadius: 4
+                            }}>
+                              {Math.round(prop.confidence_score * 100)}% Conf
                             </span>
                           </div>
 
-                          <div style={{ backgroundColor: '#FFFFFF', borderRadius: 3, padding: '6px 8px', border: '1px solid #E5E7EB', marginBottom: 6 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, marginBottom: 2 }}>
-                              <span style={{ fontWeight: 500, color: '#4B5563', textTransform: 'capitalize' }}>
-                                {prop.field_name.replace(/_/g, ' ')}:
-                              </span>
-                              <span style={{ color: '#DC2626', textDecoration: 'line-through' }}>
-                                {prop.current_value || 'None'}
-                              </span>
-                              <span>→</span>
-                              <span style={{ color: '#059669', fontWeight: 600 }}>
-                                {prop.proposed_value}
-                              </span>
-                            </div>
-                            {prop.reason && (
-                              <p style={{ margin: 0, fontSize: 10, color: '#6B7280' }}>
-                                {prop.reason}
-                              </p>
-                            )}
+                          <div style={{ fontSize: 12, color: '#475569' }}>
+                            Proposed: <strong style={{ color: '#4F46E5' }}>{prop.proposed_value}</strong>
                           </div>
 
-                          {isPending ? (
-                            <button
-                              onClick={() => {
-                                setSelectedProposal(prop);
-                                setIsReviewModalOpen(true);
-                              }}
-                              style={{
-                                width: '100%',
-                                height: 26,
-                                borderRadius: 3,
-                                border: 'none',
-                                backgroundColor: '#1D4ED8',
-                                color: '#FFFFFF',
-                                fontSize: 11,
-                                fontWeight: 500,
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: 4
-                              }}
-                            >
-                              <span>Review & Decide</span>
-                            </button>
-                          ) : (
-                            <div style={{ fontSize: 10, color: '#4B5563', backgroundColor: '#F3F4F6', padding: '4px 6px', borderRadius: 3 }}>
-                              Decision: <strong>{prop.reviewer_notes || prop.status}</strong>
+                          {prop.reason && (
+                            <div style={{ fontSize: 11.5, color: '#64748B', lineHeight: 1.4 }}>
+                              {prop.reason}
                             </div>
                           )}
+
+                          <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+                            <button
+                              onClick={() => handleOpenReviewModal(prop)}
+                              style={{
+                                flex: 1,
+                                padding: '6px 10px',
+                                background: 'linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)',
+                                color: '#FFFFFF',
+                                border: 'none',
+                                borderRadius: 6,
+                                fontSize: 12,
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                boxShadow: '0 1px 3px rgba(79, 70, 229, 0.25)'
+                              }}
+                            >
+                              Review & Decide
+                            </button>
+                          </div>
                         </div>
-                      );
-                    })}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ) : (
-          <div style={{ padding: '32px', textAlign: 'center', background: '#FFFFFF', borderRadius: 4, border: '1px solid #E5E7EB' }}>
-            <h3 style={{ color: '#111827', fontSize: 14, fontWeight: 600 }}>No Complaint Selected for Detail Review</h3>
-            <p style={{ color: '#6B7280', fontSize: 12, marginTop: 4 }}>
-              Select a complaint from the operational queue list to inspect details and decide AI proposals.
-            </p>
-            <button
-              onClick={() => setActiveSubTab('QUEUE_LIST')}
-              style={{
-                marginTop: 10,
-                padding: '6px 12px',
-                borderRadius: 4,
-                backgroundColor: '#1D4ED8',
-                color: '#FFFFFF',
-                border: 'none',
-                fontSize: 11,
-                fontWeight: 500,
-                cursor: 'pointer'
-              }}
-            >
-              Open Operational Queue
-            </button>
-          </div>
-        )
+          )}
+        </>
       )}
 
       {/* SUBTAB 2: OPERATIONAL QUEUE LIST */}
       {activeSubTab === 'QUEUE_LIST' && (
-        <div style={{ backgroundColor: '#FFFFFF', borderRadius: 4, border: '1px solid #E5E7EB', padding: '16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {/* Filters Bar */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                backgroundColor: '#F9FAFB',
-                border: '1px solid #D1D5DB',
-                borderRadius: 4,
-                padding: '3px 8px'
-              }}>
-                <Search size={13} color="#6B7280" />
-                <input
-                  type="text"
-                  placeholder="Filter by ID, customer, product..."
-                  value={queueSearch}
-                  onChange={(e) => setQueueSearch(e.target.value)}
-                  style={{
-                    border: 'none',
-                    background: 'transparent',
-                    outline: 'none',
-                    fontSize: 11,
-                    color: '#111827',
-                    width: 180
-                  }}
-                />
-              </div>
+        <div style={{
+          backgroundColor: '#FFFFFF',
+          borderRadius: 12,
+          border: '1px solid #E2E8F0',
+          boxShadow: '0 1px 3px rgba(15, 23, 42, 0.06)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden'
+        }}>
+          {/* Filter Bar */}
+          <div style={{
+            padding: '14px 18px',
+            borderBottom: '1px solid #E2E8F0',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 10,
+            backgroundColor: '#FAFAFC'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #CBD5E1',
+              borderRadius: 8,
+              padding: '6px 12px',
+              width: '260px'
+            }}>
+              <Search size={14} style={{ color: '#94A3B8' }} />
+              <input
+                type="text"
+                placeholder="Search queue..."
+                value={queueSearch}
+                onChange={(e) => setQueueSearch(e.target.value)}
+                style={{
+                  border: 'none',
+                  background: 'none',
+                  outline: 'none',
+                  fontSize: 12.5,
+                  width: '100%',
+                  color: '#0F172A',
+                  fontWeight: 500
+                }}
+              />
+            </div>
 
+            <div style={{ display: 'flex', gap: 8 }}>
               <select
-                className="form-select"
-                style={{ height: 28, fontSize: 11, padding: '0 8px' }}
                 value={filterSeverity}
                 onChange={(e) => setFilterSeverity(e.target.value)}
+                style={{
+                  height: 32,
+                  padding: '0 10px',
+                  borderRadius: 6,
+                  border: '1px solid #CBD5E1',
+                  backgroundColor: '#FFFFFF',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: '#334155'
+                }}
               >
                 <option value="ALL">All Severities</option>
                 <option value="Critical">Critical</option>
@@ -672,104 +692,125 @@ export const QualityReviewWorkspace: React.FC<QualityReviewWorkspaceProps> = ({
               </select>
 
               <select
-                className="form-select"
-                style={{ height: 28, fontSize: 11, padding: '0 8px' }}
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
+                style={{
+                  height: 32,
+                  padding: '0 10px',
+                  borderRadius: 6,
+                  border: '1px solid #CBD5E1',
+                  backgroundColor: '#FFFFFF',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: '#334155'
+                }}
               >
-                <option value="ALL">All Lifecycle States</option>
+                <option value="ALL">All Statuses</option>
+                <option value="DRAFT">Draft</option>
                 <option value="PENDING_TRIAGE">Pending Triage</option>
                 <option value="UNDER_REVIEW">Under Review</option>
-                <option value="INVESTIGATION">Investigation</option>
-                <option value="QUALITY_DECISION">Quality Decision</option>
+                <option value="APPROVED">Approved</option>
                 <option value="CLOSED">Closed</option>
               </select>
             </div>
-
-            <span style={{ fontSize: 11, color: '#6B7280' }}>
-              Showing {filteredQueue.length} of {queueList?.total || 0} records
-            </span>
           </div>
 
-          {/* Queue Table */}
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 11 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
               <thead>
-                <tr style={{ backgroundColor: '#F9FAFB', borderBottom: '1px solid #E5E7EB', color: '#6B7280', fontSize: 10, textTransform: 'uppercase' }}>
-                  <th style={{ padding: '8px 10px' }}>Complaint ID</th>
-                  <th style={{ padding: '8px 10px' }}>Customer</th>
-                  <th style={{ padding: '8px 10px' }}>Product</th>
-                  <th style={{ padding: '8px 10px' }}>Batch</th>
-                  <th style={{ padding: '8px 10px' }}>Severity</th>
-                  <th style={{ padding: '8px 10px' }}>Priority</th>
-                  <th style={{ padding: '8px 10px' }}>Status</th>
-                  <th style={{ padding: '8px 10px', textAlign: 'right' }}>Action</th>
+                <tr style={{
+                  backgroundColor: '#F8FAFC',
+                  borderBottom: '1px solid #E2E8F0',
+                  color: '#475569',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
+                  <th style={{ padding: '10px 18px', textAlign: 'left' }}>Complaint ID</th>
+                  <th style={{ padding: '10px 14px', textAlign: 'left' }}>Product & Batch</th>
+                  <th style={{ padding: '10px 14px', textAlign: 'left' }}>Customer</th>
+                  <th style={{ padding: '10px 14px', textAlign: 'left' }}>Severity</th>
+                  <th style={{ padding: '10px 14px', textAlign: 'left' }}>Status</th>
+                  <th style={{ padding: '10px 18px', textAlign: 'right' }}>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredQueue.map((item) => (
-                  <tr key={item.id || item.complaint_number} style={{ borderBottom: '1px solid #F3F4F6' }}>
-                    <td style={{ padding: '8px 10px', fontWeight: 600, fontFamily: 'var(--font-mono)', color: '#111827' }}>
-                      {item.complaint_number}
-                    </td>
-                    <td style={{ padding: '8px 10px', color: '#374151' }}>
-                      {item.customer_name || '—'}
-                    </td>
-                    <td style={{ padding: '8px 10px', color: '#374151' }}>
-                      {item.product_name || '—'}
-                    </td>
-                    <td style={{ padding: '8px 10px', fontFamily: 'var(--font-mono)', color: '#4B5563' }}>
-                      {item.batch_number || '—'}
-                    </td>
-                    <td style={{ padding: '8px 10px' }}>
-                      <span className={`badge ${
-                        item.severity === 'Critical' ? 'badge-critical' :
-                        item.severity === 'High' ? 'badge-high' :
-                        item.severity === 'Medium' ? 'badge-medium' : 'badge-low'
-                      }`}>
-                        {item.severity || 'Medium'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '8px 10px' }}>
-                      <span className={`badge ${
-                        item.priority === 'Urgent' ? 'badge-urgent' :
-                        item.priority === 'High' ? 'badge-high' : 'badge-normal'
-                      }`}>
-                        {item.priority || 'Normal'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '8px 10px' }}>
-                      <span style={{ fontSize: 10, color: '#4B5563', backgroundColor: '#F3F4F6', padding: '1px 5px', borderRadius: 3 }}>
-                        {item.status || 'Pending Triage'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '8px 10px', textAlign: 'right' }}>
-                      <button
-                        onClick={() => {
-                          setComplaint(item);
-                          onComplaintUpdated(item);
-                          setActiveSubTab('REVIEW_DETAIL');
-                        }}
-                        style={{
-                          padding: '3px 8px',
-                          borderRadius: 3,
-                          backgroundColor: '#1D4ED8',
-                          color: '#FFFFFF',
-                          border: 'none',
-                          fontSize: 11,
-                          fontWeight: 500,
-                          cursor: 'pointer',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 3
-                        }}
-                      >
-                        <Eye size={11} />
-                        <span>Inspect</span>
-                      </button>
+                {filteredQueue.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} style={{ padding: '40px 16px', textAlign: 'center', color: '#94A3B8' }}>
+                      No complaints found in operational queue.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filteredQueue.map((item) => (
+                    <tr
+                      key={item.id || item.complaint_number}
+                      style={{ borderBottom: '1px solid #F1F5F9', transition: 'background-color 120ms ease-out' }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F8FAFC')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                    >
+                      <td style={{ padding: '12px 18px', fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#4F46E5' }}>
+                        {item.complaint_number}
+                      </td>
+                      <td style={{ padding: '12px 14px' }}>
+                        <div style={{ fontWeight: 600, color: '#0F172A' }}>{item.product_name || '—'}</div>
+                        <div style={{ fontSize: 11.5, color: '#64748B', fontFamily: 'var(--font-mono)' }}>
+                          Batch: {item.batch_number || '—'}
+                        </div>
+                      </td>
+                      <td style={{ padding: '12px 14px', color: '#475569', fontWeight: 500 }}>
+                        {item.customer_name || '—'}
+                      </td>
+                      <td style={{ padding: '12px 14px' }}>
+                        <span style={{
+                          display: 'inline-block',
+                          padding: '2px 8px',
+                          borderRadius: 6,
+                          fontSize: 11.5,
+                          fontWeight: 700,
+                          backgroundColor:
+                            item.severity === 'Critical' ? '#FEF2F2' :
+                            item.severity === 'High' ? '#FFFBEB' :
+                            item.severity === 'Medium' ? '#F0F9FF' : '#F1F5F9',
+                          color:
+                            item.severity === 'Critical' ? '#991B1B' :
+                            item.severity === 'High' ? '#92400E' :
+                            item.severity === 'Medium' ? '#0369A1' : '#475569',
+                          border: `1px solid ${
+                            item.severity === 'Critical' ? '#FECACA' :
+                            item.severity === 'High' ? '#FDE68A' :
+                            item.severity === 'Medium' ? '#BAE6FD' : '#E2E8F0'
+                          }`
+                        }}>
+                          {item.severity || 'UNASSESSED'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '12px 14px' }}>
+                        <span style={{ fontSize: 11.5, fontWeight: 600, color: item.status === 'APPROVED' ? '#059669' : '#475569' }}>
+                          {item.status?.replace('_', ' ') || 'DRAFT'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '12px 18px', textAlign: 'right' }}>
+                        <button
+                          onClick={() => handleSelectComplaintFromQueue(item)}
+                          style={{
+                            padding: '4px 10px',
+                            backgroundColor: '#FFFFFF',
+                            border: '1px solid #CBD5E1',
+                            borderRadius: 6,
+                            fontSize: 12,
+                            fontWeight: 600,
+                            color: '#4F46E5',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Inspect →
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -778,24 +819,37 @@ export const QualityReviewWorkspace: React.FC<QualityReviewWorkspaceProps> = ({
 
       {/* SUBTAB 3: AUDIT TIMELINE */}
       {activeSubTab === 'TIMELINE' && (
-        <ComplaintActivityTimeline
-          events={timelineData?.events || []}
-          complaintNumber={complaint?.complaint_number}
-        />
+        <div style={{ backgroundColor: '#FFFFFF', borderRadius: 12, border: '1px solid #E2E8F0', padding: '20px', boxShadow: '0 1px 3px rgba(15, 23, 42, 0.06)' }}>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: '#0F172A', marginBottom: 14 }}>
+            21 CFR Part 11 Audit Trail & Event Stream
+          </h3>
+          {timelineData ? (
+            <ComplaintActivityTimeline
+              events={timelineData.events}
+              complaintNumber={timelineData.complaint_number}
+            />
+          ) : (
+            <div style={{ color: '#94A3B8', textAlign: 'center', padding: '30px 0', fontSize: 13 }}>
+              Select a complaint record to view its immutable audit stream.
+            </div>
+          )}
+        </div>
       )}
 
-      {/* Proposal Review Modal */}
-      <ProposalReviewModal
-        isOpen={isReviewModalOpen}
-        onClose={() => {
-          setIsReviewModalOpen(false);
-          setSelectedProposal(null);
-        }}
-        proposal={selectedProposal}
-        onApprove={handleApprove}
-        onReject={handleReject}
-        onModify={handleModify}
-      />
+      {/* HITL Review Decision Modal */}
+      {isReviewModalOpen && selectedProposal && (
+        <ProposalReviewModal
+          isOpen={isReviewModalOpen}
+          proposal={selectedProposal}
+          onClose={() => {
+            setIsReviewModalOpen(false);
+            setSelectedProposal(null);
+          }}
+          onDecision={handleProposalDecision}
+        />
+      )}
     </div>
   );
 };
+
+export default QualityReviewWorkspace;

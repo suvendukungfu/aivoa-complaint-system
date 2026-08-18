@@ -18,10 +18,10 @@ import { RiskAssessmentCard } from './RiskAssessmentCard';
 import { CompletenessWidget } from './CompletenessWidget';
 import { DocumentUpload } from './DocumentUpload';
 import {
-  Bot,
   Send,
   Loader2,
-  Paperclip
+  Paperclip,
+  Cpu
 } from 'lucide-react';
 
 export const CopilotPanel: React.FC = () => {
@@ -102,56 +102,70 @@ export const CopilotPanel: React.FC = () => {
       display: 'flex',
       flexDirection: 'column',
       height: '100%',
-      backgroundColor: 'var(--bg-surface)',
-      borderLeft: '1px solid var(--border)',
+      backgroundColor: '#FFFFFF',
+      borderLeft: '1px solid #E2E8F0',
       minWidth: '320px',
       maxWidth: '420px',
-      width: '100%'
+      width: '100%',
+      boxShadow: '0 1px 3px rgba(15, 23, 42, 0.05)'
     }}>
       {/* Copilot Header */}
       <div style={{
-        padding: '12px 16px',
-        borderBottom: '1px solid var(--border)',
+        padding: '14px 18px',
+        borderBottom: '1px solid #E2E8F0',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        flexShrink: 0
+        flexShrink: 0,
+        backgroundColor: '#FAFAFC'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
-            width: 8,
-            height: 8,
-            borderRadius: '50%',
-            backgroundColor: loading ? 'var(--warning)' : 'var(--success)'
-          }} />
-          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
-            AIVOA Copilot
-          </span>
-          <span style={{
-            fontSize: 10.5,
-            fontWeight: 500,
-            color: 'var(--text-muted)',
-            backgroundColor: 'var(--bg-subtle)',
-            padding: '1px 5px',
-            borderRadius: 'var(--radius-xs)'
+            width: 28,
+            height: 28,
+            borderRadius: 7,
+            background: 'linear-gradient(135deg, #4F46E5 0%, #3B82F6 100%)',
+            color: '#FFFFFF',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 6px rgba(79, 70, 229, 0.3)'
           }}>
-            {loading ? 'Processing' : 'Active'}
-          </span>
+            <Cpu size={15} />
+          </div>
+          <div>
+            <div style={{ fontSize: 13.5, fontWeight: 700, color: '#0F172A', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>AIVOA Copilot</span>
+              <span className="pulse-dot" style={{ backgroundColor: loading ? '#F59E0B' : '#10B981', width: 6, height: 6 }} />
+            </div>
+            <div style={{ fontSize: 11, color: '#64748B', fontWeight: 500 }}>
+              {loading ? statusText || 'Analyzing...' : 'Gemma2-9B · GxP Agent'}
+            </div>
+          </div>
         </div>
 
         {/* Tab switchers */}
-        <div style={{ display: 'flex', gap: 2 }}>
+        <div style={{
+          display: 'flex',
+          gap: 2,
+          backgroundColor: '#F1F5F9',
+          padding: 3,
+          borderRadius: 8,
+          border: '1px solid #E2E8F0'
+        }}>
           <button
             onClick={() => setActiveTab('ASSISTANT')}
             style={{
-              padding: '3px 8px',
-              fontSize: 11,
-              fontWeight: 500,
+              padding: '4px 9px',
+              fontSize: 11.5,
+              fontWeight: 600,
               border: 'none',
-              borderRadius: 'var(--radius-xs)',
-              backgroundColor: activeTab === 'ASSISTANT' ? 'var(--bg-subtle)' : 'transparent',
-              color: activeTab === 'ASSISTANT' ? 'var(--text-primary)' : 'var(--text-muted)',
-              cursor: 'pointer'
+              borderRadius: 6,
+              backgroundColor: activeTab === 'ASSISTANT' ? '#FFFFFF' : 'transparent',
+              color: activeTab === 'ASSISTANT' ? '#4F46E5' : '#64748B',
+              boxShadow: activeTab === 'ASSISTANT' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+              cursor: 'pointer',
+              transition: 'all 120ms ease-out'
             }}
           >
             Chat
@@ -159,14 +173,16 @@ export const CopilotPanel: React.FC = () => {
           <button
             onClick={() => setActiveTab('RISK')}
             style={{
-              padding: '3px 8px',
-              fontSize: 11,
-              fontWeight: 500,
+              padding: '4px 9px',
+              fontSize: 11.5,
+              fontWeight: 600,
               border: 'none',
-              borderRadius: 'var(--radius-xs)',
-              backgroundColor: activeTab === 'RISK' ? 'var(--bg-subtle)' : 'transparent',
-              color: activeTab === 'RISK' ? 'var(--text-primary)' : 'var(--text-muted)',
-              cursor: 'pointer'
+              borderRadius: 6,
+              backgroundColor: activeTab === 'RISK' ? '#FFFFFF' : 'transparent',
+              color: activeTab === 'RISK' ? '#4F46E5' : '#64748B',
+              boxShadow: activeTab === 'RISK' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+              cursor: 'pointer',
+              transition: 'all 120ms ease-out'
             }}
           >
             Risk
@@ -174,14 +190,16 @@ export const CopilotPanel: React.FC = () => {
           <button
             onClick={() => setActiveTab('UPLOAD')}
             style={{
-              padding: '3px 8px',
-              fontSize: 11,
-              fontWeight: 500,
+              padding: '4px 9px',
+              fontSize: 11.5,
+              fontWeight: 600,
               border: 'none',
-              borderRadius: 'var(--radius-xs)',
-              backgroundColor: activeTab === 'UPLOAD' ? 'var(--bg-subtle)' : 'transparent',
-              color: activeTab === 'UPLOAD' ? 'var(--text-primary)' : 'var(--text-muted)',
-              cursor: 'pointer'
+              borderRadius: 6,
+              backgroundColor: activeTab === 'UPLOAD' ? '#FFFFFF' : 'transparent',
+              color: activeTab === 'UPLOAD' ? '#4F46E5' : '#64748B',
+              boxShadow: activeTab === 'UPLOAD' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+              cursor: 'pointer',
+              transition: 'all 120ms ease-out'
             }}
           >
             Upload
@@ -192,9 +210,9 @@ export const CopilotPanel: React.FC = () => {
       {/* Suggested Quick Actions Row */}
       {activeTab === 'ASSISTANT' && (
         <div style={{
-          padding: '8px 14px',
-          borderBottom: '1px solid var(--border)',
-          backgroundColor: 'var(--bg-subtle)',
+          padding: '10px 16px',
+          borderBottom: '1px solid #E2E8F0',
+          backgroundColor: '#FAFAFC',
           display: 'flex',
           gap: 6,
           overflowX: 'auto'
@@ -202,14 +220,27 @@ export const CopilotPanel: React.FC = () => {
           <button
             onClick={() => handleQuickAction('Assess risk for potential contamination in batch')}
             style={{
-              fontSize: 11,
-              padding: '3px 7px',
-              backgroundColor: 'var(--bg-surface)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius-xs)',
-              color: 'var(--text-secondary)',
+              fontSize: 11.5,
+              fontWeight: 600,
+              padding: '4px 10px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #CBD5E1',
+              borderRadius: 6,
+              color: '#334155',
               cursor: 'pointer',
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+              transition: 'all 120ms ease-out'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#EEF2FF';
+              e.currentTarget.style.borderColor = '#C7D2FE';
+              e.currentTarget.style.color = '#4338CA';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#FFFFFF';
+              e.currentTarget.style.borderColor = '#CBD5E1';
+              e.currentTarget.style.color = '#334155';
             }}
           >
             Assess Risk
@@ -217,14 +248,27 @@ export const CopilotPanel: React.FC = () => {
           <button
             onClick={() => handleQuickAction('Check completeness of current complaint')}
             style={{
-              fontSize: 11,
-              padding: '3px 7px',
-              backgroundColor: 'var(--bg-surface)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius-xs)',
-              color: 'var(--text-secondary)',
+              fontSize: 11.5,
+              fontWeight: 600,
+              padding: '4px 10px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #CBD5E1',
+              borderRadius: 6,
+              color: '#334155',
               cursor: 'pointer',
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+              transition: 'all 120ms ease-out'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#EEF2FF';
+              e.currentTarget.style.borderColor = '#C7D2FE';
+              e.currentTarget.style.color = '#4338CA';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#FFFFFF';
+              e.currentTarget.style.borderColor = '#CBD5E1';
+              e.currentTarget.style.color = '#334155';
             }}
           >
             Completeness
@@ -232,14 +276,27 @@ export const CopilotPanel: React.FC = () => {
           <button
             onClick={() => handleQuickAction('Update quantity affected to 50 kg')}
             style={{
-              fontSize: 11,
-              padding: '3px 7px',
-              backgroundColor: 'var(--bg-surface)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius-xs)',
-              color: 'var(--text-secondary)',
+              fontSize: 11.5,
+              fontWeight: 600,
+              padding: '4px 10px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #CBD5E1',
+              borderRadius: 6,
+              color: '#334155',
               cursor: 'pointer',
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+              transition: 'all 120ms ease-out'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#EEF2FF';
+              e.currentTarget.style.borderColor = '#C7D2FE';
+              e.currentTarget.style.color = '#4338CA';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#FFFFFF';
+              e.currentTarget.style.borderColor = '#CBD5E1';
+              e.currentTarget.style.color = '#334155';
             }}
           >
             Edit Quantity
@@ -248,25 +305,38 @@ export const CopilotPanel: React.FC = () => {
       )}
 
       {/* Main Content Area */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '14px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
         {activeTab === 'RISK' && <RiskAssessmentCard />}
         {activeTab === 'COMPLETENESS' && <CompletenessWidget />}
         {activeTab === 'UPLOAD' && <DocumentUpload />}
 
         {activeTab === 'ASSISTANT' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {messages.length === 0 ? (
               <div style={{
                 textAlign: 'center',
-                padding: '40px 16px',
-                color: 'var(--text-muted)'
+                padding: '48px 16px',
+                color: '#94A3B8'
               }}>
-                <Bot size={28} style={{ margin: '0 auto 10px', color: 'var(--text-light)' }} />
-                <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 4 }}>
+                <div style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 12,
+                  backgroundColor: '#EEF2FF',
+                  color: '#4F46E5',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 12px',
+                  boxShadow: '0 2px 8px rgba(79, 70, 229, 0.15)'
+                }}>
+                  <Cpu size={22} />
+                </div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#0F172A', marginBottom: 4 }}>
                   AIVOA Complaint Assistant
                 </div>
-                <div style={{ fontSize: 11.5, lineHeight: 1.4 }}>
-                  Paste a customer complaint narrative, request field edits, or attach a supporting quality document.
+                <div style={{ fontSize: 12.5, lineHeight: 1.5, color: '#64748B' }}>
+                  Paste a customer complaint narrative, request natural language edits, or attach a supporting batch certificate.
                 </div>
               </div>
             ) : (
@@ -279,47 +349,52 @@ export const CopilotPanel: React.FC = () => {
                     alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
                     maxWidth: '92%'
                   }}
+                  className="animate-fade-in"
                 >
                   <div style={{
-                    fontSize: 10,
-                    color: 'var(--text-muted)',
-                    marginBottom: 3,
+                    fontSize: 10.5,
+                    color: '#94A3B8',
+                    marginBottom: 4,
+                    fontWeight: 600,
                     alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start'
                   }}>
                     {msg.sender === 'user' ? 'You' : 'AIVOA Copilot'} · {msg.timestamp || 'Just now'}
                   </div>
 
                   <div style={{
-                    padding: '8px 12px',
-                    borderRadius: 'var(--radius-sm)',
-                    backgroundColor: msg.sender === 'user' ? 'var(--primary)' : 'var(--bg-subtle)',
-                    color: msg.sender === 'user' ? '#FFFFFF' : 'var(--text-primary)',
-                    fontSize: 12.5,
-                    lineHeight: 1.45,
-                    border: msg.sender === 'user' ? 'none' : '1px solid var(--border)'
+                    padding: '10px 14px',
+                    borderRadius: 10,
+                    backgroundColor: msg.sender === 'user' ? '#4F46E5' : '#F8FAFC',
+                    color: msg.sender === 'user' ? '#FFFFFF' : '#0F172A',
+                    fontSize: 13,
+                    lineHeight: 1.5,
+                    border: msg.sender === 'user' ? 'none' : '1px solid #E2E8F0',
+                    boxShadow: msg.sender === 'user' ? '0 2px 6px rgba(79, 70, 229, 0.25)' : '0 1px 2px rgba(0,0,0,0.02)',
+                    fontWeight: 500
                   }}>
                     {msg.text}
 
                     {/* Updated fields tags */}
                     {msg.updatedFields && msg.updatedFields.length > 0 && (
                       <div style={{
-                        marginTop: 8,
-                        paddingTop: 6,
-                        borderTop: '1px solid var(--border)',
+                        marginTop: 10,
+                        paddingTop: 8,
+                        borderTop: '1px solid rgba(0,0,0,0.06)',
                         display: 'flex',
                         flexWrap: 'wrap',
-                        gap: 4
+                        gap: 5
                       }}>
                         {msg.updatedFields.map((f: string, i: number) => (
                           <span
                             key={i}
                             style={{
-                              fontSize: 10,
-                              padding: '1px 5px',
-                              backgroundColor: 'var(--bg-surface)',
-                              border: '1px solid var(--border)',
-                              borderRadius: 'var(--radius-xs)',
-                              color: 'var(--primary)',
+                              fontSize: 10.5,
+                              fontWeight: 700,
+                              padding: '2px 7px',
+                              backgroundColor: '#FFFFFF',
+                              border: '1px solid #C7D2FE',
+                              borderRadius: 5,
+                              color: '#4338CA',
                               fontFamily: 'var(--font-mono)'
                             }}
                           >
@@ -337,14 +412,16 @@ export const CopilotPanel: React.FC = () => {
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 8,
-                padding: '8px 12px',
-                backgroundColor: 'var(--bg-subtle)',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: 12,
-                color: 'var(--text-secondary)'
+                gap: 10,
+                padding: '10px 14px',
+                backgroundColor: '#F8FAFC',
+                borderRadius: 10,
+                border: '1px solid #E2E8F0',
+                fontSize: 12.5,
+                color: '#475569',
+                fontWeight: 500
               }}>
-                <Loader2 size={13} className="animate-spin" />
+                <Loader2 size={15} className="animate-spin" style={{ color: '#4F46E5' }} />
                 <span>{statusText || 'Analyzing complaint...'}</span>
               </div>
             )}
@@ -355,19 +432,20 @@ export const CopilotPanel: React.FC = () => {
       {/* Input Form Bar */}
       {activeTab === 'ASSISTANT' && (
         <div style={{
-          padding: '12px 14px',
-          borderTop: '1px solid var(--border)',
-          backgroundColor: 'var(--bg-surface)',
+          padding: '14px 16px',
+          borderTop: '1px solid #E2E8F0',
+          backgroundColor: '#FAFAFC',
           flexShrink: 0
         }}>
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 6,
-            backgroundColor: 'var(--bg-subtle)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-sm)',
-            padding: '4px 8px'
+            gap: 8,
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #CBD5E1',
+            borderRadius: 8,
+            padding: '6px 10px',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
           }}>
             <button
               onClick={() => setActiveTab('UPLOAD')}
@@ -375,13 +453,15 @@ export const CopilotPanel: React.FC = () => {
               style={{
                 background: 'none',
                 border: 'none',
-                color: 'var(--text-muted)',
+                color: '#64748B',
                 cursor: 'pointer',
                 display: 'flex',
-                alignItems: 'center'
+                alignItems: 'center',
+                padding: 4,
+                borderRadius: 4
               }}
             >
-              <Paperclip size={14} />
+              <Paperclip size={16} />
             </button>
 
             <textarea
@@ -401,10 +481,11 @@ export const CopilotPanel: React.FC = () => {
                 background: 'none',
                 outline: 'none',
                 resize: 'none',
-                fontSize: 12.5,
-                color: 'var(--text-primary)',
+                fontSize: 13,
+                color: '#0F172A',
                 lineHeight: 1.4,
-                padding: '2px 0'
+                padding: '2px 0',
+                fontWeight: 500
               }}
             />
 
@@ -412,29 +493,31 @@ export const CopilotPanel: React.FC = () => {
               onClick={handleSend}
               disabled={!input.trim() || loading}
               style={{
-                padding: '4px 8px',
-                backgroundColor: input.trim() && !loading ? 'var(--text-primary)' : 'var(--bg-active)',
-                color: '#FFFFFF',
+                padding: '6px 10px',
+                background: input.trim() && !loading ? 'linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)' : '#E2E8F0',
+                color: input.trim() && !loading ? '#FFFFFF' : '#94A3B8',
                 border: 'none',
-                borderRadius: 'var(--radius-xs)',
+                borderRadius: 6,
                 cursor: input.trim() && !loading ? 'pointer' : 'not-allowed',
                 display: 'flex',
                 alignItems: 'center',
-                transition: 'background-color var(--transition-fast)'
+                boxShadow: input.trim() && !loading ? '0 2px 6px rgba(79, 70, 229, 0.3)' : 'none',
+                transition: 'all 140ms ease-out'
               }}
             >
-              <Send size={11} />
+              <Send size={13} />
             </button>
           </div>
           <div style={{
-            fontSize: 10,
-            color: 'var(--text-muted)',
-            marginTop: 4,
+            fontSize: 11,
+            color: '#94A3B8',
+            marginTop: 6,
             display: 'flex',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            fontWeight: 500
           }}>
             <span>Press Enter to send</span>
-            <span>Deterministic safety active</span>
+            <span>Deterministic GxP Safety Active</span>
           </div>
         </div>
       )}

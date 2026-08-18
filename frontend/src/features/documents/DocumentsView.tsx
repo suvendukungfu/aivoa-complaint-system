@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAppSelector } from '../../store';
+import type { FieldProvenanceItem } from '../../types';
 import {
   FileText,
   Copy,
@@ -12,7 +13,7 @@ import {
 export const DocumentsView: React.FC = () => {
   const currentFile = useAppSelector((state) => state.document.currentFile);
   const complaint = useAppSelector((state) => state.complaint.data);
-  const allProvenance = complaint.field_provenance || {};
+  const allProvenance: Record<string, FieldProvenanceItem> = (complaint.field_provenance as any) || {};
 
   const [selectedSpan, setSelectedSpan] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -29,178 +30,241 @@ export const DocumentsView: React.FC = () => {
 
   return (
     <div style={{
-      maxWidth: 1440,
+      maxWidth: 1360,
       margin: '0 auto',
-      padding: '20px',
       display: 'flex',
       flexDirection: 'column',
-      gap: 16,
-      color: '#111827'
-    }}>
+      gap: 18,
+      color: '#0F172A'
+    }} className="animate-fade-in">
       {/* Header */}
       <div style={{
         backgroundColor: '#FFFFFF',
-        border: '1px solid #E5E7EB',
-        borderRadius: 6,
-        padding: '16px 20px',
+        border: '1px solid #E2E8F0',
+        borderRadius: 12,
+        padding: '18px 24px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        boxShadow: '0 1px 2px rgba(16, 24, 40, 0.04)'
+        boxShadow: '0 1px 3px rgba(15, 23, 42, 0.05)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <FileText size={18} color="#1D4ED8" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{
+            width: 36,
+            height: 36,
+            borderRadius: 9,
+            backgroundColor: '#EEF2FF',
+            color: '#4F46E5',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: '1px solid #C7D2FE'
+          }}>
+            <FileText size={18} />
+          </div>
           <div>
-            <h1 style={{ fontSize: 16, fontWeight: 600, color: '#111827', margin: 0 }}>
+            <h1 style={{ fontSize: 16, fontWeight: 700, color: '#0F172A', margin: 0 }}>
               Document Evidence & Provenance Inspector
             </h1>
-            <p style={{ fontSize: 12, color: '#6B7280', margin: '2px 0 0 0' }}>
+            <p style={{ fontSize: 12.5, color: '#64748B', margin: '2px 0 0 0', fontWeight: 500 }}>
               Inspect verbatim source text spans, page mapping, and parameter extraction lineage
             </p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#6B7280' }}>
-          <span>Active Record: <strong style={{ color: '#111827' }}>{complaint.complaint_number || 'Draft'}</strong></span>
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          backgroundColor: '#ECFDF5',
+          border: '1px solid #A7F3D0',
+          padding: '4px 12px',
+          borderRadius: 20,
+          fontSize: 12,
+          fontWeight: 700,
+          color: '#065F46'
+        }}>
+          <ShieldCheck size={14} style={{ color: '#10B981' }} />
+          <span>ALCOA+ Traceable Lineage</span>
         </div>
       </div>
 
-      {/* Main Two-Column Layout */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 14 }}>
-        {/* Left: Source Text & Highlight Inspection */}
+      {/* Main Grid: Left is Evidence Lineage, Right is Raw Source Document */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+        gap: 18
+      }}>
+        {/* Left Column: Traceable Text Spans */}
         <div style={{
           backgroundColor: '#FFFFFF',
-          border: '1px solid #E5E7EB',
-          borderRadius: 6,
-          padding: '16px',
+          border: '1px solid #E2E8F0',
+          borderRadius: 12,
+          boxShadow: '0 1px 3px rgba(15, 23, 42, 0.05)',
           display: 'flex',
           flexDirection: 'column',
-          gap: 12
+          overflow: 'hidden'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #F3F4F6', paddingBottom: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <FileCheck2 size={15} color="#1D4ED8" />
-              <h3 style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#111827' }}>
-                {currentFile ? currentFile.name : 'Complaint Document Source Text'}
-              </h3>
+          <div style={{
+            padding: '14px 18px',
+            borderBottom: '1px solid #E2E8F0',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            backgroundColor: '#FAFAFC'
+          }}>
+            <h2 style={{ fontSize: 13.5, fontWeight: 700, color: '#0F172A', margin: 0 }}>
+              Extracted Evidence Spans ({evidenceItems.length})
+            </h2>
+            <span style={{ fontSize: 11.5, color: '#64748B', fontWeight: 500 }}>
+              Complaint: {complaint.complaint_number || 'DRAFT'}
+            </span>
+          </div>
+
+          <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12, overflowY: 'auto', maxHeight: '600px' }}>
+            {evidenceItems.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px 16px', color: '#94A3B8', fontSize: 13 }}>
+                No text span evidence recorded for the current complaint draft.
+              </div>
+            ) : (
+              evidenceItems.map(([fieldName, prov]) => (
+                <div
+                  key={fieldName}
+                  onClick={() => setSelectedSpan(prov?.text_span || '')}
+                  style={{
+                    backgroundColor: selectedSpan === prov?.text_span ? '#EEF2FF' : '#F8FAFC',
+                    border: `1px solid ${selectedSpan === prov?.text_span ? '#818CF8' : '#E2E8F0'}`,
+                    borderRadius: 10,
+                    padding: '12px 14px',
+                    cursor: 'pointer',
+                    transition: 'all 140ms ease-out',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#0F172A', textTransform: 'capitalize' }}>
+                      {fieldName.replace('_', ' ')}
+                    </span>
+                    <span style={{
+                      fontSize: 10.5,
+                      fontWeight: 700,
+                      color: '#059669',
+                      backgroundColor: '#ECFDF5',
+                      padding: '1px 6px',
+                      borderRadius: 4,
+                      border: '1px solid #A7F3D0'
+                    }}>
+                      {prov?.confidence ? `${Math.round(prov.confidence * 100)}%` : '100%'}
+                    </span>
+                  </div>
+
+                  <div style={{
+                    fontSize: 12,
+                    fontStyle: 'italic',
+                    color: '#334155',
+                    lineHeight: 1.4,
+                    marginBottom: 6
+                  }}>
+                    "{prov?.text_span}"
+                  </div>
+
+                  <div style={{ fontSize: 11, color: '#64748B', display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Source: {prov?.source_type || 'Document'}</span>
+                    {prov?.page_number && <span>Page {prov.page_number}</span>}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Right Column: Source Document Viewer */}
+        <div style={{
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: 12,
+          boxShadow: '0 1px 3px rgba(15, 23, 42, 0.05)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            padding: '14px 18px',
+            borderBottom: '1px solid #E2E8F0',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            backgroundColor: '#FAFAFC'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <FileCheck2 size={15} style={{ color: '#4F46E5' }} />
+              <h2 style={{ fontSize: 13.5, fontWeight: 700, color: '#0F172A', margin: 0 }}>
+                {currentFile ? (currentFile.filename || currentFile.name) : 'Active Ingestion Document'}
+              </h2>
             </div>
-            {selectedSpan && (
+
+            {currentFile && (
               <button
-                onClick={() => handleCopy(selectedSpan)}
+                onClick={() => handleCopy(currentFile.text_content || '')}
                 style={{
-                  padding: '3px 8px',
-                  borderRadius: 3,
-                  border: '1px solid #D1D5DB',
-                  backgroundColor: '#FFFFFF',
-                  color: '#374151',
-                  fontSize: 11,
-                  cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 3
+                  gap: 4,
+                  padding: '4px 8px',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #CBD5E1',
+                  borderRadius: 6,
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                  color: '#475569',
+                  cursor: 'pointer'
                 }}
               >
-                {copied ? <Check size={11} color="#059669" /> : <Copy size={11} />}
-                <span>{copied ? 'Copied' : 'Copy Evidence'}</span>
+                {copied ? <Check size={12} color="#10B981" /> : <Copy size={12} />}
+                <span>{copied ? 'Copied' : 'Copy Text'}</span>
               </button>
             )}
           </div>
 
-          <div style={{
-            padding: '14px',
-            backgroundColor: '#F9FAFB',
-            borderRadius: 4,
-            border: '1px solid #E5E7EB',
-            minHeight: 280,
-            fontSize: 12,
-            lineHeight: 1.5,
-            color: '#111827',
-            fontFamily: 'inherit'
-          }}>
-            {complaint.detailed_description ? (
-              <p style={{ margin: 0 }}>{complaint.detailed_description}</p>
+          <div style={{ padding: '16px', flex: 1, overflowY: 'auto', maxHeight: '600px' }}>
+            {currentFile && currentFile.text_content ? (
+              <div style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: 12,
+                lineHeight: 1.6,
+                color: '#1E293B',
+                whiteSpace: 'pre-wrap',
+                backgroundColor: '#F8FAFC',
+                padding: '14px',
+                borderRadius: 8,
+                border: '1px solid #E2E8F0'
+              }}>
+                {currentFile.text_content}
+              </div>
             ) : (
-              <div style={{ textAlign: 'center', padding: '40px', color: '#6B7280' }}>
-                <UploadCloud size={24} style={{ margin: '0 auto 8px', color: '#9CA3AF' }} />
-                <p style={{ margin: 0, fontSize: 12 }}>Upload a complaint PDF, DOCX, TXT, or EML in the Intake workspace to view full document text.</p>
+              <div style={{
+                textAlign: 'center',
+                padding: '60px 16px',
+                color: '#94A3B8',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 10
+              }}>
+                <UploadCloud size={36} style={{ color: '#CBD5E1' }} />
+                <div style={{ fontSize: 13.5, fontWeight: 600, color: '#475569' }}>
+                  No Active Supporting Document Uploaded
+                </div>
+                <div style={{ fontSize: 12, color: '#94A3B8', maxWidth: 320 }}>
+                  Upload a batch release certificate, CoA (.pdf, .docx, .txt), or customer letter in Complaint Intake to inspect full document context.
+                </div>
               </div>
             )}
           </div>
-
-          <div style={{
-            padding: '8px 10px',
-            backgroundColor: '#EFF6FF',
-            border: '1px solid #BFDBFE',
-            borderRadius: 4,
-            fontSize: 11,
-            color: '#1E40AF',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6
-          }}>
-            <ShieldCheck size={13} color="#1D4ED8" />
-            <span><strong>Non-Fabrication Invariant:</strong> Inferred fields without verbatim text are explicitly labeled as <code>INFERRED</code> without fabricated citations.</span>
-          </div>
-        </div>
-
-        {/* Right: Extracted Entities & Citations List */}
-        <div style={{
-          backgroundColor: '#FFFFFF',
-          border: '1px solid #E5E7EB',
-          borderRadius: 6,
-          padding: '16px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 10
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #F3F4F6', paddingBottom: 8 }}>
-            <h3 style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#111827' }}>
-              Extracted Parameters ({evidenceItems.length})
-            </h3>
-          </div>
-
-          {evidenceItems.length === 0 ? (
-            <div style={{ padding: '24px', textAlign: 'center', color: '#6B7280', backgroundColor: '#F9FAFB', borderRadius: 4, border: '1px dashed #D1D5DB', fontSize: 11 }}>
-              No verbatim evidence citations extracted yet.
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 380, overflowY: 'auto' }}>
-              {evidenceItems.map(([field, prov]) => {
-                const isSelected = selectedSpan === prov.text_span;
-                return (
-                  <div
-                    key={field}
-                    onClick={() => setSelectedSpan(prov.text_span || null)}
-                    style={{
-                      padding: '8px 10px',
-                      borderRadius: 4,
-                      border: isSelected ? '1px solid #1D4ED8' : '1px solid #E5E7EB',
-                      backgroundColor: isSelected ? '#EFF6FF' : '#F9FAFB',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 3
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: 11, fontWeight: 600, color: '#111827', textTransform: 'capitalize' }}>
-                        {field.replace(/_/g, ' ')}
-                      </span>
-                      <span style={{ fontSize: 10, color: '#1D4ED8', fontWeight: 500 }}>
-                        {Math.round(prov.confidence * 100)}% Conf
-                      </span>
-                    </div>
-
-                    <div style={{ fontSize: 10, color: '#4B5563', fontFamily: 'var(--font-mono)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      "{prov.text_span}"
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
         </div>
       </div>
     </div>
   );
 };
+
+export default DocumentsView;

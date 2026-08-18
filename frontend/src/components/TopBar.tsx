@@ -10,7 +10,8 @@ import {
   ChevronDown,
   Command,
   Plus,
-  Menu
+  Menu,
+  FileCheck2
 } from 'lucide-react';
 import type { WorkspaceView } from '../App';
 
@@ -106,63 +107,67 @@ export const TopBar: React.FC<TopBarProps> = ({
   };
 
   const workspaceLabels: Record<WorkspaceView, string> = {
-    OVERVIEW: 'Overview',
-    INTAKE: 'Complaint Intake',
+    OVERVIEW: 'Overview Dashboard',
+    INTAKE: 'Complaint Intake & Copilot',
     REVIEW: 'Quality Review Queue',
-    DOCUMENTS: 'Document Evidence',
+    DOCUMENTS: 'Document Evidence Viewer',
     ANALYTICS: 'Operational Analytics',
     TIMELINE: '21 CFR Part 11 Audit Trail',
-    SYSTEM_HEALTH: 'System Diagnostics'
+    SYSTEM_HEALTH: 'System Health & Telemetry'
   };
 
   return (
     <header style={{
-      height: '50px',
-      backgroundColor: 'var(--bg-surface)',
-      borderBottom: '1px solid var(--border)',
+      height: '56px',
+      backgroundColor: 'rgba(255, 255, 255, 0.92)',
+      backdropFilter: 'blur(16px)',
+      WebkitBackdropFilter: 'blur(16px)',
+      borderBottom: '1px solid #E2E8F0',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      padding: '0 16px',
+      padding: '0 20px',
       flexShrink: 0,
       zIndex: 10,
-      gap: 12
+      gap: 16
     }}>
-      {/* Mobile Drawer Trigger & Breadcrumbs */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+      {/* Left: Breadcrumbs & Current Record */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
         {onToggleMobileMenu && (
           <button
             onClick={onToggleMobileMenu}
             style={{
               background: 'none',
               border: 'none',
-              color: 'var(--text-secondary)',
+              color: '#475569',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              padding: '4px'
+              padding: 6,
+              borderRadius: 6
             }}
             aria-label="Toggle navigation menu"
           >
-            <Menu size={16} />
+            <Menu size={18} />
           </button>
         )}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, whiteSpace: 'nowrap' }}>
-          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Workspace</span>
-          <span style={{ fontSize: 12, color: 'var(--text-light)' }}>/</span>
-          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: 12.5, fontWeight: 500, color: '#64748B' }}>Workspace</span>
+          <span style={{ fontSize: 12, color: '#CBD5E1' }}>/</span>
+          <span style={{ fontSize: 13.5, fontWeight: 700, color: '#0F172A', textOverflow: 'ellipsis', overflow: 'hidden' }}>
             {workspaceLabels[activeWorkspace]}
           </span>
           {activeWorkspace === 'INTAKE' && complaintData.complaint_number && (
             <span style={{
               fontFamily: 'var(--font-mono)',
-              fontSize: 11,
-              fontWeight: 600,
-              color: 'var(--primary)',
-              backgroundColor: 'var(--primary-subtle)',
-              padding: '1px 6px',
-              borderRadius: 'var(--radius-xs)',
+              fontSize: 11.5,
+              fontWeight: 700,
+              color: '#4F46E5',
+              backgroundColor: '#EEF2FF',
+              padding: '2px 8px',
+              borderRadius: 6,
+              border: '1px solid #C7D2FE',
               marginLeft: 4
             }}>
               {complaintData.complaint_number}
@@ -171,48 +176,64 @@ export const TopBar: React.FC<TopBarProps> = ({
         </div>
       </div>
 
-      {/* Global Search Command Bar Trigger */}
+      {/* Center: Command Palette Trigger Search */}
       <button
         onClick={onOpenCommandBar}
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 8,
-          backgroundColor: 'var(--bg-subtle)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--radius-sm)',
-          padding: '5px 12px',
-          color: 'var(--text-muted)',
-          fontSize: 12,
+          gap: 10,
+          backgroundColor: '#F1F5F9',
+          border: '1px solid #E2E8F0',
+          borderRadius: 8,
+          padding: '6px 14px',
+          color: '#64748B',
+          fontSize: 12.5,
           cursor: 'pointer',
-          maxWidth: '280px',
+          maxWidth: '320px',
           flex: '1 1 auto',
           justifyContent: 'space-between',
-          transition: 'border-color var(--transition-fast)'
+          transition: 'all 160ms ease-out',
+          boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.02)'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = '#CBD5E1';
+          e.currentTarget.style.backgroundColor = '#FFFFFF';
+          e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.04)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = '#E2E8F0';
+          e.currentTarget.style.backgroundColor = '#F1F5F9';
+          e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(0, 0, 0, 0.02)';
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
-          <Search size={13} style={{ flexShrink: 0 }} />
-          <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>Search or jump to...</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
+          <Search size={14} style={{ flexShrink: 0, color: '#94A3B8' }} />
+          <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', fontWeight: 500 }}>
+            Search complaints, batches, documents...
+          </span>
         </div>
         <span style={{
           display: 'inline-flex',
           alignItems: 'center',
           gap: 2,
-          fontSize: 10,
+          fontSize: 10.5,
           fontFamily: 'var(--font-mono)',
-          backgroundColor: 'var(--bg-surface)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--radius-xs)',
-          padding: '1px 4px',
-          flexShrink: 0
+          fontWeight: 600,
+          backgroundColor: '#FFFFFF',
+          color: '#475569',
+          border: '1px solid #CBD5E1',
+          borderRadius: 5,
+          padding: '2px 6px',
+          flexShrink: 0,
+          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)'
         }}>
-          <Command size={9} />K
+          <Command size={10} />K
         </span>
       </button>
 
-      {/* Action Controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+      {/* Right: Actions Group */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
         {/* Scenario Loader Dropdown */}
         <div style={{ position: 'relative' }}>
           <button
@@ -220,19 +241,30 @@ export const TopBar: React.FC<TopBarProps> = ({
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 4,
-              padding: '5px 9px',
-              backgroundColor: 'var(--bg-surface)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius-sm)',
-              fontSize: 12,
-              fontWeight: 500,
-              color: 'var(--text-secondary)',
-              cursor: 'pointer'
+              gap: 6,
+              padding: '6px 12px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #CBD5E1',
+              borderRadius: 7,
+              fontSize: 12.5,
+              fontWeight: 600,
+              color: '#334155',
+              cursor: 'pointer',
+              boxShadow: 'var(--shadow-subtle)',
+              transition: 'all 140ms ease-out'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#F8FAFC';
+              e.currentTarget.style.borderColor = '#94A3B8';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#FFFFFF';
+              e.currentTarget.style.borderColor = '#CBD5E1';
             }}
           >
-            <span>Scenarios</span>
-            <ChevronDown size={12} />
+            <FileCheck2 size={13} style={{ color: '#6366F1' }} />
+            <span>GxP Scenarios</span>
+            <ChevronDown size={13} style={{ color: '#94A3B8' }} />
           </button>
 
           {showScenarioMenu && (
@@ -240,24 +272,25 @@ export const TopBar: React.FC<TopBarProps> = ({
               position: 'absolute',
               top: '100%',
               right: 0,
-              marginTop: 4,
-              width: '260px',
-              backgroundColor: 'var(--bg-surface)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius-md)',
+              marginTop: 6,
+              width: '300px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E2E8F0',
+              borderRadius: 10,
               boxShadow: 'var(--shadow-popover)',
-              padding: 4,
-              zIndex: 50
+              padding: 6,
+              zIndex: 50,
+              animation: 'slideUp 160ms cubic-bezier(0.16, 1, 0.3, 1) forwards'
             }}>
               <div style={{
-                fontSize: 10,
-                fontWeight: 600,
-                color: 'var(--text-muted)',
-                padding: '4px 8px',
-                letterSpacing: '0.04em',
+                fontSize: 10.5,
+                fontWeight: 700,
+                color: '#64748B',
+                padding: '6px 10px',
+                letterSpacing: '0.05em',
                 textTransform: 'uppercase'
               }}>
-                Pre-seeded GxP Scenarios
+                Pre-seeded GxP Test Scenarios
               </div>
               {SAMPLE_DATASETS.map((scenario, idx) => (
                 <button
@@ -267,17 +300,25 @@ export const TopBar: React.FC<TopBarProps> = ({
                     display: 'block',
                     width: '100%',
                     textAlign: 'left',
-                    padding: '6px 8px',
+                    padding: '8px 10px',
                     border: 'none',
                     background: 'none',
-                    borderRadius: 'var(--radius-xs)',
-                    fontSize: 11.5,
-                    color: 'var(--text-primary)',
+                    borderRadius: 6,
+                    fontSize: 12,
+                    fontWeight: 500,
+                    color: '#1E293B',
                     cursor: 'pointer',
-                    transition: 'background-color var(--transition-fast)'
+                    transition: 'all 120ms ease-out',
+                    lineHeight: 1.4
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-subtle)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#EEF2FF';
+                    e.currentTarget.style.color = '#4338CA';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = '#1E293B';
+                  }}
                 >
                   {scenario.label}
                 </button>
@@ -292,42 +333,61 @@ export const TopBar: React.FC<TopBarProps> = ({
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 4,
-            padding: '5px 9px',
-            backgroundColor: 'var(--bg-surface)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: 12,
-            fontWeight: 500,
-            color: 'var(--text-secondary)',
-            cursor: 'pointer'
+            gap: 6,
+            padding: '6px 12px',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #CBD5E1',
+            borderRadius: 7,
+            fontSize: 12.5,
+            fontWeight: 600,
+            color: '#334155',
+            cursor: 'pointer',
+            boxShadow: 'var(--shadow-subtle)',
+            transition: 'all 140ms ease-out'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#F8FAFC';
+            e.currentTarget.style.borderColor = '#94A3B8';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#FFFFFF';
+            e.currentTarget.style.borderColor = '#CBD5E1';
           }}
           title="Browse persisted database complaints"
         >
-          <Database size={13} />
+          <Database size={13} style={{ color: '#0EA5E9' }} />
           <span>Ledger</span>
         </button>
 
-        {/* New Complaint Quick Action */}
+        {/* Primary New Intake Button */}
         <button
           onClick={onNewComplaint}
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 4,
-            padding: '5px 10px',
-            backgroundColor: 'var(--text-primary)',
+            gap: 6,
+            padding: '6px 14px',
+            background: 'linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)',
             color: '#FFFFFF',
             border: 'none',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: 12,
-            fontWeight: 500,
+            borderRadius: 7,
+            fontSize: 12.5,
+            fontWeight: 600,
             cursor: 'pointer',
-            boxShadow: 'var(--shadow-subtle)'
+            boxShadow: '0 2px 6px rgba(79, 70, 229, 0.3)',
+            transition: 'all 140ms ease-out'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-1px)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(79, 70, 229, 0.4)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 2px 6px rgba(79, 70, 229, 0.3)';
           }}
         >
-          <Plus size={13} />
-          <span>New</span>
+          <Plus size={14} />
+          <span>New Intake</span>
         </button>
       </div>
     </header>

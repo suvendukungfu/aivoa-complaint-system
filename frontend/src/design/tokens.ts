@@ -1,117 +1,81 @@
+// Modern Premium Design System Tokens
 export const tokens = {
   colors: {
-    // Neutral Canvas & Surfaces
-    bgApp: '#F7F8FA',
-    bgSidebar: '#F9FAFB',
+    // Canvas & Neutral Hierarchy
+    bgApp: '#F8FAFC',
+    bgSidebar: '#0F172A',
+    bgSidebarSurface: '#1E293B',
     bgSurface: '#FFFFFF',
-    bgSubtle: '#F3F4F6',
-    bgHover: '#E5E7EB',
-    bgActive: '#D1D5DB',
+    bgSubtle: '#F1F5F9',
+    bgHover: '#E2E8F0',
+    bgActive: '#CBD5E1',
 
     // Borders
-    border: '#E5E7EB',
-    borderStrong: '#D1D5DB',
-    borderFocus: '#2563EB',
+    border: '#E2E8F0',
+    borderLight: '#F1F5F9',
+    borderStrong: '#CBD5E1',
+    borderFocus: '#6366F1',
 
     // Typography
-    textPrimary: '#17191C',
-    textSecondary: '#626873',
-    textMuted: '#8A9099',
-    textLight: '#9CA3AF',
+    textPrimary: '#0F172A',
+    textSecondary: '#475569',
+    textMuted: '#94A3B8',
+    textLight: '#CBD5E1',
     textInverse: '#FFFFFF',
 
-    // Primary Brand / Focal Accent
-    primary: '#1D4ED8',
-    primaryHover: '#1E40AF',
-    primarySubtle: '#EFF6FF',
-    primaryBorder: '#BFDBFE',
-    primaryText: '#1E3A8A',
+    // Primary Accents (Modern Indigo-Blue)
+    primary: '#4F46E5',
+    primaryHover: '#4338CA',
+    primaryLight: '#6366F1',
+    primarySubtle: '#EEF2FF',
+    primaryBorder: '#C7D2FE',
+    primaryText: '#3730A3',
 
-    // Semantic States (Restrained)
-    success: '#15803D',
-    successSubtle: '#F0FDF4',
-    successBorder: '#BBF7D0',
-    successText: '#166534',
+    // Semantic States
+    success: '#10B981',
+    successHover: '#059669',
+    successSubtle: '#ECFDF5',
+    successBorder: '#A7F3D0',
+    successText: '#065F46',
 
-    warning: '#B45309',
+    warning: '#F59E0B',
+    warningHover: '#D97706',
     warningSubtle: '#FFFBEB',
     warningBorder: '#FDE68A',
     warningText: '#92400E',
 
-    danger: '#B91C1C',
+    danger: '#EF4444',
+    dangerHover: '#DC2626',
     dangerSubtle: '#FEF2F2',
     dangerBorder: '#FECACA',
     dangerText: '#991B1B',
 
-    info: '#0369A1',
+    info: '#0EA5E9',
     infoSubtle: '#F0F9FF',
     infoBorder: '#BAE6FD',
-    infoText: '#075985'
-  },
-
-  typography: {
-    fontSans: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    fontMono: "'JetBrains Mono', 'SFMono-Regular', Consolas, monospace",
-    sizes: {
-      display: '30px',
-      titlePage: '22px',
-      titleSection: '16px',
-      titleCard: '14px',
-      body: '13px',
-      secondary: '12px',
-      metadata: '11px'
-    },
-    weights: {
-      regular: 400,
-      medium: 500,
-      semibold: 600
-    },
-    lineHeights: {
-      tight: 1.25,
-      normal: 1.5,
-      relaxed: 1.625
-    }
+    infoText: '#0369A1'
   },
 
   radii: {
-    badge: '3px',
-    input: '5px',
-    button: '5px',
-    card: '6px',
-    modal: '8px'
+    xs: '4px',
+    sm: '6px',
+    md: '8px',
+    lg: '12px',
+    xl: '16px',
+    full: '9999px'
   },
 
   shadows: {
-    subtle: '0 1px 2px 0 rgba(16, 24, 40, 0.04)',
-    card: '0 1px 3px 0 rgba(16, 24, 40, 0.06), 0 1px 2px -1px rgba(16, 24, 40, 0.03)',
-    popover: '0 4px 12px -2px rgba(16, 24, 40, 0.08), 0 2px 6px -2px rgba(16, 24, 40, 0.04)',
-    modal: '0 12px 24px -4px rgba(16, 24, 40, 0.12), 0 4px 8px -2px rgba(16, 24, 40, 0.04)'
-  },
-
-  spacing: {
-    xs: '4px',
-    sm: '8px',
-    md: '12px',
-    lg: '16px',
-    xl: '20px',
-    xxl: '24px',
-    huge: '32px'
-  },
-
-  heights: {
-    inputSm: '28px',
-    inputMd: '32px',
-    inputLg: '36px',
-    buttonSm: '28px',
-    buttonMd: '32px',
-    sidebar: '100vh',
-    topbar: '52px'
+    subtle: '0 1px 2px 0 rgba(15, 23, 42, 0.05)',
+    card: '0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.04)',
+    elevated: '0 4px 12px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04)',
+    popover: '0 10px 25px -3px rgba(15, 23, 42, 0.12), 0 4px 10px -2px rgba(15, 23, 42, 0.04)',
+    modal: '0 20px 35px -5px rgba(15, 23, 42, 0.2), 0 10px 15px -5px rgba(15, 23, 42, 0.08)'
   },
 
   transitions: {
     fast: '120ms cubic-bezier(0.16, 1, 0.3, 1)',
-    normal: '180ms cubic-bezier(0.16, 1, 0.3, 1)'
+    normal: '200ms cubic-bezier(0.16, 1, 0.3, 1)',
+    slow: '300ms cubic-bezier(0.16, 1, 0.3, 1)'
   }
 } as const;
-
-export type Tokens = typeof tokens;

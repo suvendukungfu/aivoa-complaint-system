@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   LayoutDashboard,
   FileText,
@@ -8,7 +7,6 @@ import {
   History,
   Activity,
   RotateCcw,
-  ShieldCheck,
   Command,
   X
 } from 'lucide-react';
@@ -44,12 +42,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const navItems: { id: WorkspaceView; label: string; icon: React.ReactNode; badge?: number }[] = [
-    { id: 'OVERVIEW', label: 'Overview', icon: <LayoutDashboard size={15} /> },
-    { id: 'INTAKE', label: 'Complaints', icon: <FileText size={15} /> },
-    { id: 'REVIEW', label: 'Review Queue', icon: <CheckSquare size={15} />, badge: pendingReviewCount },
-    { id: 'DOCUMENTS', label: 'Documents', icon: <FileCode2 size={15} /> },
-    { id: 'ANALYTICS', label: 'Analytics', icon: <BarChart3 size={15} /> },
-    { id: 'TIMELINE', label: 'Audit Trail', icon: <History size={15} /> }
+    { id: 'OVERVIEW', label: 'Overview', icon: <LayoutDashboard size={16} /> },
+    { id: 'INTAKE', label: 'Complaints Intake', icon: <FileText size={16} /> },
+    { id: 'REVIEW', label: 'Review Queue', icon: <CheckSquare size={16} />, badge: pendingReviewCount },
+    { id: 'DOCUMENTS', label: 'Evidence Docs', icon: <FileCode2 size={16} /> },
+    { id: 'ANALYTICS', label: 'QMS Analytics', icon: <BarChart3 size={16} /> },
+    { id: 'TIMELINE', label: '21 CFR Audit', icon: <History size={16} /> }
   ];
 
   const handleItemClick = (id: WorkspaceView) => {
@@ -68,53 +66,63 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
       )}
 
-      <aside className={`sidebar-container ${isOpen ? 'open' : ''}`} style={{
-        backgroundColor: 'var(--bg-sidebar)',
-        borderRight: '1px solid var(--border)',
-        display: 'flex',
-        flexDirection: 'column',
-        userSelect: 'none'
-      }}>
-        {/* Brand & Workspace Identity */}
+      <aside className={`sidebar-container ${isOpen ? 'open' : ''}`}>
+        {/* Brand Header */}
         <div style={{
-          padding: '16px 18px 14px',
-          borderBottom: '1px solid var(--border)',
+          padding: '20px 18px 18px',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{
-              width: 22,
-              height: 22,
-              borderRadius: 4,
-              backgroundColor: 'var(--text-primary)',
+              width: 32,
+              height: 32,
+              borderRadius: 8,
+              background: 'linear-gradient(135deg, #4F46E5 0%, #3B82F6 100%)',
               color: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontWeight: 700,
-              fontSize: 11,
-              letterSpacing: '-0.02em'
+              fontWeight: 800,
+              fontSize: 15,
+              boxShadow: '0 4px 12px rgba(79, 70, 229, 0.35)',
+              letterSpacing: '-0.03em'
             }}>
               A
             </div>
             <div>
               <div style={{
-                fontSize: 13,
-                fontWeight: 600,
-                color: 'var(--text-primary)',
-                letterSpacing: '-0.01em',
-                lineHeight: 1.2
+                fontSize: 14,
+                fontWeight: 700,
+                color: '#FFFFFF',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.2,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6
               }}>
-                AIVOA
+                <span>AIVOA</span>
+                <span style={{
+                  fontSize: 9,
+                  fontWeight: 600,
+                  backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                  color: '#A5B4FC',
+                  padding: '1px 5px',
+                  borderRadius: 4,
+                  border: '1px solid rgba(165, 180, 252, 0.3)'
+                }}>
+                  GxP
+                </span>
               </div>
               <div style={{
                 fontSize: 11,
-                color: 'var(--text-muted)',
-                lineHeight: 1.2
+                color: '#94A3B8',
+                lineHeight: 1.2,
+                marginTop: 2
               }}>
-                Quality Operations
+                Pharma QMS Intelligence
               </div>
             </div>
           </div>
@@ -126,35 +134,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
               style={{
                 background: 'none',
                 border: 'none',
-                color: 'var(--text-muted)',
+                color: '#94A3B8',
                 cursor: 'pointer',
-                display: 'none'
+                padding: 4
               }}
               className="mobile-close-btn"
             >
-              <X size={15} />
+              <X size={16} />
             </button>
           )}
         </div>
 
-        {/* Navigation Item List */}
+        {/* Navigation List */}
         <nav style={{
           flex: 1,
-          padding: '12px 10px',
+          padding: '16px 12px',
           display: 'flex',
           flexDirection: 'column',
-          gap: 2,
+          gap: 4,
           overflowY: 'auto'
         }}>
           <div style={{
             fontSize: 10,
-            fontWeight: 600,
-            color: 'var(--text-muted)',
-            letterSpacing: '0.04em',
+            fontWeight: 700,
+            color: '#64748B',
+            letterSpacing: '0.06em',
             textTransform: 'uppercase',
-            padding: '4px 8px 6px'
+            padding: '4px 10px 8px'
           }}>
-            Workspace
+            Operations
           </div>
 
           {navItems.map((item) => {
@@ -168,26 +176,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   width: '100%',
-                  padding: '7px 10px',
-                  borderRadius: 'var(--radius-sm)',
-                  backgroundColor: isActive ? 'var(--bg-subtle)' : 'transparent',
-                  color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  fontWeight: isActive ? 600 : 450,
-                  fontSize: 12.5,
-                  border: 'none',
+                  padding: '9px 12px',
+                  borderRadius: 8,
+                  backgroundColor: isActive ? 'rgba(79, 70, 229, 0.16)' : 'transparent',
+                  color: isActive ? '#FFFFFF' : '#94A3B8',
+                  fontWeight: isActive ? 600 : 500,
+                  fontSize: 13,
+                  border: isActive ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid transparent',
                   cursor: 'pointer',
                   textAlign: 'left',
-                  transition: 'background-color var(--transition-fast), color var(--transition-fast)'
+                  transition: 'all 160ms ease-out',
+                  position: 'relative'
                 }}
                 onMouseEnter={(e) => {
-                  if (!isActive) e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                    e.currentTarget.style.color = '#F8FAFC';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = '#94A3B8';
+                  }
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                  <span style={{ color: isActive ? 'var(--primary)' : 'var(--text-muted)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{
+                    color: isActive ? '#818CF8' : '#64748B',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
                     {item.icon}
                   </span>
                   <span>{item.label}</span>
@@ -195,12 +214,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                 {item.badge !== undefined && item.badge > 0 && (
                   <span style={{
-                    fontSize: 10.5,
-                    fontWeight: 600,
-                    padding: '1px 5px',
-                    borderRadius: 'var(--radius-xs)',
-                    backgroundColor: isActive ? 'var(--primary)' : 'var(--border-strong)',
-                    color: isActive ? '#FFFFFF' : 'var(--text-primary)',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    padding: '2px 7px',
+                    borderRadius: 9999,
+                    backgroundColor: isActive ? '#4F46E5' : 'rgba(245, 158, 11, 0.2)',
+                    color: isActive ? '#FFFFFF' : '#FBBF24',
+                    border: isActive ? 'none' : '1px solid rgba(245, 158, 11, 0.35)',
                     fontFamily: 'var(--font-mono)'
                   }}>
                     {item.badge}
@@ -212,13 +232,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           <div style={{
             fontSize: 10,
-            fontWeight: 600,
-            color: 'var(--text-muted)',
-            letterSpacing: '0.04em',
+            fontWeight: 700,
+            color: '#64748B',
+            letterSpacing: '0.06em',
             textTransform: 'uppercase',
-            padding: '14px 8px 6px'
+            padding: '16px 10px 8px'
           }}>
-            Infrastructure
+            Diagnostics
           </div>
 
           <button
@@ -226,55 +246,81 @@ export const Sidebar: React.FC<SidebarProps> = ({
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 9,
+              gap: 10,
               width: '100%',
-              padding: '7px 10px',
-              borderRadius: 'var(--radius-sm)',
-              backgroundColor: activeWorkspace === 'SYSTEM_HEALTH' ? 'var(--bg-subtle)' : 'transparent',
-              color: activeWorkspace === 'SYSTEM_HEALTH' ? 'var(--text-primary)' : 'var(--text-secondary)',
-              fontWeight: activeWorkspace === 'SYSTEM_HEALTH' ? 600 : 450,
-              fontSize: 12.5,
-              border: 'none',
+              padding: '9px 12px',
+              borderRadius: 8,
+              backgroundColor: activeWorkspace === 'SYSTEM_HEALTH' ? 'rgba(79, 70, 229, 0.16)' : 'transparent',
+              color: activeWorkspace === 'SYSTEM_HEALTH' ? '#FFFFFF' : '#94A3B8',
+              fontWeight: activeWorkspace === 'SYSTEM_HEALTH' ? 600 : 500,
+              fontSize: 13,
+              border: activeWorkspace === 'SYSTEM_HEALTH' ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid transparent',
               cursor: 'pointer',
               textAlign: 'left',
-              transition: 'background-color var(--transition-fast)'
+              transition: 'all 160ms ease-out'
             }}
           >
-            <Activity size={15} style={{ color: activeWorkspace === 'SYSTEM_HEALTH' ? 'var(--primary)' : 'var(--text-muted)' }} />
-            <span>Diagnostics</span>
+            <Activity size={16} style={{ color: activeWorkspace === 'SYSTEM_HEALTH' ? '#818CF8' : '#64748B' }} />
+            <span>Health & Telemetry</span>
           </button>
         </nav>
 
-        {/* Footer Tenant & Utility */}
+        {/* Footer Tenant & Actions */}
         <div style={{
-          padding: '12px 14px',
-          borderTop: '1px solid var(--border)',
+          padding: '16px 14px',
+          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          backgroundColor: 'rgba(0, 0, 0, 0.2)',
           display: 'flex',
           flexDirection: 'column',
-          gap: 10
+          gap: 12
         }}>
-          {/* Active Tenant / QP Badge */}
+          {/* Qualified Person Card */}
           <div style={{
-            padding: '8px 10px',
-            backgroundColor: 'var(--bg-subtle)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-sm)',
+            padding: '10px 12px',
+            backgroundColor: 'rgba(255, 255, 255, 0.04)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: 8,
             display: 'flex',
             alignItems: 'center',
-            gap: 8
+            gap: 10
           }}>
-            <ShieldCheck size={14} style={{ color: 'var(--success)', flexShrink: 0 }} />
+            <div style={{
+              width: 28,
+              height: 28,
+              borderRadius: '50%',
+              backgroundColor: '#1E293B',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 11,
+              fontWeight: 700,
+              color: '#818CF8'
+            }}>
+              MV
+            </div>
             <div style={{ minWidth: 0, flex: 1 }}>
-              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                Dr. Marcus Vance, QP
+              <div style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: '#F8FAFC',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5
+              }}>
+                <span>Dr. Marcus Vance</span>
+                <span className="pulse-dot" style={{ backgroundColor: '#10B981', width: 6, height: 6 }} />
               </div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>
-                Qualified Person · GxP
+              <div style={{ fontSize: 10.5, color: '#94A3B8' }}>
+                Lead Qualified Person (QP)
               </div>
             </div>
           </div>
 
-          {/* Reset Demo / Re-seed action */}
+          {/* Quick Context Reset & Command bar hint */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <button
               onClick={handleResetDemo}
@@ -282,29 +328,36 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 5,
-                fontSize: 11,
-                color: 'var(--text-muted)',
+                fontSize: 11.5,
+                color: '#94A3B8',
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                padding: '2px 4px',
-                borderRadius: 'var(--radius-xs)'
+                padding: '3px 6px',
+                borderRadius: 4,
+                transition: 'color 140ms ease-out'
               }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#F8FAFC')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = '#94A3B8')}
               title="Reset current complaint draft session"
             >
-              <RotateCcw size={11} />
+              <RotateCcw size={12} />
               <span>Reset Context</span>
             </button>
 
             <span style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 2,
-              fontSize: 10,
+              gap: 3,
+              fontSize: 10.5,
               fontFamily: 'var(--font-mono)',
-              color: 'var(--text-muted)'
+              color: '#94A3B8',
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
+              padding: '2px 6px',
+              borderRadius: 4,
+              border: '1px solid rgba(255, 255, 255, 0.1)'
             }}>
-              <Command size={9} />K
+              <Command size={10} />K
             </span>
           </div>
         </div>

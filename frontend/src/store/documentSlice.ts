@@ -9,6 +9,8 @@ interface DocumentState {
     name: string;
     size: number;
     type: string;
+    text_content?: string;
+    filename?: string;
   } | null;
   error: string | null;
 }

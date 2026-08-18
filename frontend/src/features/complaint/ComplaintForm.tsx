@@ -17,7 +17,6 @@ import {
   History,
   X
 } from 'lucide-react';
-import { typography } from '../../design/typography';
 
 export const ComplaintForm: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -91,54 +90,55 @@ export const ComplaintForm: React.FC = () => {
 
   return (
     <div style={{
-      backgroundColor: 'var(--bg-surface)',
-      border: '1px solid var(--border)',
-      borderRadius: 'var(--radius-card)',
-      boxShadow: 'var(--shadow-card)',
+      backgroundColor: '#FFFFFF',
+      border: '1px solid #E2E8F0',
+      borderRadius: 12,
+      boxShadow: '0 1px 3px rgba(15, 23, 42, 0.06)',
       display: 'flex',
       flexDirection: 'column',
       minWidth: 0,
-      flex: 1
-    }}>
+      flex: 1,
+      overflow: 'hidden'
+    }} className="animate-fade-in">
       {/* Form Action Header */}
       <div style={{
-        padding: '14px 20px',
-        borderBottom: '1px solid var(--border)',
+        padding: '16px 22px',
+        borderBottom: '1px solid #E2E8F0',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         flexWrap: 'wrap',
         gap: 12,
-        backgroundColor: 'var(--bg-surface)'
+        backgroundColor: '#FAFAFC'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
-            fontSize: 14,
-            fontWeight: 600,
-            color: 'var(--text-primary)',
+            fontSize: 15,
+            fontWeight: 800,
+            color: '#0F172A',
             fontFamily: 'var(--font-mono)'
           }}>
             {formData.complaint_number || 'DRAFT-NEW'}
           </div>
           <span style={{
-            padding: '2px 7px',
-            borderRadius: 'var(--radius-xs)',
-            fontSize: 11,
-            fontWeight: 600,
+            padding: '3px 9px',
+            borderRadius: 20,
+            fontSize: 11.5,
+            fontWeight: 700,
             backgroundColor:
-              formData.status === 'UNDER_REVIEW' ? 'var(--warning-subtle)' :
-              formData.status === 'APPROVED' ? 'var(--success-subtle)' : 'var(--bg-subtle)',
+              formData.status === 'UNDER_REVIEW' ? '#FFFBEB' :
+              formData.status === 'APPROVED' ? '#ECFDF5' : '#F1F5F9',
             color:
-              formData.status === 'UNDER_REVIEW' ? 'var(--warning-text)' :
-              formData.status === 'APPROVED' ? 'var(--success-text)' : 'var(--text-secondary)',
+              formData.status === 'UNDER_REVIEW' ? '#92400E' :
+              formData.status === 'APPROVED' ? '#065F46' : '#475569',
             border: `1px solid ${
-              formData.status === 'UNDER_REVIEW' ? 'var(--warning-border)' :
-              formData.status === 'APPROVED' ? 'var(--success-border)' : 'var(--border)'
+              formData.status === 'UNDER_REVIEW' ? '#FDE68A' :
+              formData.status === 'APPROVED' ? '#A7F3D0' : '#CBD5E1'
             }`
           }}>
             {formData.status?.replace('_', ' ') || 'DRAFT'}
           </span>
-          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+          <span style={{ fontSize: 11.5, color: '#64748B', fontWeight: 500 }}>
             {saveStatus === 'saving' ? 'Saving changes...' : saveStatus === 'unsaved' ? 'Unsaved edits' : 'Autosaved'}
           </span>
         </div>
@@ -148,18 +148,21 @@ export const ComplaintForm: React.FC = () => {
             type="button"
             onClick={handleReset}
             style={{
-              padding: '6px 11px',
-              backgroundColor: 'var(--bg-surface)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius-sm)',
+              padding: '7px 12px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #CBD5E1',
+              borderRadius: 7,
               fontSize: 12,
-              fontWeight: 500,
-              color: 'var(--text-secondary)',
+              fontWeight: 600,
+              color: '#475569',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: 4
+              gap: 5,
+              transition: 'all 120ms ease-out'
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F8FAFC')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#FFFFFF')}
           >
             <RotateCcw size={12} />
             <span>Reset</span>
@@ -170,17 +173,18 @@ export const ComplaintForm: React.FC = () => {
             onClick={handleSave}
             disabled={saving}
             style={{
-              padding: '6px 12px',
-              backgroundColor: 'var(--bg-surface)',
-              border: '1px solid var(--border-strong)',
-              borderRadius: 'var(--radius-sm)',
+              padding: '7px 14px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #94A3B8',
+              borderRadius: 7,
               fontSize: 12,
-              fontWeight: 500,
-              color: 'var(--text-primary)',
+              fontWeight: 600,
+              color: '#0F172A',
               cursor: saving ? 'not-allowed' : 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: 5
+              gap: 5,
+              boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
             }}
           >
             <Save size={13} />
@@ -191,18 +195,18 @@ export const ComplaintForm: React.FC = () => {
             type="button"
             onClick={handleSubmitTriage}
             style={{
-              padding: '6px 14px',
-              backgroundColor: 'var(--text-primary)',
+              padding: '7px 16px',
+              background: 'linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)',
               color: '#FFFFFF',
               border: 'none',
-              borderRadius: 'var(--radius-sm)',
+              borderRadius: 7,
               fontSize: 12,
-              fontWeight: 500,
+              fontWeight: 600,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: 5,
-              boxShadow: 'var(--shadow-subtle)'
+              gap: 6,
+              boxShadow: '0 2px 6px rgba(79, 70, 229, 0.3)'
             }}
           >
             <Send size={12} />
@@ -212,27 +216,44 @@ export const ComplaintForm: React.FC = () => {
       </div>
 
       {/* Main Form Fields Container */}
-      <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div style={{ padding: '22px', display: 'flex', flexDirection: 'column', gap: 24 }}>
         {/* SECTION 1: COMPLAINT SOURCE */}
         <div>
           <div style={{
-            ...typography.sectionHeaderLabel,
-            paddingBottom: 6,
-            borderBottom: '1px solid var(--border)',
-            marginBottom: 12,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            paddingBottom: 8,
+            borderBottom: '1px solid #E2E8F0',
+            marginBottom: 14
           }}>
-            <span>1. Complaint Source</span>
-            <span style={{ fontSize: 10, fontWeight: 400, textTransform: 'none', color: 'var(--text-muted)' }}>
-              Reporter identification & channel
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{
+                width: 22,
+                height: 22,
+                borderRadius: '50%',
+                backgroundColor: '#EEF2FF',
+                color: '#4F46E5',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 11,
+                fontWeight: 800
+              }}>
+                1
+              </div>
+              <span style={{ fontSize: 13.5, fontWeight: 700, color: '#0F172A' }}>
+                Complaint Source & Channel
+              </span>
+            </div>
+            <span style={{ fontSize: 11.5, color: '#64748B', fontWeight: 500 }}>
+              Customer contact & channel traceability
             </span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 4 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 5 }}>
                 Customer Name *
               </label>
               <EvidencePopover
@@ -247,21 +268,22 @@ export const ComplaintForm: React.FC = () => {
                   placeholder="e.g. ABC Pharma Corp"
                   style={{
                     width: '100%',
-                    height: '32px',
-                    padding: '0 10px',
-                    backgroundColor: updatedFields.includes('customer_name') ? 'var(--primary-subtle)' : 'var(--bg-surface)',
-                    border: `1px solid ${updatedFields.includes('customer_name') ? 'var(--primary-border)' : 'var(--border)'}`,
-                    borderRadius: 'var(--radius-sm)',
+                    height: '34px',
+                    padding: '0 12px',
+                    backgroundColor: updatedFields.includes('customer_name') ? '#EEF2FF' : '#FFFFFF',
+                    border: `1px solid ${updatedFields.includes('customer_name') ? '#818CF8' : '#CBD5E1'}`,
+                    borderRadius: 6,
                     fontSize: 12.5,
-                    color: 'var(--text-primary)',
-                    outline: 'none'
+                    color: '#0F172A',
+                    outline: 'none',
+                    fontWeight: 500
                   }}
                 />
               </EvidencePopover>
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 4 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 5 }}>
                 Complaint Date
               </label>
               <EvidencePopover
@@ -275,20 +297,21 @@ export const ComplaintForm: React.FC = () => {
                   onChange={(e) => handleChange('complaint_date', e.target.value)}
                   style={{
                     width: '100%',
-                    height: '32px',
-                    padding: '0 10px',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius-sm)',
+                    height: '34px',
+                    padding: '0 12px',
+                    border: '1px solid #CBD5E1',
+                    borderRadius: 6,
                     fontSize: 12.5,
-                    color: 'var(--text-primary)',
-                    fontFamily: 'var(--font-mono)'
+                    color: '#0F172A',
+                    fontFamily: 'var(--font-mono)',
+                    fontWeight: 500
                   }}
                 />
               </EvidencePopover>
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 4 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 5 }}>
                 Source Channel
               </label>
               <EvidencePopover
@@ -301,13 +324,14 @@ export const ComplaintForm: React.FC = () => {
                   onChange={(e) => handleChange('complaint_source', e.target.value)}
                   style={{
                     width: '100%',
-                    height: '32px',
-                    padding: '0 8px',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius-sm)',
+                    height: '34px',
+                    padding: '0 10px',
+                    border: '1px solid #CBD5E1',
+                    borderRadius: 6,
                     fontSize: 12.5,
-                    color: 'var(--text-primary)',
-                    backgroundColor: 'var(--bg-surface)'
+                    color: '#0F172A',
+                    backgroundColor: '#FFFFFF',
+                    fontWeight: 500
                   }}
                 >
                   <option value="Email">Email Communication</option>
@@ -323,23 +347,40 @@ export const ComplaintForm: React.FC = () => {
         {/* SECTION 2: PRODUCT IDENTIFICATION */}
         <div>
           <div style={{
-            ...typography.sectionHeaderLabel,
-            paddingBottom: 6,
-            borderBottom: '1px solid var(--border)',
-            marginBottom: 12,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            paddingBottom: 8,
+            borderBottom: '1px solid #E2E8F0',
+            marginBottom: 14
           }}>
-            <span>2. Product Identification</span>
-            <span style={{ fontSize: 10, fontWeight: 400, textTransform: 'none', color: 'var(--text-muted)' }}>
-              Batch, strength & manufacturing traceability
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{
+                width: 22,
+                height: 22,
+                borderRadius: '50%',
+                backgroundColor: '#EEF2FF',
+                color: '#4F46E5',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 11,
+                fontWeight: 800
+              }}>
+                2
+              </div>
+              <span style={{ fontSize: 13.5, fontWeight: 700, color: '#0F172A' }}>
+                Product & Batch Traceability
+              </span>
+            </div>
+            <span style={{ fontSize: 11.5, color: '#64748B', fontWeight: 500 }}>
+              Batch, strength & manufacturing genealogy
             </span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 4 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 5 }}>
                 Product Name *
               </label>
               <EvidencePopover
@@ -354,21 +395,22 @@ export const ComplaintForm: React.FC = () => {
                   placeholder="e.g. Paracetamol API 99.5%"
                   style={{
                     width: '100%',
-                    height: '32px',
-                    padding: '0 10px',
-                    backgroundColor: updatedFields.includes('product_name') ? 'var(--primary-subtle)' : 'var(--bg-surface)',
-                    border: `1px solid ${updatedFields.includes('product_name') ? 'var(--primary-border)' : 'var(--border)'}`,
-                    borderRadius: 'var(--radius-sm)',
+                    height: '34px',
+                    padding: '0 12px',
+                    backgroundColor: updatedFields.includes('product_name') ? '#EEF2FF' : '#FFFFFF',
+                    border: `1px solid ${updatedFields.includes('product_name') ? '#818CF8' : '#CBD5E1'}`,
+                    borderRadius: 6,
                     fontSize: 12.5,
-                    color: 'var(--text-primary)'
+                    color: '#0F172A',
+                    fontWeight: 500
                   }}
                 />
               </EvidencePopover>
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 4 }}>
-                Strength / Grade
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 5 }}>
+                Strength / Specification
               </label>
               <EvidencePopover
                 label="Product Strength"
@@ -382,19 +424,20 @@ export const ComplaintForm: React.FC = () => {
                   placeholder="e.g. 500mg / USP Grade"
                   style={{
                     width: '100%',
-                    height: '32px',
-                    padding: '0 10px',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius-sm)',
+                    height: '34px',
+                    padding: '0 12px',
+                    border: '1px solid #CBD5E1',
+                    borderRadius: 6,
                     fontSize: 12.5,
-                    color: 'var(--text-primary)'
+                    color: '#0F172A',
+                    fontWeight: 500
                   }}
                 />
               </EvidencePopover>
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 4 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 5 }}>
                 Batch / Lot Number *
               </label>
               <EvidencePopover
@@ -409,21 +452,22 @@ export const ComplaintForm: React.FC = () => {
                   placeholder="e.g. PA240812"
                   style={{
                     width: '100%',
-                    height: '32px',
-                    padding: '0 10px',
+                    height: '34px',
+                    padding: '0 12px',
                     fontFamily: 'var(--font-mono)',
-                    backgroundColor: updatedFields.includes('batch_number') ? 'var(--primary-subtle)' : 'var(--bg-surface)',
-                    border: `1px solid ${updatedFields.includes('batch_number') ? 'var(--primary-border)' : 'var(--border)'}`,
-                    borderRadius: 'var(--radius-sm)',
+                    backgroundColor: updatedFields.includes('batch_number') ? '#EEF2FF' : '#FFFFFF',
+                    border: `1px solid ${updatedFields.includes('batch_number') ? '#818CF8' : '#CBD5E1'}`,
+                    borderRadius: 6,
                     fontSize: 12.5,
-                    color: 'var(--text-primary)'
+                    color: '#0F172A',
+                    fontWeight: 600
                   }}
                 />
               </EvidencePopover>
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 4 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 5 }}>
                 Quantity Affected
               </label>
               <EvidencePopover
@@ -438,19 +482,20 @@ export const ComplaintForm: React.FC = () => {
                   placeholder="e.g. 25 kg / 350 cartons"
                   style={{
                     width: '100%',
-                    height: '32px',
-                    padding: '0 10px',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius-sm)',
+                    height: '34px',
+                    padding: '0 12px',
+                    border: '1px solid #CBD5E1',
+                    borderRadius: 6,
                     fontSize: 12.5,
-                    color: 'var(--text-primary)'
+                    color: '#0F172A',
+                    fontWeight: 500
                   }}
                 />
               </EvidencePopover>
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 4 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 5 }}>
                 Manufacturing Date
               </label>
               <EvidencePopover
@@ -464,12 +509,12 @@ export const ComplaintForm: React.FC = () => {
                   onChange={(e) => handleChange('manufacturing_date', e.target.value)}
                   style={{
                     width: '100%',
-                    height: '32px',
-                    padding: '0 10px',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius-sm)',
+                    height: '34px',
+                    padding: '0 12px',
+                    border: '1px solid #CBD5E1',
+                    borderRadius: 6,
                     fontSize: 12.5,
-                    color: 'var(--text-primary)',
+                    color: '#0F172A',
                     fontFamily: 'var(--font-mono)'
                   }}
                 />
@@ -477,7 +522,7 @@ export const ComplaintForm: React.FC = () => {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 4 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 5 }}>
                 Expiry Date
               </label>
               <EvidencePopover
@@ -491,12 +536,12 @@ export const ComplaintForm: React.FC = () => {
                   onChange={(e) => handleChange('expiry_date', e.target.value)}
                   style={{
                     width: '100%',
-                    height: '32px',
-                    padding: '0 10px',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius-sm)',
+                    height: '34px',
+                    padding: '0 12px',
+                    border: '1px solid #CBD5E1',
+                    borderRadius: 6,
                     fontSize: 12.5,
-                    color: 'var(--text-primary)',
+                    color: '#0F172A',
                     fontFamily: 'var(--font-mono)'
                   }}
                 />
@@ -508,59 +553,75 @@ export const ComplaintForm: React.FC = () => {
         {/* SECTION 3: DEFECT CLASSIFICATION & DESCRIPTION */}
         <div>
           <div style={{
-            ...typography.sectionHeaderLabel,
-            paddingBottom: 6,
-            borderBottom: '1px solid var(--border)',
-            marginBottom: 12,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            paddingBottom: 8,
+            borderBottom: '1px solid #E2E8F0',
+            marginBottom: 14
           }}>
-            <span>3. Defect Classification & Description</span>
-            <span style={{ fontSize: 10, fontWeight: 400, textTransform: 'none', color: 'var(--text-muted)' }}>
-              Verbatim complaint narrative & categorization
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{
+                width: 22,
+                height: 22,
+                borderRadius: '50%',
+                backgroundColor: '#EEF2FF',
+                color: '#4F46E5',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 11,
+                fontWeight: 800
+              }}>
+                3
+              </div>
+              <span style={{ fontSize: 13.5, fontWeight: 700, color: '#0F172A' }}>
+                Defect Description & Categorization
+              </span>
+            </div>
+            <span style={{ fontSize: 11.5, color: '#64748B', fontWeight: 500 }}>
+              Verbatim observation narrative
             </span>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-              <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 4 }}>
-                  Complaint Classification
-                </label>
-                <EvidencePopover
-                  label="Complaint Type"
-                  provenance={formData.field_provenance?.complaint_type}
-                  onOpenEvidence={() => setActiveHistoryField('complaint_type')}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ maxWidth: '320px' }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 5 }}>
+                Complaint Classification
+              </label>
+              <EvidencePopover
+                label="Complaint Type"
+                provenance={formData.field_provenance?.complaint_type}
+                onOpenEvidence={() => setActiveHistoryField('complaint_type')}
+              >
+                <select
+                  value={formData.complaint_type || 'Foreign Matter'}
+                  onChange={(e) => handleChange('complaint_type', e.target.value)}
+                  style={{
+                    width: '100%',
+                    height: '34px',
+                    padding: '0 10px',
+                    border: '1px solid #CBD5E1',
+                    borderRadius: 6,
+                    fontSize: 12.5,
+                    color: '#0F172A',
+                    backgroundColor: '#FFFFFF',
+                    fontWeight: 500
+                  }}
                 >
-                  <select
-                    value={formData.complaint_type || 'Foreign Matter'}
-                    onChange={(e) => handleChange('complaint_type', e.target.value)}
-                    style={{
-                      width: '100%',
-                      height: '32px',
-                      padding: '0 8px',
-                      border: '1px solid var(--border)',
-                      borderRadius: 'var(--radius-sm)',
-                      fontSize: 12.5,
-                      color: 'var(--text-primary)',
-                      backgroundColor: 'var(--bg-surface)'
-                    }}
-                  >
-                    <option value="Foreign Matter">Foreign Matter / Particulate</option>
-                    <option value="Packaging Defect">Packaging Defect / Seal Integrity</option>
-                    <option value="Out of Specification">Out of Specification (Assay/Potency)</option>
-                    <option value="Labeling Error">Labeling / Artwork Defect</option>
-                    <option value="Adverse Event">Clinical / Adverse Event</option>
-                    <option value="Other">Other Quality Discrepancy</option>
-                  </select>
-                </EvidencePopover>
-              </div>
+                  <option value="Foreign Matter">Foreign Matter / Particulate</option>
+                  <option value="Packaging Defect">Packaging Defect / Seal Integrity</option>
+                  <option value="Out of Specification">Out of Specification (Assay/Potency)</option>
+                  <option value="Labeling Error">Labeling / Artwork Defect</option>
+                  <option value="Adverse Event">Clinical / Adverse Event</option>
+                  <option value="Other">Other Quality Discrepancy</option>
+                </select>
+              </EvidencePopover>
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 4 }}>
-                Detailed Description *
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 5 }}>
+                Detailed Description & Findings *
               </label>
               <EvidencePopover
                 label="Detailed Description"
@@ -570,18 +631,19 @@ export const ComplaintForm: React.FC = () => {
                 <textarea
                   value={formData.detailed_description || ''}
                   onChange={(e) => handleChange('detailed_description', e.target.value)}
-                  placeholder="Enter complete customer complaint description, observations, and initial containment steps..."
+                  placeholder="Enter complete customer complaint narrative, batch observations, and initial containment steps..."
                   rows={4}
                   style={{
                     width: '100%',
-                    padding: '8px 10px',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius-sm)',
+                    padding: '10px 12px',
+                    border: '1px solid #CBD5E1',
+                    borderRadius: 6,
                     fontSize: 12.5,
-                    lineHeight: 1.45,
-                    color: 'var(--text-primary)',
+                    lineHeight: 1.5,
+                    color: '#0F172A',
                     outline: 'none',
-                    resize: 'vertical'
+                    resize: 'vertical',
+                    fontWeight: 500
                   }}
                 />
               </EvidencePopover>
@@ -592,23 +654,40 @@ export const ComplaintForm: React.FC = () => {
         {/* SECTION 4: QUALITY RISK ASSESSMENT */}
         <div>
           <div style={{
-            ...typography.sectionHeaderLabel,
-            paddingBottom: 6,
-            borderBottom: '1px solid var(--border)',
-            marginBottom: 12,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            paddingBottom: 8,
+            borderBottom: '1px solid #E2E8F0',
+            marginBottom: 14
           }}>
-            <span>4. Quality Risk Assessment</span>
-            <span style={{ fontSize: 10, fontWeight: 400, textTransform: 'none', color: 'var(--text-muted)' }}>
-              ICH Q9 defect severity & operational urgency
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{
+                width: 22,
+                height: 22,
+                borderRadius: '50%',
+                backgroundColor: '#EEF2FF',
+                color: '#4F46E5',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 11,
+                fontWeight: 800
+              }}>
+                4
+              </div>
+              <span style={{ fontSize: 13.5, fontWeight: 700, color: '#0F172A' }}>
+                Quality Risk Assessment (ICH Q9)
+              </span>
+            </div>
+            <span style={{ fontSize: 11.5, color: '#64748B', fontWeight: 500 }}>
+              Defect severity & SLA prioritization
             </span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 4 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 5 }}>
                 Defect Severity
               </label>
               <EvidencePopover
@@ -621,13 +700,14 @@ export const ComplaintForm: React.FC = () => {
                   onChange={(e) => handleChange('severity', e.target.value as SeverityLevel)}
                   style={{
                     width: '100%',
-                    height: '32px',
-                    padding: '0 8px',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius-sm)',
+                    height: '34px',
+                    padding: '0 10px',
+                    border: '1px solid #CBD5E1',
+                    borderRadius: 6,
                     fontSize: 12.5,
-                    color: 'var(--text-primary)',
-                    backgroundColor: 'var(--bg-surface)'
+                    color: '#0F172A',
+                    backgroundColor: '#FFFFFF',
+                    fontWeight: 600
                   }}
                 >
                   <option value="Critical">Critical (Immediate Health Hazard)</option>
@@ -639,7 +719,7 @@ export const ComplaintForm: React.FC = () => {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', marginBottom: 4 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 5 }}>
                 Investigation Priority
               </label>
               <EvidencePopover
@@ -652,13 +732,14 @@ export const ComplaintForm: React.FC = () => {
                   onChange={(e) => handleChange('priority', e.target.value as PriorityLevel)}
                   style={{
                     width: '100%',
-                    height: '32px',
-                    padding: '0 8px',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius-sm)',
+                    height: '34px',
+                    padding: '0 10px',
+                    border: '1px solid #CBD5E1',
+                    borderRadius: 6,
                     fontSize: 12.5,
-                    color: 'var(--text-primary)',
-                    backgroundColor: 'var(--bg-surface)'
+                    color: '#0F172A',
+                    backgroundColor: '#FFFFFF',
+                    fontWeight: 600
                   }}
                 >
                   <option value="Urgent">Urgent (24-Hour SLA)</option>
@@ -677,8 +758,8 @@ export const ComplaintForm: React.FC = () => {
         <div style={{
           position: 'fixed',
           inset: 0,
-          backgroundColor: 'rgba(17, 24, 39, 0.4)',
-          backdropFilter: 'blur(2px)',
+          backgroundColor: 'rgba(15, 23, 42, 0.55)',
+          backdropFilter: 'blur(4px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -686,48 +767,49 @@ export const ComplaintForm: React.FC = () => {
           padding: 16
         }}>
           <div style={{
-            backgroundColor: 'var(--bg-surface)',
-            borderRadius: 'var(--radius-modal)',
-            border: '1px solid var(--border)',
+            backgroundColor: '#FFFFFF',
+            borderRadius: 12,
+            border: '1px solid #E2E8F0',
             boxShadow: 'var(--shadow-modal)',
             width: '100%',
-            maxWidth: '480px',
+            maxWidth: '500px',
             overflow: 'hidden'
-          }}>
+          }} className="animate-slide-up">
             <div style={{
-              padding: '14px 18px',
-              borderBottom: '1px solid var(--border)',
+              padding: '16px 20px',
+              borderBottom: '1px solid #E2E8F0',
               display: 'flex',
               justifyContent: 'space-between',
-              alignItems: 'center'
+              alignItems: 'center',
+              backgroundColor: '#FAFAFC'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <History size={14} style={{ color: 'var(--primary)' }} />
-                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <History size={15} style={{ color: '#4F46E5' }} />
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#0F172A' }}>
                   Field Lineage: {activeHistoryField.replace('_', ' ')}
                 </span>
               </div>
               <button
                 onClick={() => setActiveHistoryField(null)}
-                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+                style={{ background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', padding: 4 }}
               >
-                <X size={14} />
+                <X size={15} />
               </button>
             </div>
 
-            <div style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
               {activeProvenance ? (
                 <>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                    <div>
-                      <div style={typography.metadata}>Source Origin</div>
-                      <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', marginTop: 2 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div style={{ backgroundColor: '#F8FAFC', padding: '10px 12px', borderRadius: 8, border: '1px solid #E2E8F0' }}>
+                      <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600, textTransform: 'uppercase' }}>Source Origin</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', marginTop: 3 }}>
                         {activeProvenance.source_type || 'User Manual Edit'}
                       </div>
                     </div>
-                    <div>
-                      <div style={typography.metadata}>Confidence Score</div>
-                      <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', marginTop: 2 }}>
+                    <div style={{ backgroundColor: '#F8FAFC', padding: '10px 12px', borderRadius: 8, border: '1px solid #E2E8F0' }}>
+                      <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600, textTransform: 'uppercase' }}>Confidence Score</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#059669', marginTop: 3 }}>
                         {activeProvenance.confidence ? `${Math.round(activeProvenance.confidence * 100)}%` : '100%'}
                       </div>
                     </div>
@@ -735,16 +817,16 @@ export const ComplaintForm: React.FC = () => {
 
                   {activeProvenance.text_span && (
                     <div>
-                      <div style={typography.metadata}>Verbatim Evidence Span</div>
+                      <div style={{ fontSize: 11.5, color: '#64748B', fontWeight: 600, marginBottom: 5 }}>Verbatim Evidence Text Span</div>
                       <div style={{
-                        fontSize: 12,
+                        fontSize: 12.5,
                         fontStyle: 'italic',
-                        color: 'var(--text-primary)',
-                        backgroundColor: 'var(--bg-subtle)',
-                        padding: '8px 10px',
-                        borderRadius: 'var(--radius-sm)',
-                        border: '1px solid var(--border)',
-                        marginTop: 4
+                        color: '#1E293B',
+                        backgroundColor: '#EEF2FF',
+                        padding: '10px 12px',
+                        borderRadius: 8,
+                        border: '1px solid #C7D2FE',
+                        lineHeight: 1.5
                       }}>
                         "{activeProvenance.text_span}"
                       </div>
@@ -752,38 +834,35 @@ export const ComplaintForm: React.FC = () => {
                   )}
 
                   {activeProvenance.page_number !== undefined && activeProvenance.page_number !== null && (
-                    <div>
-                      <div style={typography.metadata}>Page Attribution</div>
-                      <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
-                        Page {activeProvenance.page_number}
-                      </div>
+                    <div style={{ fontSize: 12, color: '#64748B', fontWeight: 500 }}>
+                      Document Page Attribution: <strong style={{ color: '#0F172A' }}>Page {activeProvenance.page_number}</strong>
                     </div>
                   )}
                 </>
               ) : (
-                <div style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', padding: '16px 0' }}>
+                <div style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', padding: '24px 0' }}>
                   No automated AI provenance recorded for this field.
                 </div>
               )}
             </div>
 
             <div style={{
-              padding: '10px 18px',
-              borderTop: '1px solid var(--border)',
-              backgroundColor: 'var(--bg-subtle)',
+              padding: '12px 20px',
+              borderTop: '1px solid #E2E8F0',
+              backgroundColor: '#FAFAFC',
               display: 'flex',
               justifyContent: 'flex-end'
             }}>
               <button
                 onClick={() => setActiveHistoryField(null)}
                 style={{
-                  padding: '5px 12px',
-                  backgroundColor: 'var(--bg-surface)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius-sm)',
-                  fontSize: 12,
-                  fontWeight: 500,
-                  color: 'var(--text-primary)',
+                  padding: '6px 14px',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #CBD5E1',
+                  borderRadius: 6,
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  color: '#0F172A',
                   cursor: 'pointer'
                 }}
               >
