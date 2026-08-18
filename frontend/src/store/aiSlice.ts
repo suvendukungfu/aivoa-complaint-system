@@ -27,17 +27,16 @@ interface AIState {
 const initialWelcomeMessage: ChatMessage = {
   id: 'welcome-1',
   sender: 'assistant',
-  text: `👋 **Welcome to AIVOA Quality Co-pilot.**
+  text: `**AIVOA Quality Copilot**
+Assistant for Pharmaceutical Complaint Intake & Risk Triage.
 
-I am your AI assistant for Pharmaceutical Complaint Intake & Risk Triage.
-
-**How I can assist you:**
-• **Natural-Language Logging:** Type raw complaint emails, customer reports, or quality queries.
+**Available Capabilities:**
+• **Natural-Language Logging:** Enter raw complaint emails, customer reports, or quality observations.
 • **Document Ingestion:** Drag and drop **PDF, DOCX, TXT, or EML** files.
-• **Natural-Language Edits:** Say *"Change the affected quantity to 40 kg"* or *"Change batch number to PA240813"*.
-• **Automated QMS Triage:** Instant severity/priority scoring and audit trails.
+• **Controlled Record Edits:** Request field changes such as *"Update affected quantity to 40 kg"* or *"Set batch number to PA240813"*.
+• **Automated QMS Triage:** Deterministic severity scoring, evidence extraction, and audit trails.
 
-*Try selecting a sample prompt or upload a sample document below to begin.*`,
+*Select a quick action or upload a file below to begin.*`,
   timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 };
 

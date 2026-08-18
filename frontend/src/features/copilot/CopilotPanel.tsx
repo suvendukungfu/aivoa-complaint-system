@@ -97,6 +97,69 @@ export const CopilotPanel: React.FC = () => {
     setInput(actionText);
   };
 
+  const renderFormattedMessage = (text: string, isUser: boolean) => {
+    if (!text) return null;
+    const lines = text.split('\n');
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {lines.map((line, lineIdx) => {
+          const trimmed = line.trim();
+          if (!trimmed) {
+            return <div key={lineIdx} style={{ height: 4 }} />;
+          }
+
+          const isBullet = trimmed.startsWith('•') || trimmed.startsWith('- ') || trimmed.startsWith('* ');
+          const content = isBullet ? trimmed.replace(/^[•\-*]\s*/, '') : trimmed;
+
+          const parts: React.ReactNode[] = [];
+          let lastIndex = 0;
+          const regex = /(\*\*.*?\*\*|\*.*?\*)/g;
+          let match: RegExpExecArray | null;
+
+          while ((match = regex.exec(content)) !== null) {
+            if (match.index > lastIndex) {
+              parts.push(content.slice(lastIndex, match.index));
+            }
+            const token = match[0];
+            if (token.startsWith('**') && token.endsWith('**')) {
+              parts.push(
+                <strong key={`b-${match.index}`} style={{ fontWeight: 700, color: isUser ? '#FFFFFF' : '#0F172A' }}>
+                  {token.slice(2, -2)}
+                </strong>
+              );
+            } else if (token.startsWith('*') && token.endsWith('*')) {
+              parts.push(
+                <em key={`i-${match.index}`} style={{ fontStyle: 'italic', opacity: 0.9 }}>
+                  {token.slice(1, -1)}
+                </em>
+              );
+            }
+            lastIndex = regex.lastIndex;
+          }
+          if (lastIndex < content.length) {
+            parts.push(content.slice(lastIndex));
+          }
+
+          if (isBullet) {
+            return (
+              <div key={lineIdx} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, paddingLeft: 2 }}>
+                <span style={{ color: isUser ? '#FFFFFF' : '#4F46E5', fontWeight: 700, fontSize: 13, lineHeight: '18px' }}>•</span>
+                <span style={{ flex: 1, lineHeight: 1.45 }}>{parts}</span>
+              </div>
+            );
+          }
+
+          return (
+            <div key={lineIdx} style={{ lineHeight: 1.45 }}>
+              {parts}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <div style={{
       display: 'flex',
@@ -372,7 +435,7 @@ export const CopilotPanel: React.FC = () => {
                     boxShadow: msg.sender === 'user' ? '0 2px 6px rgba(79, 70, 229, 0.25)' : '0 1px 2px rgba(0,0,0,0.02)',
                     fontWeight: 500
                   }}>
-                    {msg.text}
+                    {renderFormattedMessage(msg.text, msg.sender === 'user')}
 
                     {/* Updated fields tags */}
                     {msg.updatedFields && msg.updatedFields.length > 0 && (
